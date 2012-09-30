@@ -5,8 +5,8 @@
 *.pyc
 
 # Data files
-data/
-*.nc
+data/*.nc
+
 
 # Build directories
 build/
