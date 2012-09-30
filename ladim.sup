@@ -1,0 +1,30 @@
+# Setup file for pyladim
+#
+
+# -------------
+# Time section
+# -------------
+
+# Options considered:
+# ------------------
+# start_time : [yyyy-mm-dd hh:mm:ss]
+# dt         : time step [seconds], optional, default = 3600
+# stop_time  : [yyyy-mm-dd hh:mm:ss], optional
+# nsteps     : Number of time steps, optional
+#
+# At least one of stop_time or nsteps must be defined
+ 
+[time]
+start_time = 1989-06-01 12:00:00
+stop_time = 1989-06-04 15:00:00
+#dt = 7200
+nsteps = 24
+
+# --------------------
+# File section
+# --------------------
+
+grid_file   : ./data/ocean_avg_0014.nc
+input_file  : ./data/ocean_avg_0014.nc
+#output_file : None
+

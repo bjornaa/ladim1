@@ -1,0 +1,19 @@
+# Backup files from emacs
+*~
+
+# Byte-compiled python code
+*.pyc
+
+# Data files
+data/
+*.nc
+
+# Build directories
+build/
+doc/build
+
+# Object code
+*.o
+
+
+
