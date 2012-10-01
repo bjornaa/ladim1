@@ -24,5 +24,32 @@ differential equations
 .. math:: \frac{d X}{d t} = U(X(t), Y(t), z, t) \quad
           \frac{d Y}{d t} = V(X(t), Y(t), z, t)
 
+[characteristic curves]
 
-  
+Coordinate systems
+------------------
+
+Let :math:`x,  y` be an *orthogonal* curvilinear coordinate system for
+an ocean domain, with a metric given as
+
+.. math:: g = 
+       \frac{1}{m^2} dx \otimes dx
+     + \frac{1}{n^2} dy \otimes dy
+
+With a given velocity field :math:`\vec{U}` with components
+:math:`u, v`.
+
+
+
+As an example, the longitude-latitude system is given by
+longitude :math:`x = \lambda` and latitude :math:`y = \phi`
+in radians. This is an ortogonal system with metric terms
+
+.. math:: m = \frac{1}{R \cos \phi} \quad n = \frac{1}{R}
+
+The particle tracking is given by
+
+.. math:: \dot{x} = m u \quad \dot{y} = n v
+
+Correction if given in degrees.
+
