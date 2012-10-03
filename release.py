@@ -17,20 +17,31 @@
 # Bedre ha klasse (eller dictionary for output) 
 # pluss generator
 
+import numpy as np
+
 class ParticleReleaser(object):
 
     def __init__(self, particle_release_file):
+        
+        # Open the file and init counters
         self.fid = open(particle_release_file)
         self.particle_counter = 0
         self.release_step = 0
-        # Read to first time line 
-        # Alternativt ikke bruke T på denne
-        # Nå: Leser ikke tiden.
+        
+        # Init empty particle release values
+        self._pid, self._start = [], []
+        self._X, self._Y, self._Z  = [], [], []
+        self.pid   = np.array(self._pid)
+        self.X     = np.array(self._X)
+        self.Y     = np.array(self._Y)
+        self.Z     = np.array(self._Z)
+        self.start = np.array(self._start)
+
+        # Read until first time line
         for line in self.fid:
-            print line
             if line[0] == 'T' : break
 
-    def read_particles(self):
+    def read_particles(self):  # Leser til neste "T"
 
         for line in self.fid:
 
@@ -42,27 +53,28 @@ class ParticleReleaser(object):
 
             # Skip comments
             if line[0] in ['#','!']: continue
-
-            print line
             
             if line[0] == 'G':   # Grid coordinates
+                self.particle_counter += 1   # New particle
+
+                # Add particle characteristics to accumulators
                 w = line.split()
-                self.particle_counter += 1
-                X.append(float(w[1]))
-                Y.append(float(w[2]))
-                Z.append(float(w[3]))
-                start.append(release_step)
-                pid.append(particle_counter)
- 
+                self._pid.append(self.particle_counter)
+                self._X.append(float(w[1]))
+                self._Y.append(float(w[2]))
+                self._Z.append(float(w[3]))
+                self._start.append(self.release_step)
+                 
             if line[0] == "T": # Time line
-                # Break 
-                self.X = np.array(X)
-                self.Y = np.array(Y)
-                self.Z = np.array(Z)
-                self.start = np.array(start)  # Bedre navn
-                self.pid = np.array(pid)
-                #yield()
-                break
+
+                # Make arrays of the accumulators
+                self.pid   = np.array(self._pid)
+                self.X     = np.array(self._X)
+                self.Y     = np.array(self._Y)
+                self.Z     = np.array(self._Z)
+                self.start = np.array(self._start)
+
+                # Next release step
                 if line[1] == "R":  # Relative time
                     w = line.split()
                     tdelta = int(w[1])
@@ -71,18 +83,35 @@ class ParticleReleaser(object):
                         tdelta = tdelta*3600
                     elif units[0] == 'd': 
                         tdelta = tdelta*24*3600
-                    release_step = tdelta // setup['dt']
-                    print "next release step = ", release_step
-                X, Y, Z, start = [], [], [], []
+                    self.release_step = tdelta // setup['dt']
+                    #print "next release step = ", release_step
 
+                # Initialise accumulators for next step
+                self._pid, self._start = [], []
+                self._X, self._Y, self._Z  = [], [], []
 
+                # Pause the file reading, returning control to caller
+                break
+
+        # If not end of file, line is non-empty (starting with "T")
+        if not line:  
+            #print "==>  end of file"
+
+            # Save last array versions of the accumultators
+            self.pid   = np.array(self._pid)
+            self.X     = np.array(self._X)
+            self.Y     = np.array(self._Y)
+            self.Z     = np.array(self._Z)
+            self.start = np.array(self._start)
+            # Indicate end of file by impossible value for release_step
+            self.release_step = -99  
             
+            
+    def close(self):
+        self.fid.close()
 
 
-
-
-
-
+# ==================================================
 
 if __name__ == "__main__":
 
@@ -90,9 +119,21 @@ if __name__ == "__main__":
     setup = readsup('ladim.sup')
     particle_release_file = 'particles.in'
     p = ParticleReleaser('particles.in')
-    p.read_particles()
-    #p.read_particles()
-    print p.X
+
+    while 1:
+        
+        #print "==> ", p.release_step, p.particle_counter
+        p.read_particles()
+        #print p.X
+        for i in range(len(p.X)):
+            #print " == ", i
+            print "%8d %8.2f %8.2f %8.2f %6d" % (
+                p.pid[i], p.X[i], p.Y[i], p.Z[i], p.start[i])
+        if p.release_step < 0: break
+        
+    p.close()
+    
+    #print p.X
 
 
     
