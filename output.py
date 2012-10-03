@@ -4,12 +4,13 @@ from netCDF4 import Dataset
 
 class OutPut(object):
 
-    def __init__(self, setup, outfile, outper, Nout):
+    def __init__(self, setup):
 
-        nc = Dataset(outfile, mode='w', format="NETCDF3_CLASSIC")
+        nc = Dataset(setup['output_filename'], mode='w', 
+                     format="NETCDF3_CLASSIC")
     
         nc.createDimension('Particle_Index', None)
-        nc.createDimension('Time', Nout)
+        nc.createDimension('Time', setup['Nout'])
 
         v = nc.createVariable('time', 'float64', ('Time'))
         v.units = 'seconds since %s' % setup['start_time']
@@ -22,10 +23,10 @@ class OutPut(object):
         #v = nc.createVariable('Z', 'float32', ('Particle_Index', 'Time'))
 
         self.nc = nc
-        self.Nout = Nout
+        #self.Nout = Nout
         self.outcount = 0
         self.pStart   = 0
-        self.outstep  =  outper*setup['dt']      # Ta fra setup
+        self.outstep  =  setup['output_period']*setup['dt']      
 
     def write(self, step, X, Y):
         

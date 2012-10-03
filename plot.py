@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset, num2date
 
-f = Dataset('a.nc')
+f = Dataset('pyladim_out.nc')
 
 t = 6
 

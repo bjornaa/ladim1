@@ -48,3 +48,26 @@ FISH-PTM  :
 
 Sjekke referanser
 D.W. Dunsbergen doktoravhandling 1994
+
+
+2012-10-03
+----------
+
+Gjort en god del med modellen.
+
+Tanker videre:
+
+Lage til liten analyse-pakke
+(og preprossesring)
+
+particle-release:
+Ta i init beregne lon-lat => x, y
+eller ha dette som preprosessering, utenom modellen
+
+Omregning etterpå til lengde/bredde (unødig å lagre)
+Enkel plotting, alle partikler tid t
+(bruke gridfilen også, finne den automatisk om en er på dette systemet)
+Animering
+
+
+

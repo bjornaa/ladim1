@@ -8,7 +8,7 @@
 # Options considered:
 # ------------------
 # start_time : [yyyy-mm-dd hh:mm:ss]
-# dt         : time step [seconds], optional, default = 3600
+# dt         : time step duration [seconds], optional, default = 3600
 # stop_time  : [yyyy-mm-dd hh:mm:ss], optional
 # nsteps     : Number of time steps, optional
 #
@@ -20,11 +20,36 @@ stop_time = 1989-06-04 15:00:00
 #dt = 7200
 nsteps = 24
 
-# --------------------
-# File section
-# --------------------
+# --------------
+# Input section
+# --------------
+# Forbedre til sekvens av input-filer
+# Hva med vertikal info?
+# Kutte område?
 
 grid_file   : ./data/ocean_avg_0014.nc
 input_file  : ./data/ocean_avg_0014.nc
 #output_file : None
+
+
+# ----------------
+# Output section
+# ----------------
+
+# Options
+# -------
+# output_filename        : Name of netCDF file with output
+# 
+# output_period          : output period, optional [time steps]
+# output_period_seconds  : output period, optional [seconds]
+# output_period_hours    : output period, optional [hours]
+#
+# Exactly one of these output_periods must be defined
+# The period must be divisible with the time step dt
+
+output_filename = pyladim_out.nc
+output_period = 12
+output_period_hours = 12
+#output_period_seconds = 3600
+
 
