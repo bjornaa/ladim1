@@ -1,0 +1,58 @@
+# particles.in
+# 
+# Particle release file for LADIM
+#
+# 3 types of lines
+# time-lines, position-lines and comment-lines (and blank lines)
+#
+# Comment lines start with an exclamation mark ("!") or sharp ("#") 
+# in first position
+#
+# Time lines have a "T" if first position and has one of the 
+# following formats for relative or absolute time
+#
+# Relative time since start of simulation
+#     Format:  TR dtime dtime_unit
+#  where dtime_unit = "days" or "hours" or "seconds"
+#  dtime is the integer number of dtime_units relative to the
+#  start of the LADIM run.
+#  
+#     Example: TR 36 hours
+#
+# Absolute time in ISO format:
+#     Format: TA yyyy-mm-dd hh:mm:ss
+#
+# Example: TA 2004-12-08 12:00:00
+#
+#
+# Position lines have the format
+# ('A1', F, 'X', F, 'X', F)
+# The first character is S (Sphere) for position in longitude, latitude
+# or G (Grid) for position in grid coordinates
+# The following two numbers are the X and Y coordinate, followed by
+# the release depth 
+#
+# Hvor ta multiplisitet ?
+ 
+# Starter umiddelbart
+TR 0 hours
+
+G  96.0 100.0 30.0
+G  98.0 100.0 30.0
+G 100.0 100.0 30.0
+G 102.0 100.0 30.0
+G 104.0 100.0 30.0
+G 108.0 100.0 30.0
+G 110.0 100.0 30.0
+G 112.0 100.0 30.0
+G 114.0 100.0 30.0
+G 118.0 100.0 30.0
+G 120.0 100.0 30.0
+G 122.0 100.0 30.0
+
+
+
+
+
+
+
