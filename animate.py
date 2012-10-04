@@ -4,31 +4,38 @@ from netCDF4 import Dataset, num2date
 import roppy
 from roppy.mpl_util import landmask
 
+# ---------------
+# User settings
+# ---------------
+
+# Files
+particle_file  = './output/pyladim_out.nc'
+roms_file = 'data/ocean_avg_0014.nc'
+
+# Subgrid definition
 i0, j0 = 70,   80
-i1, j1 = 140, 130
+i1, j1 = 150, 133
 
+# ----------------
 
-f0 = Dataset('data/ocean_avg_0014.nc')
+# ROMS grid, plot domain
+
+f0 = Dataset(roms_file)
 g = roppy.SGrid(f0, subgrid=(i0,i1,j0,j1))
 
-#f  = Dataset('/tmp/pyladim_out.nc')
-f  = Dataset('pyladim_out.nc')
+#
+print particle_file
+f  = Dataset(particle_file)
 
 Ntimes = len(f.dimensions['Time'])
 
-#Xc, Yc = np.loadtxt("./data/ns8_coast.dat", unpack=True)
-#Xc = Xc - i0
-#Yc = Yc - j0
-
-#H = f0.variables['h'][:,:]
-
-fig = plt.figure()
-ax = fig.add_subplot(1,1,1)
-#ax.set_xlim(70,140)
-#ax.set_ylim(80,130)
-#ax.axis('image')
+# ------------------
+# Utility functions
+# ------------------
 
 def read(t):
+    """Read the particles at given time frame"""
+    
     p0 = f.variables['pStart'][t]
     Npart = f.variables['pCount'][t]
     tid = f.variables['time'][t]
@@ -51,21 +58,27 @@ def animate():
         ax.set_title(tstring)
         fig.canvas.draw()
 
-X, Y, tstring = read(0)
 
+# Create a figure
+
+fig = plt.figure(figsize=(12,8))
+ax = fig.add_subplot(1,1,1)
+
+# Make background map
 cmap = plt.get_cmap('Blues')
-
-ax.contourf(g.h, cmap=cmap)
-#ax.contour(g.h, levels = [10.0], colors='black', linewidths=2.5)
+h = ax.contourf(g.h, cmap=cmap)
+#fig.colorbar(h)
 roppy.mpl_util.landmask(g.mask_rho, (0.6, 0.8, 0.0))
 
-#plt.fill(Xc, Yc, edgecolor=(0.6, 0.8, 0.0))
-
-
+# Plot initial particle distribution
+X, Y, tstring = read(0)
 h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(tstring)
 
-
+# Do the animation
 fig.canvas.manager.window.after(100, animate)
+
+# Show the results
+plt.axis('image')
 plt.show()
 

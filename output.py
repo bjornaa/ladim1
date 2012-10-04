@@ -28,23 +28,33 @@ class OutPut(object):
         self.pStart   = 0
         self.outstep  =  setup['output_period']*setup['dt']      
 
-    def write(self, step, pid, X, Y):
+    # --------------
+ 
+    def write(self, pid, X, Y):
+        """
+        Write a particle distribution
+        """
         
         Npar = len(X)
         t = self.outcount
         nc = self.nc
+
+        # Write to time variables
         nc.variables['pStart'][t] = self.pStart
-        nc.variables['pCount'][t] = Npar           # Gjøre dette bedre
-        #nc.variables['X'][self.pStart:self.pStart+Npar] = X
-        #nc.variables['Y'][self.pStart:self.pStart+Npar] = Y
-        # Må ta en og en for å legge til i ubegrenset dimensjon??
+        nc.variables['pCount'][t] = Npar     
         nc.variables['time'][t] = t * self.outstep
-        nc.variables['pid'][self.pStart:self.pStart+Npar] = pid
-        nc.variables['X'][self.pStart:self.pStart+Npar] = X
-        nc.variables['Y'][self.pStart:self.pStart+Npar] = Y
-  
+
+        # Write to particle properties
+        T = slice(self.pStart, self.pStart + Npar)
+        nc.variables['pid'][T] = pid
+        nc.variables['X'][T] = X
+        nc.variables['Y'][T] = Y
+
+        # Write 
         self.pStart += Npar
         self.outcount += 1
+
+    # --------------
 
     def close(self):
 
