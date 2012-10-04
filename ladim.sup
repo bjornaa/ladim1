@@ -48,7 +48,7 @@ input_file  : ./data/ocean_avg_0014.nc
 # Exactly one of these output_periods must be defined
 # The period must be divisible with the time step dt
 
-output_filename = /tmp/pyladim_out.nc
+output_filename = output/pyladim_out.nc
 #output_period = 3
 output_period_hours = 3
 #output_period_seconds = 3600
