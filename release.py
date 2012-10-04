@@ -2,27 +2,15 @@
 
 # Particle release class
 
-# File format
-# columns x, y, z, relative time (in hours)
-
-# Vil ha ut, nye partikler + tidspunkt for ny
-# HA dette som en generator
-# initielt: particle_counter = 0, 
-# etter kall: oppdateret particle_counter, 
-#     dictionary med nye partikler (arrays)
-#     +tid for ny
-
-# Ha dette som klasse 
-
-# Bedre ha klasse (eller dictionary for output) 
-# pluss generator
 
 import numpy as np
 
 class ParticleReleaser(object):
 
-    def __init__(self, particle_release_file):
+    def __init__(self, particle_release_file, dt):
         
+        self.dt = dt   # Finne annen måte å få tak i denne setup-info?
+
         # Open the file and init counters
         self.fid = open(particle_release_file)
         self.particle_counter = 0
@@ -31,19 +19,37 @@ class ParticleReleaser(object):
         # Init empty particle release values
         self._pid, self._start = [], []
         self._X, self._Y, self._Z  = [], [], []
-        self.pid   = np.array(self._pid)
-        self.X     = np.array(self._X)
-        self.Y     = np.array(self._Y)
-        self.Z     = np.array(self._Z)
-        self.start = np.array(self._start)
+        self.pid   = np.array(self._pid, dtype='int')
+        self.X     = np.array(self._X, dtype='float32')
+        self.Y     = np.array(self._Y, dtype='float32')
+        self.Z     = np.array(self._Z, dtype='float32')
+        self.start = np.array(self._start, dtype='int')
 
         # Read until first time line
         for line in self.fid:
             if line[0] == 'T' : break
 
+    # ------
+
     def read_particles(self):  # Leser til neste "T"
 
-        for line in self.fid:
+        #for line in self.fid:
+        while 1:
+            try:
+                line = self.fid.next()
+            except StopIteration:
+                print "==>  end of file"
+
+                # Save last array versions of the accumultators
+                self.pid   = np.array(self._pid)
+                self.X     = np.array(self._X)
+                self.Y     = np.array(self._Y)
+                self.Z     = np.array(self._Z)
+                self.start = np.array(self._start)
+                # Indicate end of file by impossible value for release_step
+                self.release_step = -99  
+                break
+            
 
             # Remove trailing white space
             line = line.strip()  
@@ -83,7 +89,7 @@ class ParticleReleaser(object):
                         tdelta = tdelta*3600
                     elif units[0] == 'd': 
                         tdelta = tdelta*24*3600
-                    self.release_step = tdelta // setup['dt']
+                    self.release_step = tdelta // self.dt
                     #print "next release step = ", release_step
 
                 # Initialise accumulators for next step
@@ -93,20 +99,8 @@ class ParticleReleaser(object):
                 # Pause the file reading, returning control to caller
                 break
 
-        # If not end of file, line is non-empty (starting with "T")
-        if not line:  
-            #print "==>  end of file"
+    # --------            
 
-            # Save last array versions of the accumultators
-            self.pid   = np.array(self._pid)
-            self.X     = np.array(self._X)
-            self.Y     = np.array(self._Y)
-            self.Z     = np.array(self._Z)
-            self.start = np.array(self._start)
-            # Indicate end of file by impossible value for release_step
-            self.release_step = -99  
-            
-            
     def close(self):
         self.fid.close()
 
@@ -115,10 +109,15 @@ class ParticleReleaser(object):
 
 if __name__ == "__main__":
 
+    import sys
     from setup import readsup
     setup = readsup('ladim.sup')
-    particle_release_file = 'particles.in'
-    p = ParticleReleaser('particles.in')
+    #print sys.argv
+    if len(sys.argv) > 1:
+        particle_release_file = sys.argv[1]
+    else:
+        particle_release_file = 'particles.in'
+    p = ParticleReleaser(particle_release_file, dt=3600)
 
     while 1:
         
