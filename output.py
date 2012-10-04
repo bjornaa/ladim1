@@ -28,7 +28,7 @@ class OutPut(object):
         self.pStart   = 0
         self.outstep  =  setup['output_period']*setup['dt']      
 
-    def write(self, step, X, Y):
+    def write(self, step, pid, X, Y):
         
         Npar = len(X)
         t = self.outcount
@@ -39,9 +39,9 @@ class OutPut(object):
         #nc.variables['Y'][self.pStart:self.pStart+Npar] = Y
         # Må ta en og en for å legge til i ubegrenset dimensjon??
         nc.variables['time'][t] = t * self.outstep
-        for p in range(Npar):
-            nc.variables['X'][self.pStart+p] = X[p]
-            nc.variables['Y'][self.pStart+p] = Y[p]
+        nc.variables['pid'][self.pStart:self.pStart+Npar] = pid
+        nc.variables['X'][self.pStart:self.pStart+Npar] = X
+        nc.variables['Y'][self.pStart:self.pStart+Npar] = Y
   
         self.pStart += Npar
         self.outcount += 1

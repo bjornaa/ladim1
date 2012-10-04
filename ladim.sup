@@ -19,7 +19,7 @@ start_time = 1989-06-01 12:00:00
 #stop_time = 1989-06-04 15:00:00
 stop_time = 1989-06-15 15:00:00
 #dt = 7200
-nsteps = 24
+#nsteps = 24
 
 # --------------
 # Input section
@@ -49,8 +49,8 @@ input_file  : ./data/ocean_avg_0014.nc
 # The period must be divisible with the time step dt
 
 output_filename = /tmp/pyladim_out.nc
-#output_period = 3
-output_period_hours = 24
+output_period = 3
+#output_period_hours = 24
 #output_period_seconds = 3600
 
 

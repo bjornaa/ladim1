@@ -84,7 +84,7 @@ for i in range(nsteps+1):
         
     # Save to file 
     if i % setup['output_period'] == 0:
-        out.write(i, X, Y)
+        out.write(i, pid, X, Y)
     
     # Only use surface forcing presently
     Euler_Forward(inp, inp.U[-1,:,:], inp.V[-1,:,:], X, Y, dt=dt)

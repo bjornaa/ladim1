@@ -62,7 +62,7 @@ roppy.mpl_util.landmask(g.mask_rho, (0.6, 0.8, 0.0))
 #plt.fill(Xc, Yc, edgecolor=(0.6, 0.8, 0.0))
 
 
-h = ax.plot(X, Y, '.', color='red')
+h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(tstring)
 
 
