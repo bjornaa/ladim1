@@ -12,11 +12,6 @@ def total_seconds(tdelta):
     # Included as a function here for older version
     return tdelta.days*86400 + tdelta.seconds
 
-# setup = dictionary med setup info
-
-
-# Alternativ : Ha eget grid objekt
-
 class ROMS_input(SGrid):
     """
     Class for ROMS input, updated fields and static grid info
