@@ -46,6 +46,17 @@ results, as they used prediction velocities closer to zero.
 [Sjekk Heun = 2order Runge-Kutta, sjekk 4th order]
 [Bedre? Høyere orden kontra firste orden og kortere tidsteg]
 
+[Justere litt under, korrigere for q i stedet for x]
+For the second order Runge-Kutta also known as the Heun method or the
+trapezoidal method we have
+
+.. math:: x^{*} = x + u(x) \Delta t, \quad 
+          x^{+} = x + 0.5*(u(x) + u(x^{*})) \Delta t
+
+if :math:`c < 1` then :math:`u(x^{*}) \Delta t = -x(1 - c)` giving
+
+-- math:: x^+ = x + 
+
 
 
 
