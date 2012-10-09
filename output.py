@@ -12,15 +12,15 @@ class OutPut(object):
         nc.createDimension('Particle_Index', None)
         nc.createDimension('Time', setup['Nout'])
 
-        v = nc.createVariable('time', 'float64', ('Time',))
+        v = nc.createVariable('time', 'f8', ('Time',))
         v.units = 'seconds since %s' % setup['start_time']
-        v = nc.createVariable('pStart', 'int', ('Time',))
-        v = nc.createVariable('pCount', 'int', ('Time',))
+        v = nc.createVariable('pStart', 'i', ('Time',))
+        v = nc.createVariable('pCount', 'i', ('Time',))
 
-        v = nc.createVariable('pid', 'int', ('Particle_Index',))
-        v = nc.createVariable('X', 'float32', ('Particle_Index',))
-        v = nc.createVariable('Y', 'float32', ('Particle_Index',))
-        #v = nc.createVariable('Z', 'float32', ('Particle_Index', 'Time'))
+        v = nc.createVariable('pid', 'i', ('Particle_Index',))
+        v = nc.createVariable('X', 'f4', ('Particle_Index',))
+        v = nc.createVariable('Y', 'f4', ('Particle_Index',))
+        #v = nc.createVariable('Z', 'f4', ('Particle_Index', 'Time'))
 
         self.nc = nc
         #self.Nout = Nout
