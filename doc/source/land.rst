@@ -55,8 +55,27 @@ trapezoidal method we have
 
 if :math:`c < 1` then :math:`u(x^{*}) \Delta t = -x(1 - c)` giving
 
--- math:: x^+ = x + 
+Euler Forward
+
+.. math:: \lambda = 1 - c, \quad c < 1
+
+Runge-Kutta 2nd order (Heun)
+
+.. math:: \lambda = 1 - c + \frac{c^2}{2}, \quad c < 1 \\
+          \lambda = 1 - \frac{c}{2},          \quad 1 < c < 2
+
+Midpoint scheme (2 order)
+
+.. math:: \lambda = 1 - c + \frac{c^2}{2}, \quad c < 1 \\
+          \lambda = 1, \quad c > 1
 
 
+Runge-Kutta 4th order
 
+.. math:: \lambda = 1 - c + \frac{c^2}{2} - \frac{c^3}{6}
+                       + \frac{c^4/24}, \quad c < c_0 \\
+          \lambda = 1 - \frac{5}{6}c + \frac{c^2}{3} - \frac{c^3}{12},
+                                      \quad c_0 < c < 2
 
+Where :math:`c_0 \approx 1.2956` is the real root of the polynomial
+:math:`4 - 4c + 2c^2 + c^3`.
