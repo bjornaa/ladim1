@@ -70,4 +70,16 @@ Enkel plotting, alle partikler tid t
 Animering
 
 
+2012-10-09
+----------
+
+Tidtaging:
+
+Kjørte en standard kjøring (bare overflate uten vertikal sampling)
+
+Jobmaskin (med lokal disk)
+12.72s user, 5.66s system, 18.4 total
+
+Ny HP laptop
+7.64 s user, 0.12s system 7.9 total
 
