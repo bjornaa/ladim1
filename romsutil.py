@@ -59,10 +59,28 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     else:
         raise ValueError, "Unknown Vtransform"
 
+# -----------------------------
+
+# Returnere I, J, p, q også??
+# Disse fort å finne uansett
+
 def Z2S(z_rho, X, Y, Z):
     """
-    Find s-levels C s.th.
-    z_rho[C[p]] <= -Z < z_rho[C[p]+1]
+    Find s-levels K and A such that
+    i)  -Z < z_rho[0], 
+             K=1,   A=1
+    ii) z_rho[k-1] <= -Z < z_rho[k], k = 1, ..., kmax-1
+             K=k,   A=(z_rho[k] + Z)/(z_rho[k]-z_rho[k-1])
+    iii) z_rho[kmax-1] <= -Z, 
+             K=kmax-1, A=0
+
+    Find integer array K and real array A s.th.
+    z_rho[0] < -Z <= z_rho[kmax-1]:
+       -Z = A*z_rho[K-1] + (1-A)*z_rho[K]
+    extend boundary values:
+       -Z <= z_rho[0] : K = 1, A = 1
+       -Z > z_rho[kmax-1] : K = kmax-1, A = 0
+
     """
     
     kmax, jmax, imax = z_rho.shape
@@ -72,34 +90,27 @@ def Z2S(z_rho, X, Y, Z):
     I = np.around(X).astype('int')
     J = np.around(Y).astype('int')
 
-    print "I = ", I
-    print "J = ", J
-
     # Find integer array K such that 
     #   z_rho[K[p]-1, J[p], I[p]] < -Z[p] <= z_rho[K[p], J[p], I[p]]
-    print z_rho[0, J, I]
     K = np.sum(z_rho[:,J,I] < -Z, axis=0)
-    print K
-    print z_rho[K-1,J,I], -Z, z_rho[K,J,I]
-    K.clip(1, kmax)
-    print
+    K = K.clip(1, kmax-1)
+    A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K-1, J, I])
+    A = A.clip(0, 1)
 
-
-    # Find integer array C, shape = (pmax,) s.th.
-    # z_rho[C[p]-1] < -Z <= z_rho[C[p]]
-    #C = np.sum(z_rho < -Z, axis=0)
-    #C = clip(1, 
+    return I, J, K, A
 
 
 # --------
 
-def sample3D(F, X, Y, S):
+def sample3D(F, X, Y, K, A):
     """
 
     F = 3D field
     S = depth structure matrix 
     X, Y = Horizontal grid coordinates
     Z = Depth [m, positive downwards]
+
+    Everything in rho-points
 
     F.shape = S.shape = (kmax, jmax, imax)
     S.shape = (kmax, jmax, imax)
@@ -117,6 +128,8 @@ def sample3D(F, X, Y, S):
 
     """
     
+    
+
     pass
 
 
