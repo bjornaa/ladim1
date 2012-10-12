@@ -9,8 +9,8 @@ from roppy.mpl_util import landmask
 # ---------------
 
 # Files
-particle_file  = './output/pyladim_out.nc'
-roms_file = 'data/ocean_avg_0014.nc'
+particle_file  = '../output/pyladim_out.nc'
+roms_file      = '../input/ocean_avg_0014.nc'
 
 # Subgrid definition
 i0, j0 = 70,   80
@@ -59,19 +59,15 @@ def animate():
         fig.canvas.draw()
 
 
-
-
-
 # Create a figure
 
 fig = plt.figure(figsize=(12,8))
-#ax = fig.add_subplot(1,1,1)
-ax = fig.add_axes((0.1,0.1,0.8,0.8))
+ax = fig.add_subplot(1,1,1)
 
 # Make background map
 cmap = plt.get_cmap('Blues')
 h = ax.contourf(g.h, cmap=cmap)
-fig.colorbar(h)
+#fig.colorbar(h)
 roppy.mpl_util.landmask(g.mask_rho, (0.6, 0.8, 0.0))
 
 # Plot initial particle distribution

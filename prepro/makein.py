@@ -14,7 +14,7 @@ Z0 = 0.0
 X = np.linspace(x0, x1, Npart)
 Y = np.linspace(y0, y1, Npart)
 
-f = open('line.in', mode='w')
+f = open('../input/line.in', mode='w')
 
 f.write('TR 0 hours\n')
 

@@ -8,9 +8,8 @@
 *.pyc
 
 # Data files
-data/*
-*.nc
-
+#data/*
+#*.nc
 
 # Build directories
 build/
@@ -19,5 +18,15 @@ doc/build
 # Object code
 *.o
 
+# Input directory (except README file)
+input/*
+!input/README
+!input/*py
+
+
+
+# Output directory  (except README file)
+output/*
+!output/README
 
 

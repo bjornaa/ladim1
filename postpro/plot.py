@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset, num2date
 
-f0 = Dataset('data/ocean_avg_0014.nc')
-f  = Dataset('pyladim_out.nc')
+f0 = Dataset('../input/ocean_avg_0014.nc')
+f  = Dataset('../output/pyladim_out.nc')
 
 t = 6
 

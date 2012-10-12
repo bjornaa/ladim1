@@ -16,19 +16,17 @@ class ROMS_input(SGrid):
     """
     Class for ROMS input, updated fields and static grid info
 
-
     """
 
-    def __init__(self, grid_file, input_file, setup, 
-                 subgrid=None, Vinfo=None, verbose=True):
+    def __init__(self, setup, subgrid=None, Vinfo=None, verbose=True):
 
         self.verbose = verbose
 
-        nc0 = Dataset(grid_file)
+        nc0 = Dataset(setup['grid_file'])
         SGrid.__init__(self, nc0, subgrid, Vinfo)
         nc0.close()
 
-        nc = Dataset(input_file)
+        nc = Dataset(setup['input_file'])
         self.nc = nc
         
         self.timevar = nc.variables['ocean_time']

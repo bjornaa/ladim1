@@ -28,9 +28,11 @@ nsteps = 3
 # Hva med vertikal info?
 # Kutte område?
 
-grid_file   : ./data/ocean_avg_0014.nc
-input_file  : ./data/ocean_avg_0014.nc
-#output_file : None
+grid_file             : input/ocean_avg_0014.nc
+input_file            : input/ocean_avg_0014.nc
+particle_release_file : input/line.in
+
+
 
 
 # ----------------

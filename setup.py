@@ -3,9 +3,6 @@
 import datetime
 import ConfigParser
 
-# Make setup a class ?, with this as methods
-# 
-
 
 def readsup(supfile):
 
@@ -61,6 +58,16 @@ def readsup(supfile):
         import sys; sys.exit(1)
 
     # ----------
+    # Input
+    # ----------
+
+    setup['grid_file'] = config.get('time', 'grid_file')
+    setup['input_file'] = config.get('time', 'input_file')
+    setup['particle_release_file'] =        \
+               config.get('time', 'particle_release_file')
+     
+
+    # ----------
     # Output
     # ----------
 
@@ -90,22 +97,17 @@ def readsup(supfile):
 def writesup(setup):
     # Make an explicit sequence of keys
     # Can be improved with ordered_dict (from python 2.7)
-    time_keys = ['start_time', 'stop_time', 'dt', 'nsteps']
+    time_keys   = ['start_time', 'stop_time', 'dt', 'nsteps']
+    input_keys  = ['grid_file', 'input_file', 'particle_release_file']
     output_keys = ['output_filename', 'output_period', 'Nout']
     
-    for key in time_keys:
-        print "%20s :" % key, setup[key]
+    for keylist in [time_keys, input_keys, output_keys]:
+        print 50*"-"
+        for key in keylist:
+            print "%24s :" % key, setup[key]
 
-    print 40*"-"
+    print 50*"-"
 
-    for key in output_keys:
-        print "%20s :" % key, setup[key]
-
-
-
-# ---
-# Ha en write-sup method ??
-# Får penere utskrift når kjører test
 
 
 # -------------

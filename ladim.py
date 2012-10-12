@@ -28,15 +28,11 @@ nsteps = setup['nsteps']
 dt = setup['dt']
 
 
-# Ta dette fra setup             
-roms_file = "./data/ocean_avg_0014.nc"
-
-
 # --------------------
 # Input grid and files
 # --------------------
 
-inp = ROMS_input(roms_file, roms_file, setup)
+inp = ROMS_input(setup)
 
 tunits = inp.nc.variables['ocean_time'].units
 
@@ -53,8 +49,9 @@ Z     = np.array([], dtype='float32')
 start = np.array([], dtype='int32')
 
 #particle_release_file = 'particles.in'
-particle_release_file = 'line.in'
-partini = ParticleReleaser(particle_release_file, setup['dt'])
+#particle_release_file = 'line.in'
+# Bare gi setup som argument ??
+partini = ParticleReleaser(setup['particle_release_file'], setup['dt'])
 
 
 # -----------
