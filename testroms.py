@@ -15,19 +15,15 @@ z_rho = sdepth(H, Hc, C)
 
 print "z_rho.shape = ", z_rho.shape
 
-X = np.array([90.2, 90.2, 90.2,  90.8, 93.8])
-Y = np.array([99.9, 99.9, 99.9, 100.2, 106.3])
-Z = np.array([30.0, 1.0,  200.0, 30.0, 30.0])
+X = np.array([90.2, 90.2, 90.2, 90.2,  90.2,  90.8,  93.8])
+Y = np.array([99.9, 99.9, 99.9, 99.9,  99.9, 100.2, 106.3])
+Z = np.array([29.0, 30.0, 31.0,  1.0, 200.0,  30.0,  30.0])
 
 print "X = ", X
 print "Y = ", Y
 print "Z = ", Z
 
-I, J, K, A = Z2S(z_rho, X, Y, Z)
+K, A = Z2S(z_rho, X, Y, Z)
 
-print "K = ", K
-print "A = ", A
-print A*z_rho[K-1,J,I] + (1-A)*z_rho[K,J,I]
-print 
-
+print sample3D_(z_rho, X, Y, K, A)
 

@@ -10,6 +10,7 @@ from roppy.mpl_util import landmask
 
 # Files
 particle_file  = './output/pyladim_out.nc'
+#particle_file  = './output/a0.nc'
 roms_file = 'data/ocean_avg_0014.nc'
 
 # Subgrid definition

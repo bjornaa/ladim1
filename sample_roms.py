@@ -87,6 +87,7 @@ def Z2S(z_rho, X, Y, Z):
     pmax = Z.shape
 
     # Find rho-based horizontal grid cell
+    # i.e. closest rho-point
     I = np.around(X).astype('int')
     J = np.around(Y).astype('int')
 
@@ -97,7 +98,7 @@ def Z2S(z_rho, X, Y, Z):
     A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K-1, J, I])
     A = A.clip(0, 1)
 
-    return I, J, K, A
+    return K, A
 
 
 # --------
@@ -128,10 +129,39 @@ def sample3D(F, X, Y, K, A):
 
     """
     
+    # Find rho-point as lower left corner
+    I = X.astype('int')
+    J = Y.astype('int')
     
+    P = X - I
+    Q = Y - J
+    W000 = (1-P)*(1-Q)*(1-A)
+    W010 = (1-P)*Q*(1-A)
+    W100 = P*(1-Q)*(1-A)
+    W110 = P*Q*(1-A)
+    W001 = (1-P)*(1-Q)*A
+    W011 = (1-P)*Q*A
+    W101 = P*(1-Q)*A
+    W111 = P*Q*A
 
-    pass
+    return (   W000*F[K,J,I]     + W010*F[K,J+1,I]
+            +  W100*F[K,J,I+1]   + W110*F[K,J+1,I+1]
+            +  W001*F[K-1,J,I]   + W011*F[K-1,J+1,I]
+            +  W101*F[K-1,J,I+1] + W111*F[K-1,J+1,I+1] )   
 
 
+#def sample3D(F, X, Y, Z):
+#    K, A = Z2S(z_rho, X, Y, Z)
+#    F0 = sample3D_(F, X, Y, K, A)
+
+def sample3DU(U, X, Y, K, A):
+    return sample3D(U, X-0.5, Y, K, A)
+
+def sample3DV(V, X, Y, K, A):
+    return sample3D(V, X, Y-0.5, K, A)
+
+
+
+    
 
 

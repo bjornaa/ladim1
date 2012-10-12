@@ -68,8 +68,6 @@ out = OutPut(setup)
 # ==============
 
 for i in range(nsteps+1):
-    print "i = ", i, num2date(i*dt,
-             'seconds since %s' % str(setup['start_time']))
     inp.update(i)
     #print "F = ", inp.F, num2date(inp.F, tunits)
 
@@ -84,10 +82,13 @@ for i in range(nsteps+1):
         
     # Save to file 
     if i % setup['output_period'] == 0:
+        print "i = ", i, num2date(i*dt,
+             'seconds since %s' % str(setup['start_time']))
         out.write(pid, X, Y)
     
     # Only use surface forcing presently
-    Euler_Forward(inp, inp.U[-1,:,:], inp.V[-1,:,:], X, Y, dt=dt)
+    Euler_Forward(inp, inp.U, inp.V, X, Y, Z, dt=dt)
+    
 
  
 # ========

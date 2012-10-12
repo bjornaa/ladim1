@@ -19,7 +19,7 @@ start_time = 1989-06-01 12:00:00
 #stop_time = 1989-06-04 15:00:00
 stop_time = 1989-06-15 15:00:00
 #dt = 7200
-#nsteps = 24
+nsteps = 3
 
 # --------------
 # Input section
