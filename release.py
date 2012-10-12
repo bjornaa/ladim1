@@ -7,12 +7,12 @@ import numpy as np
 
 class ParticleReleaser(object):
 
-    def __init__(self, particle_release_file, dt):
+    def __init__(self, setup):
         
-        self.dt = dt   # Finne annen måte å få tak i denne setup-info?
+        self.dt = setup['dt'] # Finne annen måte å få tak i denne setup-info?
 
         # Open the file and init counters
-        self.fid = open(particle_release_file)
+        self.fid = open(setup['particle_release_file'])
         self.particle_counter = 0
         self.release_step = 0
         
@@ -109,15 +109,17 @@ class ParticleReleaser(object):
 
 if __name__ == "__main__":
 
+
     import sys
     from setup import readsup
+
     setup = readsup('ladim.sup')
-    #print sys.argv
+    
+    # Take optional release file from command line
     if len(sys.argv) > 1:
-        particle_release_file = sys.argv[1]
-    else:
-        particle_release_file = 'particles.in'
-    p = ParticleReleaser(particle_release_file, dt=3600)
+        setup['particle_release_file'] = sys.argv[1]
+
+    p = ParticleReleaser(setup)
 
     while 1:
         
