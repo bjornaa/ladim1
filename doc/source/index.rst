@@ -11,6 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   setup.rst
    tracking.rst
    land.rst
 

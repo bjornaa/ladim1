@@ -51,7 +51,7 @@ start = np.array([], dtype='int32')
 #particle_release_file = 'particles.in'
 #particle_release_file = 'line.in'
 # Bare gi setup som argument ??
-partini = ParticleReleaser(setup['particle_release_file'], setup['dt'])
+partini = ParticleReleaser(setup)
 
 
 # -----------
