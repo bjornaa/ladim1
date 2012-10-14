@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from netCDF4 import Dataset, num2date
 import roppy
 from roppy.mpl_util import landmask
+from particlefile import ParticleFile
 
 # ---------------
 # User settings
@@ -24,35 +25,17 @@ f0 = Dataset(roms_file)
 g = roppy.SGrid(f0, subgrid=(i0,i1,j0,j1))
 
 #
-print particle_file
-f  = Dataset(particle_file)
+#print particle_file
+pf = ParticleFile(particle_file)
 
-Ntimes = len(f.dimensions['Time'])
-
-# ------------------
-# Utility functions
-# ------------------
-
-def read(t):
-    """Read the particles at given time frame"""
-    
-    p0 = f.variables['pStart'][t]
-    Npart = f.variables['pCount'][t]
-    tid = f.variables['time'][t]
-    tunit = f.variables['time'].units
-    #print p0, Npart
-    timestr = num2date(tid, tunit)
-    X = f.variables['X'][p0:p0+Npart]
-    Y = f.variables['Y'][p0:p0+Npart]
-    # Not handling subgrids properly??
-    X = X - i0
-    Y = Y - j0
-    return X, Y, timestr
+Ntimes = pf.nFrames
 
 
 def animate():
     for t in range(1, Ntimes):
-        X, Y, tstring = read(t)
+        X, Y = pf.get_position(t)
+        X, Y = X-i0, Y-j0
+        tstring = pf.get_time(t)
         h[0].set_xdata(X)
         h[0].set_ydata(Y)
         ax.set_title(tstring)
@@ -71,7 +54,9 @@ h = ax.contourf(g.h, cmap=cmap)
 roppy.mpl_util.landmask(g.mask_rho, (0.6, 0.8, 0.0))
 
 # Plot initial particle distribution
-X, Y, tstring = read(0)
+X, Y = pf.get_position(0)
+X, Y = X-i0, Y-j0
+tstring = pf.get_time(0)
 h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(tstring)
 

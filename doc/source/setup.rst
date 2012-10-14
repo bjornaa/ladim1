@@ -27,3 +27,38 @@ with PYthon).  This is available at
 http://code.google.com/p/roppy/. This requirement may be removed later
 by incorporating the necessary parts of roppy in pyladim.
 
+The git version control system is not necessary for running
+pyladim. It is recommended for keeping the model up to date and for
+  keeping tracks of model experiments performed.
+
+Installing pyladim
+------------------
+
+The pyladim model may presently be downloaded from dropbox, contact
+Bjørn.  It will be moved to a more central space soon. It will be
+donladable as a tar ball in addition to the recommended git clone
+availability.
+
+To make the model easy to modify and adapt to new problems, it is not
+installed centrally on the computer as a python package. Instead the
+source code for an experiment is contained in the working directory.
+
+A fresh install has the following directory structure. 
+
+ - pyladim : the source code
+  
+ - input : Placeholder for input files, forcing from an ocean model
+   and particle release file
+
+ - output : Placeholder for output files
+
+ - prepro : Pre-processing tools 
+
+ - postpro : post-processing tools
+
+ - test : unit tests for model components
+ 
+ - examples : examples of model set-ups
+
+The main directory has two essential files, `ladim` the model executable,
+a link to `pyladim/ladim.py` and a set-up file (by default `ladim.sup`).
