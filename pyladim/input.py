@@ -58,6 +58,7 @@ class ROMS_input(SGrid):
         while self.step[j+1] <= 0:
             j = j + 1
         self.fieldnr = j-1
+        self.timespan = self.step[self.fieldnr+1] - self.step[self.fieldnr]
         T1 = self.timevar[self.fieldnr+1]
         self.T1 = T1
         if self.verbose:
@@ -68,6 +69,12 @@ class ROMS_input(SGrid):
                       self.fieldnr+1, :, self.Ju, self.Iu]
         self.V1 = self.nc.variables['v'][
                       self.fieldnr+1, :, self.Jv, self.Iv]
+        self.T0 = self.timevar[self.fieldnr]
+        self.U0 = self.nc.variables['u'][
+                      self.fieldnr, :, self.Ju, self.Iu]
+        self.V0 = self.nc.variables['v'][
+                      self.fieldnr, :, self.Jv, self.Iv]
+        
         #self.dF = 0.0
         # Has step[fieldnr+1] <= 0 < step[fieldnr+2]
         # F is field at step = step[fieldnr+1]
@@ -93,7 +100,6 @@ class ROMS_input(SGrid):
                           self.fieldnr+1, :, self.Ju, self.Iu]
             self.V1 = self.nc.variables['v'][
                           self.fieldnr+1, :, self.Jv, self.Iv]
-            print "=== Reading, field nr = ", j+1
             print step[self.fieldnr], " < ", t, " <= ", step[self.fieldnr+1]
             self.timespan = step[self.fieldnr+1] - step[self.fieldnr]
             #self.dF = (step[j+1]-step[j]) * dt / timespan
