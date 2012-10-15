@@ -42,16 +42,21 @@ def readsup(supfile):
     stop_time = config.get('time', 'stop_time')
     nsteps = config.get('time', 'nsteps')
 
-    if not stop_time in ["", "None", None]:
+    print "stop_time = ", stop_time
+
+    # nsteps overrides stop_time
+    if not nsteps in ["", "None", None]:
+        setup['nsteps'] = int(nsteps)
+        setup['stop_time'] = setup['start_time']    \
+            + datetime.timedelta(seconds=setup['dt']*setup['nsteps'])
+
+    elif not stop_time in ["", "None", None]:
         setup['stop_time'] = datetime.datetime.strptime(stop_time, 
                                    "%Y-%m-%d %H:%M:%S")
         total_time = setup['stop_time'] - setup['start_time']
         setup['nsteps'] = ( (total_time.days*86400 + total_time.seconds) 
-                             // setup['dt'] )
-    elif not nsteps in ["", "None", None]:
-        setup['nsteps'] = int(nsteps)
-        setup['stop_time'] = setup['start_time']    \
-            + datetime.timedelta(seconds=setup['dt']*setup['nsteps'])
+                               // setup['dt'] )
+
     else:
         # Raise exception instead
         print "***Error in setup: must have nsteps or stop_time"
@@ -115,7 +120,7 @@ def writesup(setup):
 # -------------
 
 if __name__ == '__main__':
-    supfile = 'ladim.sup'
+    supfile = '../ladim.sup'
     setup = readsup(supfile)
     writesup(setup)
 
