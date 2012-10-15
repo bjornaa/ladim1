@@ -11,7 +11,8 @@ class ParticleFile(object):
 
     def get_time(self, n):
         tvar = self.nc.variables['time']
-        timestr = num2date(tvar[0], tvar.units)
+        return num2date(tvar[n], tvar.units)
+        
         
     def get_position(self, n):
         """Get particle positions at n-th time frame"""
