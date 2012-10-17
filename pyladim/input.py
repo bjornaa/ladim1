@@ -35,7 +35,8 @@ class ROMS_input(SGrid):
 
         # Find first/last forcing times
         # -----------------------------
-        timevar = nc.variables['ocean_time']
+        self._timevar = nc.variables['ocean_time']
+        timevar = self._timevar
         self._time_units = timevar.units
         time0 = num2date(timevar[0],  self._time_units)
         time1 = num2date(timevar[-1], self._time_units)
@@ -68,22 +69,12 @@ class ROMS_input(SGrid):
 
         # Read old input
         # --------------
-        self.T1 = timevar[fieldnr]
-        self.U1 = self.nc.variables['u'][
-                      fieldnr, :, self.Ju, self.Iu]
-        self.V1 = self.nc.variables['v'][
-                      fieldnr, :, self.Jv, self.Iv]
+        self.T1, self.U1, self.V1 = self._readfield(fieldnr)
 
-        if self.verbose:
-            print "Reading ROMS input, input time = ",   \
-                  num2date(timevar[fieldnr], self._time_units)
-
-            print step[n-1], " < ", t, " <= ", step[n]
-            print "U[100,80] ", self.U1[-1,100,80]
-
-
+        #print step[fieldnr], " < ", 0, " <= ", step[fieldnr+1]
+        
         # Variables needed by update
-        self._timevar = timevar
+        #timevar = timevar
         self._step    = step
         self._fieldnr = fieldnr
 
@@ -101,29 +92,35 @@ class ROMS_input(SGrid):
             self.V = self.V1
             return None
         if t > step[fieldnr]:  # Need new fields
-            n = fieldnr + 1
+            fieldnr = fieldnr + 1
             self.T0 = self.T1
             self.U0 = self.U1
             self.V0 = self.V1
-            if self.verbose:
-                print "Reading ROMS input, input time = ",   \
-                       num2date(self._timevar[n], self._time_units)
-            self.T1 = self.nc.variables['ocean_time'][n]  # Read new fields
-            self.U1 = self.nc.variables['u'][n, :, self.Ju, self.Iu]
-            self.V1 = self.nc.variables['v'][n, :, self.Jv, self.Iv]
-            print step[n-1], " < ", t, " <= ", step[n]
-            print "U[100,80] ", self.U1[-1,100,80]
-            self._timespan = step[n] - step[n-1]
-            self._fieldnr = n
+            self.T1, self.U1, self.V1 = self._readfield(fieldnr)
+            #print step[fieldnr-1], " < ", t, " <= ", step[fieldnr]
+            self._timespan = step[fieldnr] - step[fieldnr-1]
+            self._fieldnr = fieldnr
 
         # Linear interpolation in time
-        a = (step[fieldnr]-t) / self._timespan
-        #b = (t-step[n-1]) / self.timespan
+        #print "fieldnr ... = ", fieldnr, step[fieldnr]-t, self._timespan
+        a = float(step[fieldnr]-t) / self._timespan
         self.F = a*self.T0 + (1-a)*self.T1
         self.U = a*self.U0 + (1-a)*self.U1
         self.V = a*self.V0 + (1-a)*self.V1
 
     # --------------
+
+    def _readfield(self, n):
+        """Read fields at time frame = n"""
+        T = self.nc.variables['ocean_time'][n]  # Read new fields
+        U = self.nc.variables['u'][n, :, self.Ju, self.Iu]
+        V = self.nc.variables['v'][n, :, self.Jv, self.Iv]
+        if self.verbose:
+            print "Reading ROMS input, input time = ",   \
+                   num2date(self._timevar[n], self._time_units)
+        return T, U, V
+
+    # ------------------
 
     def close(self):
 
