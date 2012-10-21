@@ -94,6 +94,11 @@ def readsup(supfile):
 
     # Number of time frames in output, add one for initial distribution
     setup['Nout'] = 1 + setup['nsteps'] // outper
+
+    # Output variables
+    w = config.get('time', 'output_variables')
+    w = w.replace(",", " ")  # replace commas with blanks
+    setup['output_variables'] = w.split()
         
     return setup
 
@@ -104,7 +109,7 @@ def writesup(setup):
     # Can be improved with ordered_dict (from python 2.7)
     time_keys   = ['start_time', 'stop_time', 'dt', 'nsteps']
     input_keys  = ['grid_file', 'input_file', 'particle_release_file']
-    output_keys = ['output_filename', 'output_period', 'Nout']
+    output_keys = ['output_filename', 'output_period', 'Nout', 'output_variables']
     
     for keylist in [time_keys, input_keys, output_keys]:
         print 50*"-"

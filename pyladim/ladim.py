@@ -42,17 +42,24 @@ tunits = inp.nc.variables['ocean_time'].units
 
 # Lage et objekt som holder partiklene ??
 
-pid   = np.array([], dtype='int32')
-X     = np.array([], dtype='float32')
-Y     = np.array([], dtype='float32')
-Z     = np.array([], dtype='float32')
-start = np.array([], dtype='int32')
+# Initiate the model state
+# unødvendig, gjøres av ParticleReleaser
+#state = dict(
+#    pid   = np.array([], dtype='int32'),
+#    X     = np.array([], dtype='float32'),
+#    Y     = np.array([], dtype='float32'),
+#    Z     = np.array([], dtype='float32'),
+#   start = np.array([], dtype='int32')
+#)
+
 
 #particle_release_file = 'particles.in'
 #particle_release_file = 'line.in'
 # Bare gi setup som argument ??
 partini = ParticleReleaser(setup)
 
+# Initial (empty state)
+state = partini.state
 
 # -----------
 # Init output
@@ -71,20 +78,19 @@ for i in range(nsteps+1):
     # Read particles ?
     if i == partini.release_step:
         partini.read_particles()
-        pid = np.concatenate((pid, partini.pid))
-        X = np.concatenate((X, partini.X))
-        Y = np.concatenate((Y, partini.Y))
-        Z = np.concatenate((Z, partini.Z))
-        start = np.concatenate((start, partini.start))
+        # Trenger ikke partini.state
+        # Kan bruke getattr(partini, v)
+        for v in ['pid', 'X', 'Y', 'Z', 'start']:
+            state[v] = np.concatenate((state[v], partini.state[v]))
         
     # Save to file 
     if i % setup['output_period'] == 0:
         print "i = ", i, num2date(i*dt,
              'seconds since %s' % str(setup['start_time']))
-        out.write(pid, X, Y)
+        out.write(state)
     
     # Only use surface forcing presently
-    Euler_Forward(inp, inp.U, inp.V, X, Y, Z, dt=dt)
+    Euler_Forward(inp, inp.U, inp.V, state['X'], state['Y'], state['Z'], dt=dt)
     
 
  

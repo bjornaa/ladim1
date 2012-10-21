@@ -19,15 +19,30 @@ class ParticleReleaser(object):
         # Init empty particle release values
         self._pid, self._start = [], []
         self._X, self._Y, self._Z  = [], [], []
+        # Nødvendig å ha disse med som attributter??
+        # Øker lminnebehov utenom release_time
+        # Alternativ:
+        #  pid = list(state['pid']) i read-particles
+        # Annet alternativ, lag bare liste av nye partikler
+        #  concatenate inn i state-variablene
+
         self.pid   = np.array(self._pid, dtype='int')
         self.X     = np.array(self._X, dtype='float32')
         self.Y     = np.array(self._Y, dtype='float32')
         self.Z     = np.array(self._Z, dtype='float32')
         self.start = np.array(self._start, dtype='int')
-
+        self.state = dict(
+            pid   = np.array(self._pid, dtype='int'),
+            X     = np.array(self._X, dtype='float32'),
+            Y     = np.array(self._Y, dtype='float32'),
+            Z     = np.array(self._Z, dtype='float32'),
+            start = np.array(self._start, dtype='int'),
+            )
+        
         # Read until first time line
         for line in self.fid:
             if line[0] == 'T' : break
+
 
     # ------
 
@@ -39,13 +54,15 @@ class ParticleReleaser(object):
                 line = self.fid.next()
             except StopIteration:
                 print "==>  end of file"
+                # Save final array versions of the accumultators
+                self.state = dict(
+                    pid   = np.array(self._pid, dtype='int'),
+                    X     = np.array(self._X, dtype='float32'),
+                    Y     = np.array(self._Y, dtype='float32'),
+                    Z     = np.array(self._Z, dtype='float32'),
+                    start = np.array(self._start, dtype='int'),
+                    )
 
-                # Save last array versions of the accumultators
-                self.pid   = np.array(self._pid)
-                self.X     = np.array(self._X)
-                self.Y     = np.array(self._Y)
-                self.Z     = np.array(self._Z)
-                self.start = np.array(self._start)
                 # Indicate end of file by impossible value for release_step
                 self.release_step = -99  
                 break
@@ -74,11 +91,13 @@ class ParticleReleaser(object):
             if line[0] == "T": # Time line
 
                 # Make arrays of the accumulators
-                self.pid   = np.array(self._pid)
-                self.X     = np.array(self._X)
-                self.Y     = np.array(self._Y)
-                self.Z     = np.array(self._Z)
-                self.start = np.array(self._start)
+                self.state = dict(
+                    pid   = np.array(self._pid, dtype='int'),
+                    X     = np.array(self._X, dtype='float32'),
+                    Y     = np.array(self._Y, dtype='float32'),
+                    Z     = np.array(self._Z, dtype='float32'),
+                    start = np.array(self._start, dtype='int'),
+                    )
 
                 # Next release step
                 if line[1] == "R":  # Relative time

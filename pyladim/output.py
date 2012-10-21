@@ -2,6 +2,22 @@
 
 from netCDF4 import Dataset
 
+# For each possible variable, provide a
+# netcdf type and a dictionary of netcdf attributes 
+# Example:
+#  ('f4', dict(standard_name='longitude', units='degrees_east'))
+
+variables_ncdef = dict(
+    pid = ('i', dict(longname='particle identifier')),
+    X = ('f4', dict(longname='grid X-coordinate of particles')),
+    Y = ('f4', dict(longname='grid Y-coordinate of particles')),
+    )
+    
+
+
+
+
+
 class OutPut(object):
 
     def __init__(self, setup):
@@ -17,25 +33,29 @@ class OutPut(object):
         v = nc.createVariable('pStart', 'i', ('Time',))
         v = nc.createVariable('pCount', 'i', ('Time',))
 
-        v = nc.createVariable('pid', 'i', ('Particle_Index',))
-        v = nc.createVariable('X', 'f4', ('Particle_Index',))
-        v = nc.createVariable('Y', 'f4', ('Particle_Index',))
-        #v = nc.createVariable('Z', 'f4', ('Particle_Index', 'Time'))
+        for var in setup['output_variables']:
+            nctype = variables_ncdef[var][0]
+            atts = variables_ncdef[var][1]
+            v = nc.createVariable(var, nctype, ('Particle_Index',))
+            for att in atts:
+                setattr(v, att, atts[att])
 
         self.nc = nc
         #self.Nout = Nout
         self.outcount = 0
         self.pStart   = 0
         self.outstep  =  setup['output_period']*setup['dt']      
-
+        self.output_variables = setup['output_variables'] 
+        self.pvars = setup['output_variables']
+        
     # --------------
  
-    def write(self, pid, X, Y):
+    def write(self, state):
         """
         Write a particle distribution
         """
-        
-        Npar = len(X)
+
+        Npar = len(state['X']) 
         t = self.outcount
         nc = self.nc
 
@@ -46,9 +66,8 @@ class OutPut(object):
 
         # Write to particle properties
         T = slice(self.pStart, self.pStart + Npar)
-        nc.variables['pid'][T] = pid
-        nc.variables['X'][T] = X
-        nc.variables['Y'][T] = Y
+        for var in self.output_variables:
+            nc.variables[var][T] = state[var]
 
         # Write 
         self.pStart += Npar

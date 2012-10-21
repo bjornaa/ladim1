@@ -50,10 +50,13 @@ particle_release_file : input/line.in
 #
 # Exactly one of these output_periods must be defined
 # The period must be divisible with the time step dt
+# The output variables are separated with blanks and/or commas.
+
 
 output_filename = output/pyladim_out.nc
 #output_period = 3
 output_period_hours = 3
-#output_period_seconds = 3600
+output_variables = pid, X, Y
+
 
 
