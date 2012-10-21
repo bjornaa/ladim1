@@ -7,7 +7,7 @@ class ParticleFile(object):
     def __init__(self, filename):
         self.nc = Dataset(filename)
         # Change Time to time (or allow both)
-        self.nFrames = len(self.nc.dimensions['Time'])
+        self.nFrames = len(self.nc.dimensions['time'])
 
     def get_time(self, n):
         tvar = self.nc.variables['time']
@@ -17,8 +17,8 @@ class ParticleFile(object):
     def get_position(self, n):
         """Get particle positions at n-th time frame"""
         f = self.nc
-        p0 = f.variables['pStart'][n]
-        Npart = f.variables['pCount'][n]
+        p0 = f.variables['pstart'][n]
+        Npart = f.variables['pcount'][n]
         X = f.variables['X'][p0:p0+Npart]
         Y = f.variables['Y'][p0:p0+Npart]
         return X, Y

@@ -49,7 +49,7 @@ ax = fig.add_subplot(1,1,1)
 
 # Make background map
 cmap = plt.get_cmap('Blues')
-h = ax.contourf(g.h, cmap=cmap)
+h = ax.contourf(g.h, cmap=cmap, alpha=0.3)
 #fig.colorbar(h)
 roppy.mpl_util.landmask(g.mask_rho, (0.6, 0.8, 0.0))
 

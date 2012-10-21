@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    setup.rst
+   output.rst
    tracking.rst
    land.rst
 
