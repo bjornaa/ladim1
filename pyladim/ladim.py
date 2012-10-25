@@ -8,6 +8,7 @@ from input import ROMS_input
 from release import ParticleReleaser
 from setup import readsup, writesup
 from output import OutPut
+from behaviour import behaviour
 
 # ==================
 # Initiate the model
@@ -36,34 +37,18 @@ inp = ROMS_input(setup)
 
 tunits = inp.nc.variables['ocean_time'].units
 
-# --------------------
-# Init some particles
-# --------------------
+# ----------------------
+# Particle release file
+# ----------------------
 
-# Lage et objekt som holder partiklene ??
-
-# Initiate the model state
-# unødvendig, gjøres av ParticleReleaser
-#state = dict(
-#    pid   = np.array([], dtype='int32'),
-#    X     = np.array([], dtype='float32'),
-#    Y     = np.array([], dtype='float32'),
-#    Z     = np.array([], dtype='float32'),
-#   start = np.array([], dtype='int32')
-#)
-
-
-#particle_release_file = 'particles.in'
-#particle_release_file = 'line.in'
-# Bare gi setup som argument ??
 partini = ParticleReleaser(setup)
 
 # Initial (empty state)
 state = partini.state
 
-# -----------
-# Init output
-# -----------
+# ------------------
+# Init output file
+# -----------------
 
 out = OutPut(setup)
  
@@ -73,7 +58,6 @@ out = OutPut(setup)
 
 for i in range(nsteps+1):
     inp.update(i)
-    #print "F = ", inp.F, num2date(inp.F, tunits)
 
     # Read particles ?
     if i == partini.release_step:
@@ -90,10 +74,13 @@ for i in range(nsteps+1):
         out.write(state)
     
     # Only use surface forcing presently
+    # Redundant to give both inp, and inp.U ...
     Euler_Forward(inp, inp.U, inp.V, state['X'], state['Y'], state['Z'], dt=dt)
     
+    # Behaviour
+    behaviour(state)
 
- 
+
 # ========
 # Clean up
 # ========
