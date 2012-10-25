@@ -44,18 +44,18 @@ class OutPut(object):
 
     def __init__(self, setup):
 
-        nc = Dataset(setup['output_filename'], mode='w', 
+        nc = Dataset(setup.output_filename, mode='w', 
                      format="NETCDF3_CLASSIC")
 
         # Dimensions
         nc.createDimension('particle_index', None)  # unlimited
-        nc.createDimension('time', setup['Nout'])
+        nc.createDimension('time', setup.Nout)
 
         # Coordinate variable for time
         v = nc.createVariable('time', 'f8', ('time',))
         v.long_name = 'time'
         v.standard_name = 'time'
-        v.units = 'seconds since %s' % setup['start_time']
+        v.units = 'seconds since %s' % setup.start_time
         #v.calendar = 'proleptic_gregorian'
         # Ha mer fleksibilitet av valg av referansetid
 
@@ -65,7 +65,7 @@ class OutPut(object):
         v.long_name = 'number of particles'
 
         # Oputput variables
-        for var in setup['output_variables']:
+        for var in setup.output_variables:
             v = nc.createVariable(var, variables_nctype[var],
                                   ('particle_index',))
             atts = variables_ncatt[var]
@@ -82,9 +82,9 @@ class OutPut(object):
         #self.Nout = Nout
         self.outcount = 0
         self.pstart   = 0
-        self.outstep  =  setup['output_period']*setup['dt']      
-        self.output_variables = setup['output_variables'] 
-        self.pvars = setup['output_variables']
+        self.outstep  =  setup.output_period * setup.dt
+        self.output_variables = setup.output_variables
+        self.pvars = setup.output_variables
         
     # --------------
  

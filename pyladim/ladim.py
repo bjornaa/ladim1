@@ -25,8 +25,8 @@ print "setup file: ", setup_file
 writesup(setup)
 print " --- end of setup ---\n"
 
-nsteps = setup['nsteps']
-dt = setup['dt']
+nsteps = setup.nsteps
+dt = setup.dt
 
 
 # --------------------
@@ -67,9 +67,9 @@ for i in range(nsteps+1):
 
         
     # Save to file 
-    if i % setup['output_period'] == 0:
+    if i % setup.output_period == 0:
         print "i = ", i, num2date(i*dt,
-             'seconds since %s' % str(setup['start_time']))
+             'seconds since %s' % str(setup.start_time))
         out.write(state)
     
     # Only use surface forcing presently

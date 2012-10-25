@@ -34,10 +34,10 @@ class ParticleReleaser(object):
 
     def __init__(self, setup):
         
-        self.dt = setup['dt'] # Finne annen måte å få tak i denne setup-info?
+        self.dt = setup.dt  # Finne annen måte å få tak i denne setup-info?
 
         # Open the file and init counters
-        self.fid = open(setup['particle_release_file'])
+        self.fid = open(setup.particle_release_file)
         self.particle_counter = 0
         self.release_step = 0
         
@@ -156,15 +156,16 @@ class ParticleReleaser(object):
 
 if __name__ == "__main__":
 
+    # Få referanse til input/*in via ladim.sup
 
     import sys
     from setup import readsup
 
-    setup = readsup('ladim.sup')
+    setup = readsup('../ladim.sup')
     
     # Take optional release file from command line
     if len(sys.argv) > 1:
-        setup['particle_release_file'] = sys.argv[1]
+        setup.particle_release_file = sys.argv[1]
 
     p = ParticleReleaser(setup)
 

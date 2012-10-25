@@ -3,14 +3,24 @@
 import datetime
 import ConfigParser
 
+class Container(object):
+    """A simple container object, for the setup object"""
+    
+    #def __init__(self):
+    #    pass
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+        
+# ----------------------
 
 def readsup(supfile):
 
     # Default values for optional setup elements
     defaults = dict(
         dt = '3600',        # one hour
-        stop_time = "",   # compute from nsteps
-        nsteps    = "",   # compute from stop_time
+        stop_time = "",     # compute from nsteps
+        nsteps    = "",     # compute from stop_time
         output_period         = "", 
         output_period_seconds = "",
         output_period_hours   = "",
@@ -20,7 +30,7 @@ def readsup(supfile):
 
     config.read(supfile)
 
-    setup = {}
+    setup = Container()   
 
     # ---------------
     # Section [time]
@@ -42,8 +52,6 @@ def readsup(supfile):
     stop_time = config.get('time', 'stop_time')
     nsteps = config.get('time', 'nsteps')
 
-    print "stop_time = ", stop_time
-
     # nsteps overrides stop_time
     if not nsteps in ["", "None", None]:
         setup['nsteps'] = int(nsteps)
@@ -53,9 +61,9 @@ def readsup(supfile):
     elif not stop_time in ["", "None", None]:
         setup['stop_time'] = datetime.datetime.strptime(stop_time, 
                                    "%Y-%m-%d %H:%M:%S")
-        total_time = setup['stop_time'] - setup['start_time']
+        total_time = setup.stop_time - setup.start_time
         setup['nsteps'] = ( (total_time.days*86400 + total_time.seconds) 
-                               // setup['dt'] )
+                               // setup.dt )
 
     else:
         # Raise exception instead
@@ -87,13 +95,13 @@ def readsup(supfile):
     if not outper in ["", None, "None"]:
         outper = int(outper)
     elif not outper_s in ["", None, "None"]:
-        outper = int(outper_s) // setup['dt']
+        outper = int(outper_s) // setup.dt
     elif not outper_h in ["", None, "None"]:
-        outper = int(outper_h) * 3600 // setup['dt']
+        outper = int(outper_h) * 3600 // setup.dt
     setup['output_period'] = outper
 
     # Number of time frames in output, add one for initial distribution
-    setup['Nout'] = 1 + setup['nsteps'] // outper
+    setup['Nout'] = 1 + setup.nsteps // outper
 
     # Output variables
     w = config.get('time', 'output_variables')
@@ -114,7 +122,7 @@ def writesup(setup):
     for keylist in [time_keys, input_keys, output_keys]:
         print 50*"-"
         for key in keylist:
-            print "%24s :" % key, setup[key]
+            print "%24s :" % key, getattr(setup, key)
 
     print 50*"-"
 
