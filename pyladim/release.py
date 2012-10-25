@@ -4,7 +4,7 @@
 
 import numpy as np
 
-# Problem med empty state
+# ------------------------
 
 class State(object):
     """Class holding model state variables"""
@@ -14,7 +14,8 @@ class State(object):
         for v,a in zip(names, arrays):
             setattr(self, v, a)
 
-    def __getitem__(self,i):
+    def __getitem__(self, i):
+        """self[i] gives a tuple at time i"""
         return tuple(getattr(self, v)[i] for v in self.names)
 
     def __len__(self):
@@ -44,27 +45,9 @@ class ParticleReleaser(object):
         # Init empty particle release values
         self._pid, self._start = [], []
         self._X, self._Y, self._Z  = [], [], []
-        # Nødvendig å ha disse med som attributter??
-        # Øker lminnebehov utenom release_time
-        # Alternativ:
-        #  pid = list(state['pid']) i read-particles
-        # Annet alternativ, lag bare liste av nye partikler
-        #  concatenate inn i state-variablene
 
-        self.pid   = np.array(self._pid, dtype='int')
-        self.X     = np.array(self._X, dtype='float32')
-        self.Y     = np.array(self._Y, dtype='float32')
-        self.Z     = np.array(self._Z, dtype='float32')
-        self.start = np.array(self._start, dtype='int')
-        self.state = State(
-            ('pid', 'X', 'Y', 'Z', 'start'), 
-            (np.array(self._pid, dtype='int'),
-             np.array(self._X, dtype='float32'),
-             np.array(self._Y, dtype='float32'),
-             np.array(self._Z, dtype='float32'),
-             np.array(self._start, dtype='int')))
+        self._makestate()
 
-        
         # Read until first time line
         for line in self.fid:
             if line[0] == 'T' : break
@@ -82,14 +65,7 @@ class ParticleReleaser(object):
                 print "==>  end of file"
             
                 # Save final array versions of the accumultators
-                # Dette gjøres tre ganger, samle i en liten funksjon
-                self.state = State(
-                    ('pid', 'X', 'Y', 'Z', 'start'), 
-                    (np.array(self._pid, dtype='int'),
-                     np.array(self._X, dtype='float32'),
-                     np.array(self._Y, dtype='float32'),
-                     np.array(self._Z, dtype='float32'),
-                     np.array(self._start, dtype='int')))
+                self._makestate()
 
                 # Indicate end of file by impossible value for release_step
                 self.release_step = -99  
@@ -118,14 +94,7 @@ class ParticleReleaser(object):
                  
             if line[0] == "T": # Time line
 
-                self.state = State(
-                    ('pid', 'X', 'Y', 'Z', 'start'), 
-                    (np.array(self._pid, dtype='int'),
-                     np.array(self._X, dtype='float32'),
-                     np.array(self._Y, dtype='float32'),
-                     np.array(self._Z, dtype='float32'),
-                     np.array(self._start, dtype='int')))
-
+                self._makestate()  # Make new state
 
                 # Next release step
                 if line[1] == "R":  # Relative time
@@ -137,7 +106,6 @@ class ParticleReleaser(object):
                     elif units[0] == 'd': 
                         tdelta = tdelta*24*3600
                     self.release_step = tdelta // self.dt
-                    #print "next release step = ", release_step
 
                 # Initialise accumulators for next step
                 self._pid, self._start = [], []
@@ -145,6 +113,16 @@ class ParticleReleaser(object):
 
                 # Pause the file reading, returning control to caller
                 break
+
+    def _makestate(self):
+        self.state = State(
+              ('pid', 'X', 'Y', 'Z', 'start'), 
+              (np.array(self._pid, dtype='int'),
+               np.array(self._X, dtype='float32'),
+               np.array(self._Y, dtype='float32'),
+               np.array(self._Z, dtype='float32'),
+               np.array(self._start, dtype='int')))
+        
 
     # --------            
 
@@ -157,11 +135,13 @@ class ParticleReleaser(object):
 if __name__ == "__main__":
 
     # Få referanse til input/*in via ladim.sup
+    # Virker ikke med relative adresser fordi feil katalog
 
     import sys
     from setup import readsup
 
     setup = readsup('../ladim.sup')
+    setup.particle_release_file = '../input/line.in'
     
     # Take optional release file from command line
     if len(sys.argv) > 1:
@@ -173,11 +153,11 @@ if __name__ == "__main__":
         
         #print "==> ", p.release_step, p.particle_counter
         p.read_particles()
+        q = p.state
         #print p.X
-        for i in range(len(p.X)):
-            #print " == ", i
+        for i in range(len(q)):
             print "%8d %8.2f %8.2f %8.2f %6d" % (
-                p.pid[i], p.X[i], p.Y[i], p.Z[i], p.start[i])
+                q.pid[i], q.X[i], q.Y[i], q.Z[i], q.start[i])
         if p.release_step < 0: break
         
     p.close()
