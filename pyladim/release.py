@@ -2,8 +2,33 @@
 
 # Particle release class
 
-
 import numpy as np
+
+# Problem med empty state
+
+class State(object):
+    """Class holding model state variables"""
+
+    def __init__(self, names, arrays):
+        self.names = names
+        for v,a in zip(names, arrays):
+            setattr(self, v, a)
+
+    def __getitem__(self,i):
+        return tuple(getattr(self, v)[i] for v in self.names)
+
+    def __len__(self):
+        return len(getattr(self, self.names[0]))
+
+    def addstate(self, other):
+        """Concatenate states"""
+        # Bør ha kontroll, samme navn, ellers udefinert
+        for v in self.names:
+            setattr(self, v, 
+                np.concatenate((getattr(self,v), getattr(other,v))))
+      
+
+# --------------------------------
 
 class ParticleReleaser(object):
 
@@ -31,13 +56,14 @@ class ParticleReleaser(object):
         self.Y     = np.array(self._Y, dtype='float32')
         self.Z     = np.array(self._Z, dtype='float32')
         self.start = np.array(self._start, dtype='int')
-        self.state = dict(
-            pid   = np.array(self._pid, dtype='int'),
-            X     = np.array(self._X, dtype='float32'),
-            Y     = np.array(self._Y, dtype='float32'),
-            Z     = np.array(self._Z, dtype='float32'),
-            start = np.array(self._start, dtype='int'),
-            )
+        self.state = State(
+            ('pid', 'X', 'Y', 'Z', 'start'), 
+            (np.array(self._pid, dtype='int'),
+             np.array(self._X, dtype='float32'),
+             np.array(self._Y, dtype='float32'),
+             np.array(self._Z, dtype='float32'),
+             np.array(self._start, dtype='int')))
+
         
         # Read until first time line
         for line in self.fid:
@@ -54,14 +80,16 @@ class ParticleReleaser(object):
                 line = self.fid.next()
             except StopIteration:
                 print "==>  end of file"
+            
                 # Save final array versions of the accumultators
-                self.state = dict(
-                    pid   = np.array(self._pid, dtype='int'),
-                    X     = np.array(self._X, dtype='float32'),
-                    Y     = np.array(self._Y, dtype='float32'),
-                    Z     = np.array(self._Z, dtype='float32'),
-                    start = np.array(self._start, dtype='int'),
-                    )
+                # Dette gjøres tre ganger, samle i en liten funksjon
+                self.state = State(
+                    ('pid', 'X', 'Y', 'Z', 'start'), 
+                    (np.array(self._pid, dtype='int'),
+                     np.array(self._X, dtype='float32'),
+                     np.array(self._Y, dtype='float32'),
+                     np.array(self._Z, dtype='float32'),
+                     np.array(self._start, dtype='int')))
 
                 # Indicate end of file by impossible value for release_step
                 self.release_step = -99  
@@ -90,14 +118,14 @@ class ParticleReleaser(object):
                  
             if line[0] == "T": # Time line
 
-                # Make arrays of the accumulators
-                self.state = dict(
-                    pid   = np.array(self._pid, dtype='int'),
-                    X     = np.array(self._X, dtype='float32'),
-                    Y     = np.array(self._Y, dtype='float32'),
-                    Z     = np.array(self._Z, dtype='float32'),
-                    start = np.array(self._start, dtype='int'),
-                    )
+                self.state = State(
+                    ('pid', 'X', 'Y', 'Z', 'start'), 
+                    (np.array(self._pid, dtype='int'),
+                     np.array(self._X, dtype='float32'),
+                     np.array(self._Y, dtype='float32'),
+                     np.array(self._Z, dtype='float32'),
+                     np.array(self._start, dtype='int')))
+
 
                 # Next release step
                 if line[1] == "R":  # Relative time

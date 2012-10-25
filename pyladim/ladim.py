@@ -61,11 +61,10 @@ for i in range(nsteps+1):
 
     # Read particles ?
     if i == partini.release_step:
+        # Tips: Gjøre begge delet i read_particles
         partini.read_particles()
-        # Trenger ikke partini.state
-        # Kan bruke getattr(partini, v)
-        for v in ['pid', 'X', 'Y', 'Z', 'start']:
-            state[v] = np.concatenate((state[v], partini.state[v]))
+        state.addstate(partini.state)
+
         
     # Save to file 
     if i % setup['output_period'] == 0:
@@ -75,7 +74,7 @@ for i in range(nsteps+1):
     
     # Only use surface forcing presently
     # Redundant to give both inp, and inp.U ...
-    Euler_Forward(inp, inp.U, inp.V, state['X'], state['Y'], state['Z'], dt=dt)
+    Euler_Forward(inp, inp.U, inp.V, state.X, state.Y, state.Z, dt=dt)
     
     # Behaviour
     behaviour(state)

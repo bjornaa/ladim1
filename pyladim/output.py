@@ -93,7 +93,7 @@ class OutPut(object):
         Write a particle distribution
         """
 
-        Npar = len(state['X']) 
+        Npar = len(state) 
         t = self.outcount
         nc = self.nc
 
@@ -105,7 +105,7 @@ class OutPut(object):
         # Write to particle properties
         T = slice(self.pstart, self.pstart + Npar)
         for var in self.output_variables:
-            nc.variables[var][T] = state[var]
+            nc.variables[var][T] = getattr(state, var)
 
         # Write 
         self.pstart += Npar

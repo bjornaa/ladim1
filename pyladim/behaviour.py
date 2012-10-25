@@ -9,18 +9,20 @@ import numpy as np
 
 def behaviour(state):
 
-    pid = state['pid']
-    X   = state['X']
-    Y   = state['Y']
+    pass
+
+    #pid = state['pid']
+    #X   = state['X']
+    #Y   = state['Y']
     
-    pcount = len(pid)
+    #pcount = len(pid)
 
-    print "pcount = ", pcount
+    #print "pcount = ", pcount
 
-    active = np.array(pcount*[True])   # all particles are active
+    #active = np.array(pcount*[True])   # all particles are active
 
     # Stupid criterium for testing
-    active = np.logical_and(active, Y < 120)
+    #active = np.logical_and(active, Y < 120)
 
     # Remove inactive particles
     # Better than copy, find something that copies 
@@ -28,10 +30,10 @@ def behaviour(state):
 
     # Loop over alle state-variable
 
-    state['pid'] = np.ascontiguousarray(pid[active])
-    state['X'] = X[active].copy()
-    state['Y'] = Y[active].copy()
-    state['Z'] = state['Z'][active].copy()
+    #state['pid'] = np.ascontiguousarray(pid[active])
+    #state['X'] = X[active].copy()
+    #state['Y'] = Y[active].copy()
+    #state['Z'] = state['Z'][active].copy()
 
  
     
