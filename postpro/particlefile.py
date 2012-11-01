@@ -75,10 +75,10 @@ class ParticleFile(object):
 
         A = self.get_variable(n, vname)
 
-
+# ------------------------------
 
     def read_track(self, p):
-        """Get particle positions along a track"""
+        """Get particle positions along a single track"""
 
 
         f = self.nc
@@ -113,6 +113,51 @@ class ParticleFile(object):
             Y.append(f.variables['Y'][pstart + index])
 
         return X, Y, first_time, last_time
+
+    def close(self):
+        self.nc.close()
+
+# ----------------------------------
+
+# Ikke testet nok for udefinerte partikler
+# f.eks. for store => I[J] blir upassende
+
+
+    def read_tracks(self, P):
+        """Get particle positions along tracks
+
+        Returns an arrays of shape (len(P),nFrames)
+        with NaN where particles are undefines
+
+        """
+
+        P = np.asarray(P)
+        nP = len(P)
+
+        f = self.nc
+
+
+        X = np.nan + np.zeros((self.nFrames, nP))
+        Y = np.nan + np.zeros((self.nFrames, nP))
+
+
+        for n in xrange(self.nFrames):
+            
+            pstart = f.variables['pstart'][n]
+            pcount = f.variables['pcount'][n]
+            tslice = slice(pstart, pstart+pcount)   # time slice
+            pid = f.variables['pid'][tslice]        
+
+            I = pid.searchsorted(P+1)               
+            J, = np.nonzero(I == pid[I-1])
+
+            Xn = f.variables['X'][tslice]
+            Yn = f.variables['Y'][tslice]
+
+            X[n,J] = Xn[I[J]]
+            Y[n,J] = Yn[I[J]]
+
+        return X, Y
 
     def close(self):
         self.nc.close()
