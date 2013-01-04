@@ -6,8 +6,8 @@ f  = Dataset('../output/pyladim_out.nc')
 
 t = 6
 
-p0 = f.variables['pStart'][t]
-Npart = f.variables['pCount'][t]
+p0 = f.variables['pstart'][t]
+Npart = f.variables['pcount'][t]
 tid = f.variables['time'][t]
 tunit = f.variables['time'].units
 print p0, Npart

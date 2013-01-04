@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+"""Output module for the (py)ladim particle tracking model"""
+
+# ------------------------------------
+# Bjørn Ådlandsvik <bjorn@imr.no>
+# Institute of Marine Research
+# 2013-01-04
+# ------------------------------------
+
 import datetime
 from netCDF4 import Dataset
 
@@ -10,7 +18,7 @@ from netCDF4 import Dataset
 
 # NetCDF data types for the variables
 variables_nctype = dict(
-    pid = 'i4',
+    #pid = 'i4',
     X   = 'f4',
     Y   = 'f4',
     Z   = 'f4',
@@ -20,8 +28,8 @@ variables_nctype = dict(
 
 # NetCDF attributes
 variables_ncatt = dict(
-    pid = dict(long_name     = 'particle identifier',
-               cf_role       = 'trajectory_id'),
+    #pid = dict(long_name     = 'particle identifier',
+    #           cf_role       = 'trajectory_id'),
     X   = dict(long_name     = 'grid X-coordinate of particles'),
     Y   = dict(long_name     = 'grid Y-coordinate of particles'),
     Z   = dict(long_name     = 'particle depth',
@@ -38,8 +46,6 @@ variables_ncatt = dict(
     )
     
 
-
-
 class OutPut(object):
 
     def __init__(self, setup):
@@ -47,11 +53,11 @@ class OutPut(object):
         nc = Dataset(setup.output_filename, mode='w', 
                      format="NETCDF3_CLASSIC")
 
-        # Dimensions
-        nc.createDimension('particle_index', None)  # unlimited
+        # --- Dimensions
+        nc.createDimension('particle_dim', None)  # unlimited
         nc.createDimension('time', setup.Nout)
 
-        # Coordinate variable for time
+        # ---- Coordinate variable for time
         v = nc.createVariable('time', 'f8', ('time',))
         v.long_name = 'time'
         v.standard_name = 'time'
@@ -59,27 +65,35 @@ class OutPut(object):
         #v.calendar = 'proleptic_gregorian'
         # Ha mer fleksibilitet av valg av referansetid
 
+        # ---- Particle distrubution variables
+
+        v = nc.createVariable('pid', 'i4', ('particle_dim',))
+        v.long_name = 'particle identifier'
+        v.cf_role = 'trajectory_id'
+
         v = nc.createVariable('pstart', 'i4', ('time',))
         v.long_name = 'start index for particle distribution'
+
         v = nc.createVariable('pcount', 'i4', ('time',))
         v.long_name = 'number of particles'
 
-        # Oputput variables
+        # --- Output variables
+        
         for var in setup.output_variables:
-            v = nc.createVariable(var, variables_nctype[var],
-                                  ('particle_index',))
+            print var
+            v = nc.createVariable(var, 'f4', ('particle_dim',))
             atts = variables_ncatt[var]
             for att in atts:
                 setattr(v, att, atts[att])
 
-        # Global attributes
+        # --- Global attributes
         nc.Conventions = "CF-1.5"
         nc.institution = "Institute of Marine Research"
         nc.source = "Lagrangian Advection and DIffusion Model, python version"
         nc.history = "%s created by pyladim" % datetime.date.today()
-        
+
+        # --- Initialize
         self.nc = nc
-        #self.Nout = Nout
         self.outcount = 0
         self.pstart   = 0
         self.outstep  =  setup.output_period * setup.dt
@@ -104,6 +118,7 @@ class OutPut(object):
 
         # Write to particle properties
         T = slice(self.pstart, self.pstart + Npar)
+        nc.variables['pid'][T] = getattr(state, 'pid')
         for var in self.output_variables:
             nc.variables[var][T] = getattr(state, var)
 

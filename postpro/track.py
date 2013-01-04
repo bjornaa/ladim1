@@ -26,7 +26,6 @@ g = roppy.SGrid(f0, subgrid=(i0,i1,j0,j1))
 f0.close()
 
 
-
 pf = ParticleFile(particle_file)
 
 X, Y, first_time, last_time = pf.read_track(pid0)
