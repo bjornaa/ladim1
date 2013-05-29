@@ -1,32 +1,59 @@
+import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset, num2date
+import roppy
+from roppy.mpl_util import landmask
+from particlefile import ParticleFile
 
-f0 = Dataset('../input/ocean_avg_0014.nc')
-f  = Dataset('../output/pyladim_out.nc')
+# ---------------
+# User settings
+# ---------------
 
-t = 6
+# Files
+particle_file  = '../output/pyladim_out.nc'
+roms_file      = '../input/ocean_avg_0014.nc'
 
-p0 = f.variables['pStart'][t]
-Npart = f.variables['pCount'][t]
-tid = f.variables['time'][t]
-tunit = f.variables['time'].units
-print p0, Npart
+# Subgrid definition
+i0, j0 = 70,   80
+i1, j1 = 150, 133
 
-timestr = num2date(tid, tunit)
+t = 30     # time step 31
 
-X = f.variables['X'][p0:p0+Npart]
-Y = f.variables['Y'][p0:p0+Npart]
+# ----------------
 
-H = f0.variables['h'][:,:]
+# ROMS grid, plot domain
 
-plt.plot(X, Y, 'o', color='blue')
-plt.title(timestr)
+f0 = Dataset(roms_file)
+g = roppy.SGrid(f0, subgrid=(i0,i1,j0,j1))
+
+#
+#print particle_file
+pf = ParticleFile(particle_file)
+
+Ntimes = pf.nFrames
 
 
-plt.contour(H, levels = [50.0, 100.0, 200.0, 500.0], colors='black')
-plt.contour(H, levels = [10.0], colors='black', linewidths=2.5)
+# Create a figure
 
+fig = plt.figure(figsize=(12,8))
+ax = fig.add_subplot(1,1,1)
+
+# Make background map
+cmap = plt.get_cmap('Blues')
+h = ax.contourf(g.h, cmap=cmap, alpha=0.3)
+#fig.colorbar(h)
+roppy.mpl_util.landmask(g.mask_rho, (0.6, 0.8, 0.0))
+
+# Plot initial particle distribution
+X, Y = pf.get_position(t)
+X, Y = X-i0, Y-j0
+tstring = pf.get_time(t)
+h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+ax.set_title(tstring)
+
+
+# Show the results
 plt.axis('image')
-
 plt.show()
 

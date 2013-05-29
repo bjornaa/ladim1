@@ -2,7 +2,6 @@
 
 import numpy as np
 from netCDF4 import Dataset, num2date
-#import roppy
 
 # Methods:
 #  get_positions : all positions at time n (flag for lon, lat?)
@@ -28,7 +27,6 @@ class ParticleFile(object):
         tvar = self.nc.variables['time']
         return num2date(tvar[n], tvar.units)
         
-        
     def get_position(self, n):
         """Get particle positions at n-th time frame"""
         f = self.nc
@@ -39,6 +37,7 @@ class ParticleFile(object):
         return X, Y
 
     def get_variable(self, n, vname):
+        """Get values of a particle variable"""
         f = self.nc
         p0 = f.variables['pStart'][n]
         Npart = f.variables['pCount'][n]
@@ -68,10 +67,6 @@ class ParticleFile(object):
         index = pid.searchsorted(p)
         if pid[index] < p:      # p is missing, but has been active
             active = -1
-        
-                
-
-
 
         A = self.get_variable(n, vname)
 
@@ -126,8 +121,8 @@ class ParticleFile(object):
     def read_tracks(self, P):
         """Get particle positions along tracks
 
-        Returns an arrays of shape (len(P),nFrames)
-        with NaN where particles are undefines
+        Returns an array of shape (len(P),nFrames)
+        with NaN where particles are undefined
 
         """
 
@@ -135,7 +130,6 @@ class ParticleFile(object):
         nP = len(P)
 
         f = self.nc
-
 
         X = np.nan + np.zeros((self.nFrames, nP))
         Y = np.nan + np.zeros((self.nFrames, nP))
