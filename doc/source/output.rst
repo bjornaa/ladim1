@@ -28,7 +28,41 @@ individual trajectories.
 The dimensions are ``time`` and ``particle_dim``. NetCDF 3 format allows only
 one unlimited dimension. As the duration and output frequency are
 known at the start of a ladim simulation, the particle dimension may
-be unlimited.
+be unlimited. 
+
+An example of the structure of the output file `pyladim_out.nc` is
+shown below, in NetCDF CFL format::
+
+  netcdf pyladim_out {
+  dimensions:
+        particle_dim = UNLIMITED ; // (1130000 currently)
+        time = 113 ;
+  variables:
+        double time(time) ;
+                time:long_name = "time" ;
+                time:standard_name = "time" ;
+                time:units = "seconds since 1989-06-01 12:00:00" ;
+        int pstart(time) ;
+                pstart:long_name = "start index for particle distribution" ;
+        int pcount(time) ;
+                pcount:long_name = "number of particles" ;
+        int pid(particle_dim) ;
+                pid:long_name = "particle identifier" ;
+                pid:cf_role = "trajectory_id" ;
+        float X(particle_dim) ;
+                X:long_name = "grid X-coordinate of particles" ;
+        float Y(particle_dim) ;
+                Y:long_name = "grid Y-coordinate of particles" ;
+
+  // global attributes:
+                :Conventions = "CF-1.5" ;
+                :institution = "Institute of Marine Research" ;
+                :source = "Lagrangian Advection and DIffusion Model, python version" ;
+                :history = "2012-11-28 created by pyladim" ;
+  }
+
+
+
 
 [===LARMOD. For larmod som kjøres fra symbioses-grensesnitt, larmod vet ikke
 nødvendigvis hvor lang simuleringen blir. Bruker derfor NetCDF-4 og
@@ -91,9 +125,4 @@ Example CDL
   // global attributes:
                 :history = "2013-05-10: created by LARMOD" ;
   }
-
-
-   
-
-
 

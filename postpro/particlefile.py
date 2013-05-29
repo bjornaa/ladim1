@@ -39,8 +39,8 @@ class ParticleFile(object):
     def get_variable(self, n, vname):
         """Get values of a particle variable"""
         f = self.nc
-        p0 = f.variables['pStart'][n]
-        Npart = f.variables['pCount'][n]
+        p0 = f.variables['pstart'][n]
+        Npart = f.variables['pcount'][n]
         # put in some error control
         return f.variables[vname][p0:p0+Npart]
 
@@ -98,7 +98,7 @@ class ParticleFile(object):
             if first_time != None:
                 first_time = n
 
-            #index = sum(pid < pid0) # eller lignende
+            #index = sum(pid < p) # eller lignende
             index = pid.searchsorted(p)
             if pid[index] < p   : # p is missing
                 last_time = n     # 

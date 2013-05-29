@@ -18,6 +18,12 @@ roms_file      = '../input/ocean_avg_0014.nc'
 i0, j0 = 70,   80
 i1, j1 = 150, 133
 
+p0 = f.variables['pstart'][t]
+Npart = f.variables['pcount'][t]
+tid = f.variables['time'][t]
+tunit = f.variables['time'].units
+print p0, Npart
+
 t = 30     # time step 31
 
 # ----------------
