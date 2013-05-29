@@ -11,6 +11,8 @@ class Container(object):
 
     def __setitem__(self, key, value):
         setattr(self, key, value)
+    #def __getitem__(self, key):
+    #    getattr(self, key)
         
 # ----------------------
 
@@ -31,6 +33,7 @@ def readsup(supfile):
     config.read(supfile)
 
     setup = Container()   
+#    setup = dict()   
 
     # ---------------
     # Section [time]
@@ -44,6 +47,7 @@ def readsup(supfile):
     #    Ta med å gi warning
 
     setup['dt'] = int(config.get('time', 'dt'))
+    print setup.dt
 
     start_time = config.get('time', 'start_time')
     setup['start_time'] = datetime.datetime.strptime(start_time, 
@@ -55,8 +59,10 @@ def readsup(supfile):
     # nsteps overrides stop_time
     if not nsteps in ["", "None", None]:
         setup['nsteps'] = int(nsteps)
-        setup['stop_time'] = setup['start_time']    \
-            + datetime.timedelta(seconds=setup['dt']*setup['nsteps'])
+        #print setup['dt']
+        #print setup['nsteps']
+        setup['stop_time'] = setup.start_time    \
+            + datetime.timedelta(seconds=setup.dt*setup.nsteps)
 
     elif not stop_time in ["", "None", None]:
         setup['stop_time'] = datetime.datetime.strptime(stop_time, 
