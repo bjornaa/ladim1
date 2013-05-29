@@ -65,7 +65,7 @@ class OutPut(object):
         #v.calendar = 'proleptic_gregorian'
         # Ha mer fleksibilitet av valg av referansetid
 
-        # ---- Particle distrubution variables
+        # ---- Particle distribution variables
 
         v = nc.createVariable('pid', 'i4', ('particle_dim',))
         v.long_name = 'particle identifier'
