@@ -5,8 +5,8 @@ import numpy as np
 
 #from roppy import SGrid, sample2DU, sample2DV
 #from roppy import SGrid, sample2D
-from roppy import sample2D
-from sample_roms import Z2S, sample3DU, sample3DV
+#from roppy import sample2D
+from sample_roms import Z2S, sample3DU, sample3DV, sample2D
 
 # ---------------------
 
@@ -14,7 +14,7 @@ def Euler_Forward(grid, U, V, X, Y, Z, dt=3600, nstep=1):
     """Particle tracking with Euler Forward method
 
     grid   : SGrid object
-    U, V   : 2D Current field
+    U, V   : 3D horizontal current field
     X0, Y0 : 1D arrays with grid coordinates of start positions
     dt     : timestep [seconds]
     nstep  : number of time steps

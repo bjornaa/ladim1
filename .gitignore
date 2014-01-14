@@ -23,10 +23,16 @@ input/*
 !input/README
 !input/*py
 
-
-
 # Output directory  (except README file)
 output/*
 !output/README
 
+# Figures in the postpro directory
+postpro/*.png
+
+# Latex-stuff
+*.tex
+*.aux
+*.log
+*.out
 

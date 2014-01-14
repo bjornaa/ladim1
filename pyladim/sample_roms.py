@@ -160,8 +160,41 @@ def sample3DU(U, X, Y, K, A):
 def sample3DV(V, X, Y, K, A):
     return sample3D(V, X, Y-0.5, K, A)
 
+def sample2D(F, X, Y):
+    """Bilinear sample of a 2D field
 
+    *F* : 2D array
+    
+    *X*, *Y* : position in grid coordinates, scalars or compatible arrays
 
+    Note reversed axes, for integers i and j we have
+      ``sample2D(F, i, j) = F[j,i]``
+
+    Using linear interpolation
+    
+    """
+
+    Z = np.add(X,Y)     # Test for compatibility
+    if np.isscalar(Z):  # Both X and Y are scalars
+        I = int(X)
+        J = int(Y)
+        P = X - I
+        Q = Y - J
+    else:
+        # Make arrays of common shape
+        X0 = X + np.zeros_like(Z)
+        Y0 = Y + np.zeros_like(Z)
+        I = X0.astype('int')
+        J = Y0.astype('int')
+        P = X0 - I
+        Q = Y0 - J
+
+    W00 = (1-P)*(1-Q)
+    W01 = (1-P)*Q
+    W10 = P*(1-Q)
+    W11 = P*Q
+
+    return W00*F[J,I] + W01*F[J+1,I] + W10*F[J,I+1] + W11*F[J+1,I+1]
     
 
 
