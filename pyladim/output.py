@@ -12,19 +12,16 @@ import datetime
 from netCDF4 import Dataset
 
 # For each possible variable, provide a
-# netcdf type and a dictionary of netcdf attributes 
+# netcdf type and a dictionary of netcdf attributes
 # Example:
 #  ('f4', dict(standard_name='longitude', units='degrees_east'))
 
 # NetCDF data types for the variables
 variables_nctype = dict(
-    #pid = 'i4',
-    X   = 'f4',
-    Y   = 'f4',
-    Z   = 'f4',
-    lon = 'f4',
-    lat = 'f4'
-)
+    # pid = 'i4',
+    X='f4', Y='f4', Z='f4',
+    lon='f4', lat='f4')
+
 
 # NetCDF attributes
 variables_ncatt = dict(
@@ -42,15 +39,15 @@ variables_ncatt = dict(
     lat = dict(long_name     = 'particle latitude',
                standard_name = 'latitude',
                units         = 'degrees_north'),
-    
+
     )
-    
+
 
 class OutPut(object):
 
     def __init__(self, setup):
 
-        nc = Dataset(setup.output_filename, mode='w', 
+        nc = Dataset(setup.output_filename, mode='w',
                      format="NETCDF3_CLASSIC")
 
         # --- Dimensions
@@ -62,7 +59,7 @@ class OutPut(object):
         v.long_name = 'time'
         v.standard_name = 'time'
         v.units = 'seconds since %s' % setup.start_time
-        #v.calendar = 'proleptic_gregorian'
+        # v.calendar = 'proleptic_gregorian'
         # Ha mer fleksibilitet av valg av referansetid
 
         # ---- Particle distribution variables
@@ -78,9 +75,9 @@ class OutPut(object):
         v.long_name = 'number of particles'
 
         # --- Output variables
-        
+
         for var in setup.output_variables:
-            print var
+            print(var)
             v = nc.createVariable(var, 'f4', ('particle_dim',))
             atts = variables_ncatt[var]
             for att in atts:
@@ -99,21 +96,21 @@ class OutPut(object):
         self.outstep  =  setup.output_period * setup.dt
         self.output_variables = setup.output_variables
         self.pvars = setup.output_variables
-        
+
     # --------------
- 
+
     def write(self, state):
         """
         Write a particle distribution
         """
 
-        Npar = len(state) 
+        Npar = len(state)
         t = self.outcount
         nc = self.nc
 
         # Write to time variables
         nc.variables['pstart'][t] = self.pstart
-        nc.variables['pcount'][t] = Npar     
+        nc.variables['pcount'][t] = Npar
         nc.variables['time'][t] = t * self.outstep
 
         # Write to particle properties
@@ -122,7 +119,7 @@ class OutPut(object):
         for var in self.output_variables:
             nc.variables[var][T] = getattr(state, var)
 
-        # Write 
+        # Write
         self.pstart += Npar
         self.outcount += 1
 
@@ -131,8 +128,3 @@ class OutPut(object):
     def close(self):
 
         self.nc.close()
-
-
-
-
-    

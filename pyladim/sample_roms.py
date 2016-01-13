@@ -25,15 +25,15 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     mid-points in the s-levels.
 
     Typical usage::
-    
+
     >>> fid = Dataset(roms_file)
     >>> H = fid.variables['h'][:,:]
     >>> C = fid.variables['Cs_r'][:]
     >>> Hc = fid.variables['hc'].getValue()
     >>> z_rho = sdepth(H, Hc, C)
 
-    """    
-    H = np.asarray(H)              
+    """
+    H = np.asarray(H)
     Hshape = H.shape      # Save the shape of H
     H = H.ravel()         # and make H 1D for easy shape maniplation
     C = np.asarray(C)
@@ -44,34 +44,34 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     elif stagger == 'w':
         S = np.linspace(-1.0, 0.0, N)
     else:
-        raise ValueError, "stagger must be 'rho' or 'w'"
+        raise ValueError("stagger must be 'rho' or 'w'")
 
     if Vtransform == 1:         # Default transform by Song and Haidvogel
-        A = Hc * (S - C)[:,None]
+        A = Hc * (S - C)[:, None]
         B = np.outer(C, H)
         return (A + B).reshape(outshape)
 
     elif Vtransform == 2:       # New transform by Shchepetkin
-        N = Hc*S[:,None] + np.outer(C, H)
+        N = Hc*S[:, None] + np.outer(C, H)
         D = (1.0 + Hc/H)
         return (N/D).reshape(outshape)
 
     else:
-        raise ValueError, "Unknown Vtransform"
+        raise ValueError("Unknown Vtransform")
 
 # -----------------------------
 
+
 # Returnere I, J, p, q også??
 # Disse fort å finne uansett
-
 def Z2S(z_rho, X, Y, Z):
     """
     Find s-levels K and A such that
-    i)  -Z < z_rho[0], 
+    i)  -Z < z_rho[0],
              K=1,   A=1
     ii) z_rho[k-1] <= -Z < z_rho[k], k = 1, ..., kmax-1
              K=k,   A=(z_rho[k] + Z)/(z_rho[k]-z_rho[k-1])
-    iii) z_rho[kmax-1] <= -Z, 
+    iii) z_rho[kmax-1] <= -Z,
              K=kmax-1, A=0
 
     Find integer array K and real array A s.th.
@@ -82,7 +82,7 @@ def Z2S(z_rho, X, Y, Z):
        -Z > z_rho[kmax-1] : K = kmax-1, A = 0
 
     """
-    
+
     kmax, jmax, imax = z_rho.shape
     pmax = Z.shape
 
@@ -91,7 +91,7 @@ def Z2S(z_rho, X, Y, Z):
     I = np.around(X).astype('int')
     J = np.around(Y).astype('int')
 
-    # Find integer array K such that 
+    # Find integer array K such that
     #   z_rho[K[p]-1, J[p], I[p]] < -Z[p] <= z_rho[K[p], J[p], I[p]]
     K = np.sum(z_rho[:,J,I] < -Z, axis=0)
     K = K.clip(1, kmax-1)
@@ -102,12 +102,11 @@ def Z2S(z_rho, X, Y, Z):
 
 
 # --------
-
 def sample3D(F, X, Y, K, A):
     """
 
     F = 3D field
-    S = depth structure matrix 
+    S = depth structure matrix
     X, Y = Horizontal grid coordinates
     Z = Depth [m, positive downwards]
 
@@ -121,18 +120,18 @@ def sample3D(F, X, Y, K, A):
     # Alle partikler samme dyp => kan interpolere et 2D felt i dette dypet
     # og deretter interpolere i dette planet
     #
-    # Alternativt: 
+    # Alternativt:
     # 1) Finne s-verdi for alle punkter
     # 2) Interpolere (tri)-lineært i XYs-systemet,
     # Gjøre dette vektorielt, eller gå til cython/fortran med en gang
     # (løkke vil bli veldig treigt i python)
 
     """
-    
+
     # Find rho-point as lower left corner
     I = X.astype('int')
     J = Y.astype('int')
-    
+
     P = X - I
     Q = Y - J
     W000 = (1-P)*(1-Q)*(1-A)
@@ -144,37 +143,39 @@ def sample3D(F, X, Y, K, A):
     W101 = P*(1-Q)*A
     W111 = P*Q*A
 
-    return (   W000*F[K,J,I]     + W010*F[K,J+1,I]
-            +  W100*F[K,J,I+1]   + W110*F[K,J+1,I+1]
-            +  W001*F[K-1,J,I]   + W011*F[K-1,J+1,I]
-            +  W101*F[K-1,J,I+1] + W111*F[K-1,J+1,I+1] )   
+    return (   W000*F[K, J, I]     + W010*F[K, J+1, I]
+            +  W100*F[K, J, I+1]   + W110*F[K, J+1, I+1]
+            +  W001*F[K-1, J, I]   + W011*F[K-1, J+1, I]
+            +  W101*F[K-1, J, I+1] + W111*F[K-1, J+1, I+1] )
 
 
-#def sample3D(F, X, Y, Z):
+# def sample3D(F, X, Y, Z):
 #    K, A = Z2S(z_rho, X, Y, Z)
 #    F0 = sample3D_(F, X, Y, K, A)
 
 def sample3DU(U, X, Y, K, A):
     return sample3D(U, X-0.5, Y, K, A)
 
+
 def sample3DV(V, X, Y, K, A):
     return sample3D(V, X, Y-0.5, K, A)
+
 
 def sample2D(F, X, Y):
     """Bilinear sample of a 2D field
 
     *F* : 2D array
-    
+
     *X*, *Y* : position in grid coordinates, scalars or compatible arrays
 
     Note reversed axes, for integers i and j we have
       ``sample2D(F, i, j) = F[j,i]``
 
     Using linear interpolation
-    
+
     """
 
-    Z = np.add(X,Y)     # Test for compatibility
+    Z = np.add(X, Y)    # Test for compatibility
     if np.isscalar(Z):  # Both X and Y are scalars
         I = int(X)
         J = int(Y)
@@ -193,8 +194,3 @@ def sample2D(F, X, Y):
     W01 = (1-P)*Q
     W10 = P*(1-Q)
     W11 = P*Q
-
-    return W00*F[J,I] + W01*F[J+1,I] + W10*F[J,I+1] + W11*F[J+1,I+1]
-    
-
-

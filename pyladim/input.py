@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+# import datetime
 from netCDF4 import Dataset, num2date
 from roppy import SGrid
 
 
-
 def total_seconds(tdelta):
     """Total time in seconds of a timedelta"""
-    # Method in python 2.7 
+    # Method in python 2.7
     # Included as a function here for older version
     return tdelta.days*86400 + tdelta.seconds
+
 
 class ROMS_input(SGrid):
     """
@@ -51,7 +51,7 @@ class ROMS_input(SGrid):
         # --------------------------------------------
         step = []
         for j in range(len(timevar)):
-            t = timevar[j]
+            # t = timevar[j]
             otime = num2date(timevar[j], self._time_units)
             step.append(
                  int(float(total_seconds(otime - start_time)) / setup.dt))
@@ -63,29 +63,29 @@ class ROMS_input(SGrid):
         while step[n+1] <= 0:
             n = n + 1
         fieldnr = n
-        #print step[fieldnr], step[fieldnr+1]
+        # print step[fieldnr], step[fieldnr+1]
         self._timespan = step[fieldnr+1] - step[fieldnr]
 
         # Read old input
         # --------------
         self.T1, self.U1, self.V1 = self._readfield(fieldnr)
 
-        #print step[fieldnr], " < ", 0, " <= ", step[fieldnr+1]
-        
+        # print step[fieldnr], " < ", 0, " <= ", step[fieldnr+1]
+
         # Variables needed by update
-        #timevar = timevar
-        self._step    = step
+        # timevar = timevar
+        self._step = step
         self._fieldnr = fieldnr
 
     # ==============================================
 
     def update(self, t):
         """Update the fields to time step t"""
-        #dt = self.dt
+        # dt = self.dt
         step = self._step
         fieldnr = self._fieldnr
-        
-        if t == step[fieldnr]: # No interpolation necessary
+
+        if t == step[fieldnr]:  # No interpolation necessary
             self.F = self.T1
             self.U = self.U1
             self.V = self.V1
@@ -96,12 +96,12 @@ class ROMS_input(SGrid):
             self.U0 = self.U1
             self.V0 = self.V1
             self.T1, self.U1, self.V1 = self._readfield(fieldnr)
-            #print step[fieldnr-1], " < ", t, " <= ", step[fieldnr]
+            # print step[fieldnr-1], " < ", t, " <= ", step[fieldnr]
             self._timespan = step[fieldnr] - step[fieldnr-1]
             self._fieldnr = fieldnr
 
         # Linear interpolation in time
-        #print "fieldnr ... = ", fieldnr, step[fieldnr]-t, self._timespan
+        # print "fieldnr ... = ", fieldnr, step[fieldnr]-t, self._timespan
         a = float(step[fieldnr]-t) / self._timespan
         self.F = a*self.T0 + (1-a)*self.T1
         self.U = a*self.U0 + (1-a)*self.U1
@@ -115,8 +115,8 @@ class ROMS_input(SGrid):
         U = self.nc.variables['u'][n, :, self.Ju, self.Iu]
         V = self.nc.variables['v'][n, :, self.Jv, self.Iv]
         if self.verbose:
-            print "Reading ROMS input, input time = ",   \
-                   num2date(self._timevar[n], self._time_units)
+            print("Reading ROMS input, input time = ",
+                  num2date(self._timevar[n], self._time_units))
         return T, U, V
 
     # ------------------
@@ -125,8 +125,3 @@ class ROMS_input(SGrid):
 
         # Close the ROMS grid file
         self.nc.close()
-
-
-
-
-
