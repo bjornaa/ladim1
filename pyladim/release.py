@@ -57,7 +57,7 @@ class ParticleReleaser(object):
         # for line in self.fid:
         while 1:
             try:
-                line = self.fid.next()
+                line = next(self.fid)
             except StopIteration:
                 print("==>  end of file")
 

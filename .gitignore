@@ -36,3 +36,5 @@ postpro/*.png
 *.log
 *.out
 
+# NetCDF
+*.nc

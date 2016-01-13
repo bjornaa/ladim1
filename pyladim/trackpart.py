@@ -5,8 +5,9 @@ import numpy as np
 
 # from roppy import SGrid, sample2DU, sample2DV
 # from roppy import SGrid, sample2D
-# from roppy import sample2D
-from sample_roms import Z2S, sample3DU, sample3DV, sample2D
+from roppy import sample2D
+# from sample_roms import Z2S, sample3DU, sample3DV, sample2D
+from sample_roms import Z2S, sample3DU, sample3DV
 
 # ---------------------
 
@@ -41,7 +42,7 @@ def Euler_Forward(grid, U, V, X, Y, Z, dt=3600, nstep=1):
         # Up = sample2D(U[-1,:,:], X[:]-i0+0.5, Y[:]-j0)
         # Vp = sample2D(V[-1,:,:], X[:]-i0, Y[:]-j0+0.5)
 
-        X += Up * dt* pm
-        Y += Vp * dt* pn
+        X += Up * dt * pm
+        Y += Vp * dt * pn
 
     return X, Y

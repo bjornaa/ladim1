@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np    # Midlertidig, unødvendig når skikkelig initiering
+# import numpy as np
 from netCDF4 import num2date
 from trackpart import Euler_Forward
 from input import ROMS_input

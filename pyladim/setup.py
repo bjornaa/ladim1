@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import configparser
+try:
+    import configparser   # python3
+except ImportError:       # python2
+    import ConfigParser as configparser
 
 
 class Container(object):
