@@ -6,11 +6,11 @@ from netCDF4 import Dataset, num2date
 # Methods:
 #  get_positions : all positions at time n (flag for lon, lat?)
 #  get_variable_distribution : all variables at time n
-#  
+#
 #  active(p, n) : 1  if p is active at time n
 #                 0  if p is not released (yet)
 #                 -1 if p is deactivated
-# Bedre navn: status?, activity_status 
+# Bedre navn: status?, activity_status
 #  first_time(p) : First time frame it is active
 #  last_time(p)  : Last time it is active
 #
@@ -26,7 +26,7 @@ class ParticleFile(object):
     def get_time(self, n):
         tvar = self.nc.variables['time']
         return num2date(tvar[n], tvar.units)
-        
+
     def get_position(self, n):
         """Get particle positions at n-th time frame"""
         f = self.nc
@@ -58,10 +58,10 @@ class ParticleFile(object):
                      = ha en fill value if not active
 
         """
-        
+
         pid = self.get_variable(n, 'pid')
-        
-        if pid[-1] < p: # particle not released yet
+
+        if pid[-1] < p:  # particle not released yet
             active = 0
 
         index = pid.searchsorted(p)
@@ -75,48 +75,41 @@ class ParticleFile(object):
     def read_track(self, p):
         """Get particle positions along a single track"""
 
-
         f = self.nc
-
-
         X, Y = [], []
-        first_time = None  
-        last_time  = None  
+        first_time = None
+        last_time = None
 
         # After loop
         # particle is alive for n in [first_time:last_time]
         # or to the end if last_time == 0
 
-        for n in xrange(self.nFrames):
+        for n in range(self.nFrames):
             pstart = f.variables['pstart'][n]
             pcount = f.variables['pcount'][n]
             pid = f.variables['pid'][pstart:pstart+pcount][:]
 
-            if pid[-1] < p: # particle not released yet
-                cycle
+            if pid[-1] < p:  # particle not released yet
+                continue
 
-            if first_time != None:
+            if first_time is not None:
                 first_time = n
 
-            #index = sum(pid < p) # eller lignende
+            # index = sum(pid < p) # eller lignende
             index = pid.searchsorted(p)
-            if pid[index] < p   : # p is missing
-                last_time = n     # 
+            if pid[index] < p:  # p is missing
+                last_time = n     #
                 break             # No need for more cycles
-    
+
             X.append(f.variables['X'][pstart + index])
             Y.append(f.variables['Y'][pstart + index])
 
         return X, Y, first_time, last_time
 
-    def close(self):
-        self.nc.close()
-
 # ----------------------------------
 
 # Ikke testet nok for udefinerte partikler
 # f.eks. for store => I[J] blir upassende
-
 
     def read_tracks(self, P):
         """Get particle positions along tracks
@@ -134,26 +127,24 @@ class ParticleFile(object):
         X = np.nan + np.zeros((self.nFrames, nP))
         Y = np.nan + np.zeros((self.nFrames, nP))
 
+        for n in range(self.nFrames):
 
-        for n in xrange(self.nFrames):
-            
             pstart = f.variables['pstart'][n]
             pcount = f.variables['pcount'][n]
+            print(pstart, pcount)
             tslice = slice(pstart, pstart+pcount)   # time slice
-            pid = f.variables['pid'][tslice]        
+            pid = f.variables['pid'][tslice]
 
-            I = pid.searchsorted(P+1)               
+            I = pid.searchsorted(P+1)
             J, = np.nonzero(I == pid[I-1])
 
             Xn = f.variables['X'][tslice]
             Yn = f.variables['Y'][tslice]
 
-            X[n,J] = Xn[I[J]]
-            Y[n,J] = Yn[I[J]]
+            X[n, J] = Xn[I[J]]
+            Y[n, J] = Yn[I[J]]
 
         return X, Y
 
     def close(self):
         self.nc.close()
-
-
