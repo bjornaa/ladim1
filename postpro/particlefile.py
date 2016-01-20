@@ -131,7 +131,6 @@ class ParticleFile(object):
 
             pstart = f.variables['pstart'][n]
             pcount = f.variables['pcount'][n]
-            print(pstart, pcount)
             tslice = slice(pstart, pstart+pcount)   # time slice
             pid = f.variables['pid'][tslice]
 
