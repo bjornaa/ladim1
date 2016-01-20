@@ -7,13 +7,13 @@ from romsutil import *
 
 f = Dataset('data/ocean_avg_0014.nc')
 
-H = f.variables['h'][:,:]
+H = f.variables['h'][:, :]
 Hc = f.variables['hc'][:]
 C = f.variables['sc_r'][:]
 
 z_rho = sdepth(H, Hc, C)
 
-print "z_rho.shape = ", z_rho.shape
+print("z_rho.shape = ", z_rho.shape)
 
 X = np.array([90.2, 90.2, 90.2, 90.2,  90.2,  90.8,  93.8])
 Y = np.array([99.9, 99.9, 99.9, 99.9,  99.9, 100.2, 106.3])
@@ -26,4 +26,3 @@ print "Z = ", Z
 K, A = Z2S(z_rho, X, Y, Z)
 
 print sample3D_(z_rho, X, Y, K, A)
-
