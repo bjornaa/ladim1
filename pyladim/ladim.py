@@ -6,7 +6,7 @@ from netCDF4 import num2date
 from trackpart import Euler_Forward
 from input import ROMS_input
 from release import ParticleReleaser
-from setup import readsup, writesup
+from config import read_config, write_config
 from output import OutPut
 from behaviour import behaviour
 
@@ -14,16 +14,16 @@ from behaviour import behaviour
 # Initiate the model
 # ==================
 
-# Read the setup file
+# Read the configuration file
 # --------------------
 
-setup_file = 'ladim.sup'      # take from command line
-setup = readsup('ladim.sup')
+config_file = 'ladim.sup'      # take from command line
 
-print(" --- pyladim setup ----")
-print("setup file: ", setup_file)
-writesup(setup)
-print(" --- end of setup ---\n")
+print(" --- pyladim configuration ----")
+setup = read_config('ladim.sup')
+print("configuration file: ", config_file)
+write_config(setup)
+print(" --- end of configuration ---\n")
 
 nsteps = setup.nsteps
 dt = setup.dt

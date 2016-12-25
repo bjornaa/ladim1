@@ -21,7 +21,7 @@ class Container(object):
 # ----------------------
 
 
-def readsup(supfile):
+def read_config(config_file):
 
     # Default values for optional setup elements
     defaults = dict(
@@ -35,21 +35,9 @@ def readsup(supfile):
 
     config = configparser.ConfigParser(defaults)
 
-    config.read(supfile)
+    config.read(config_file)
 
     setup = Container()
-#    setup = dict()
-
-    # ---------------
-    # Section [time]
-    # ---------------
-
-    # Mangler: sjekk: både stop_time og nsteps finnes
-    #           gi warning dersom ikke stemmer overens
-    # Dersom total_time ikke delelig med dt
-    #    Reduser stop_time tilsvarende.
-    #   => tidsteg 1 dag, gjør ikke noe for total_time = 3 hours
-    #    Ta med å gi warning
 
     setup['dt'] = int(config.get('time', 'dt'))
     print(setup.dt)
@@ -123,7 +111,7 @@ def readsup(supfile):
 
 
 # --------------
-def writesup(setup):
+def write_config(setup):
     # Make an explicit sequence of keys
     # Can be improved with ordered_dict (from python 2.7)
     time_keys = ['start_time', 'stop_time', 'dt', 'nsteps']
@@ -144,6 +132,6 @@ def writesup(setup):
 # -------------
 
 if __name__ == '__main__':
-    supfile = '../ladim.sup'
-    setup = readsup(supfile)
-    writesup(setup)
+    config_file = '../ladim.sup'
+    setup = read_config(config_file)
+    write_config(setup)
