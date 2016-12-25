@@ -73,13 +73,14 @@ def readsup(supfile):
         setup['stop_time'] = datetime.datetime.strptime(
             stop_time, "%Y-%m-%d %H:%M:%S")
         total_time = setup.stop_time - setup.start_time
-        setup['nsteps'] = ((total_time.days*86400 + total_time.seconds)
-                           // setup.dt)
+        setup['nsteps'] = (
+            (total_time.days*86400 + total_time.seconds) // setup.dt)
 
     else:
         # Raise exception instead
         print("***Error in setup: must have nsteps or stop_time")
-        import sys; sys.exit(1)
+        import sys
+        sys.exit(1)
 
     # ----------
     # Input

@@ -27,7 +27,7 @@ class State(object):
         # Bør ha kontroll, samme navn, ellers udefinert
         for v in self.names:
             setattr(self, v,
-                np.concatenate((getattr(self, v), getattr(other, v))))
+                    np.concatenate((getattr(self, v), getattr(other, v))))
 
 # --------------------------------
 
@@ -44,12 +44,13 @@ class ParticleReleaser(object):
 
         # Init empty particle release values
         self._pid, self._start = [], []
-        self._X, self._Y, self._Z  = [], [], []
+        self._X, self._Y, self._Z = [], [], []
         self._makestate()
 
         # Read until first time line
         for line in self.fid:
-            if line[0] == 'T' : break
+            if line[0] == 'T':
+                break
 
     # ------
     def read_particles(self):  # Leser til neste "T"
@@ -72,10 +73,12 @@ class ParticleReleaser(object):
             line = line.strip()
 
             # Skip blank lines
-            if not line: continue
+            if not line:
+                continue
 
             # Skip comments
-            if line[0] in ['#', '!']: continue
+            if line[0] in ['#', '!']:
+                continue
 
             if line[0] == 'G':   # Grid coordinates
                 self.particle_counter += 1   # New particle
@@ -88,7 +91,7 @@ class ParticleReleaser(object):
                 self._Z.append(float(w[3]))
                 self._start.append(self.release_step)
 
-            if line[0] == "T": # Time line
+            if line[0] == "T":  # Time line
 
                 self._makestate()  # Make new state
 
@@ -153,7 +156,8 @@ if __name__ == "__main__":
         for i in range(len(q)):
             print("%8d %8.2f %8.2f %8.2f %6d" % (
                 q.pid[i], q.X[i], q.Y[i], q.Z[i], q.start[i]))
-        if p.release_step < 0: break
+        if p.release_step < 0:
+            break
 
     p.close()
 

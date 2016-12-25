@@ -15,7 +15,7 @@ particle_file = '../output/pyladim_out.nc'
 roms_file = '../input/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, j0 = 70,   80
+i0, j0 = 70, 80
 i1, j1 = 150, 133
 
 t = 30     # time step 31

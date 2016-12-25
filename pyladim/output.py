@@ -25,21 +25,20 @@ variables_nctype = dict(
 
 # NetCDF attributes
 variables_ncatt = dict(
-    #pid = dict(long_name     = 'particle identifier',
+    # pid = dict(long_name     = 'particle identifier',
     #           cf_role       = 'trajectory_id'),
-    X   = dict(long_name     = 'grid X-coordinate of particles'),
-    Y   = dict(long_name     = 'grid Y-coordinate of particles'),
-    Z   = dict(long_name     = 'particle depth',
-               standard_name = 'depth',
-               units         = 'm',
-               positive      = 'down'),
-    lon = dict(long_name     = 'particle longitude',
-               standard_name = 'longitude',
-               units         = 'degrees_east'),
-    lat = dict(long_name     = 'particle latitude',
-               standard_name = 'latitude',
-               units         = 'degrees_north'),
-
+    X=dict(long_name='grid X-coordinate of particles'),
+    Y=dict(long_name='grid Y-coordinate of particles'),
+    Z=dict(long_name='particle depth',
+           standard_name='depth',
+           units='m',
+           positive='down'),
+    lon=dict(long_name='particle longitude',
+             standard_name='longitude',
+             units='degrees_east'),
+    lat=dict(long_name='particle latitude',
+             standard_name='latitude',
+             units='degrees_north'),
     )
 
 
@@ -92,8 +91,8 @@ class OutPut(object):
         # --- Initialize
         self.nc = nc
         self.outcount = 0
-        self.pstart   = 0
-        self.outstep  =  setup.output_period * setup.dt
+        self.pstart = 0
+        self.outstep = setup.output_period * setup.dt
         self.output_variables = setup.output_variables
         self.pvars = setup.output_variables
 

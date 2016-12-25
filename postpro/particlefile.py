@@ -62,13 +62,15 @@ class ParticleFile(object):
         pid = self.get_variable(n, 'pid')
 
         if pid[-1] < p:  # particle not released yet
-            active = 0
+            pass
+            # active = 0
 
         index = pid.searchsorted(p)
         if pid[index] < p:      # p is missing, but has been active
-            active = -1
+            pass
+            # active = -1
 
-        A = self.get_variable(n, vname)
+        # A = self.get_variable(n, vname)
 
 # ------------------------------
 

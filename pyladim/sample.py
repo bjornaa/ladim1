@@ -21,7 +21,7 @@ Horizontal sampling
 # 2010-09-30
 # -----------------------------------
 
-import datetime
+# import datetime
 import numpy as np
 
 # ---------------------
@@ -61,7 +61,7 @@ def sample2D2(F, X, Y):
     W10 = P*(1-Q)
     W11 = P*Q
 
-    return W00*F[J,I] + W01*F[J+1,I] + W10*F[J,I+1] + W11*F[J+1,I+1]
+    return W00*F[J, I] + W01*F[J+1, I] + W10*F[J, I+1] + W11*F[J+1, I+1]
 
 # --------------------------------------------------
 
@@ -108,24 +108,26 @@ def sample2D_masked(F, M, X, Y):
         P = X0 - I
         Q = Y0 - J
 
-    W00 = M[J,I]*(1-P)*(1-Q)
-    W01 = M[J+1,I]*(1-P)*Q
-    W10 = M[J,I+1]*P*(1-Q)
-    W11 = M[J+1,I+1]*P*Q
+    W00 = M[J, I]*(1-P)*(1-Q)
+    W01 = M[J+1, I]*(1-P)*Q
+    W10 = M[J, I+1]*P*(1-Q)
+    W11 = M[J+1, I+1]*P*Q
     if masked:
-        W00 = M[J,I]     * W00
-        W01 = M[J+1,I]   * W01
-        W10 = M[J,I+1]   * W10
-        W11 = M[J+1,I+1] * W11
+        W00 = M[J, I] * W00
+        W01 = M[J+1, I] * W01
+        W10 = M[J, I+1] * W10
+        W11 = M[J+1, I+1] * W11
     SW = W00 + W01 + W10 + W11
-    F_interp = np.where(SW > 0,
-            (W00*F[J,I] + W01*F[J+1,I] + W10*F[J,I+1] + W11*F[J+1,I+1])/SW,
-             0.0)
-    #F_interp = np.ma.masked_where(SW == 0, F_interp)
+    F_interp = np.where(
+        SW > 0,
+        (W00*F[J, I] + W01*F[J+1, I] + W10*F[J, I+1] + W11*F[J+1, I+1])/SW,
+        0.0)
+    # F_interp = np.ma.masked_where(SW == 0, F_interp)
 
     return F_interp
 
 # ------------------
+
 
 def sample2D(F, X, Y, mask=None, undef_value=0.0, outside_value=None):
     """Bilinear sample of a 2D field
@@ -200,15 +202,16 @@ def sample2D(F, X, Y, mask=None, undef_value=0.0, outside_value=None):
     SW = 1.0   # Sum of weigths
 
     if mask is not None:
-        W00 = mask[J, I]     * W00
-        W01 = mask[J+1, I]   * W01
-        W10 = mask[J, I+1]   * W10
+        W00 = mask[J, I] * W00
+        W01 = mask[J+1, I] * W01
+        W10 = mask[J, I+1] * W10
         W11 = mask[J+1, I+1] * W11
         SW = W00 + W01 + W10 + W11
 
-    SW = np.where(SW==0, -1.0, SW)  # Avoid division by zero below
-    S = np.where(SW <= 0, undef_value,
-          (W00*F[J,I] + W01*F[J+1,I] + W10*F[J,I+1] + W11*F[J+1,I+1])/SW)
+    SW = np.where(SW == 0, -1.0, SW)  # Avoid division by zero below
+    S = np.where(
+        SW <= 0, undef_value,
+        (W00*F[J, I] + W01*F[J+1, I] + W10*F[J, I+1] + W11*F[J+1, I+1])/SW)
 
     # Set in outside_values
     if outside_value:
@@ -249,7 +252,7 @@ def bilin_inv(f, g, F, G, maxiter=7, tol=1.0e-7):
         x = 0.5*imax
         y = 0.5*jmax
 
-    else: # vector target
+    else:  # vector target
         f = np.asarray(f)
         g = np.asarray(g)
         fshape = f.shape
@@ -275,10 +278,10 @@ def bilin_inv(f, g, F, G, maxiter=7, tol=1.0e-7):
         p, q = x - i, y - j
 
         # Bilinear estimate of F[x,y] and G[x,y]
-        Fs = (1-p)*(1-q)*F[i,j] + p*(1-q)*F[i+1,j] + \
-             (1-p)*q*F[i,j+1] + p*q*F[i+1,j+1]
-        Gs = (1-p)*(1-q)*G[i,j] + p*(1-q)*G[i+1,j] + \
-             (1-p)*q*G[i,j+1] + p*q*G[i+1,j+1]
+        Fs = (1-p)*(1-q)*F[i, j] + p*(1-q)*F[i+1, j] + \
+             (1-p)*q*F[i, j+1] + p*q*F[i+1, j+1]
+        Gs = (1-p)*(1-q)*G[i, j] + p*(1-q)*G[i+1, j] + \
+             (1-p)*q*G[i, j+1] + p*q*G[i+1, j+1]
 
         H = (Fs - f)**2 + (Gs - g)**2
         # print t, H
@@ -286,17 +289,17 @@ def bilin_inv(f, g, F, G, maxiter=7, tol=1.0e-7):
             break
 
         # Estimate Jacobi matrix
-        Fx = (1-q)*(F[i+1,j]-F[i,j]) + q*(F[i+1,j+1]-F[i,j+1])
-        Fy = (1-p)*(F[i,j+1]-F[i,j]) + p*(F[i+1,j+1]-F[i+1,j])
-        Gx = (1-q)*(G[i+1,j]-G[i,j]) + q*(G[i+1,j+1]-G[i,j+1])
-        Gy = (1-p)*(G[i,j+1]-G[i,j]) + p*(G[i+1,j+1]-G[i+1,j])
+        Fx = (1-q)*(F[i+1, j]-F[i, j]) + q*(F[i+1, j+1]-F[i, j+1])
+        Fy = (1-p)*(F[i, j+1]-F[i, j]) + p*(F[i+1, j+1]-F[i+1, j])
+        Gx = (1-q)*(G[i+1, j]-G[i, j]) + q*(G[i+1, j+1]-G[i, j+1])
+        Gy = (1-p)*(G[i, j+1]-G[i, j]) + p*(G[i+1, j+1]-G[i+1, j])
 
         # Newton-Raphson step
         # Jinv = np.linalg.inv([[Fx, Fy], [Gx, Gy]])
         # incr = - np.dot(Jinv, [Fs-f, Gs-g])
         # x = x + incr[0], y = y + incr[1]
         det = Fx*Gy - Fy*Gx
-        x = x - ( Gy*(Fs-f) - Fy*(Gs-g)) / det
+        x = x - (Gy*(Fs-f) - Fy*(Gs-g)) / det
         y = y - (-Gx*(Fs-f) + Fx*(Gs-g)) / det
 
     return x, y
