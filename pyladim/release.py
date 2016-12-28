@@ -7,20 +7,46 @@ import numpy as np
 # ------------------------
 
 
+class ParticleVariables(object):
+    """Class holding the particle variables"""
+
+    def __init__(self, setup):
+        self.names = ['release_time']
+        self.converter = {'release_time': np.datetime64}
+        for name, dtype in setup.particle_variables:
+            self.names.append(name)
+            self.converter[name] = dtype
+        for name in self.names:
+            setattr(self, name, np.array([], dtype=self.converter[name]))
+
+    def __getitem__(self, name):
+        return getattr(self, name)
+
+
 class State(object):
     """Class holding model state variables"""
 
-    def __init__(self, names, arrays):
-        self.names = names
-        for v, a in zip(names, arrays):
-            setattr(self, v, a)
+    def __init__(self, setup):
+        self.names = ['pid', 'X', 'Y', 'Z']
+        self.converter = {
+            'pid': int,
+            'X': float,
+            'Y': float,
+            'Z': float}
+        for name, dtype in setup.state_variables:
+            self.names.append(name)
+            if dtype == 'int':
+                self.converter[name] = int
+            else:
+                self.converter[name] = float
+        for name in self.names:
+            setattr(self, name, np.array([], dtype=self.converter[name]))
 
-    def __getitem__(self, i):
-        """self[i] gives a tuple at time i"""
-        return tuple(getattr(self, v)[i] for v in self.names)
+    def __getitem__(self, name):
+        return getattr(self, name)
 
     def __len__(self):
-        return len(getattr(self, self.names[0]))
+        return len(getattr(self, self.X))
 
     def addstate(self, other):
         """Concatenate states"""
@@ -35,94 +61,56 @@ class State(object):
 class ParticleReleaser(object):
 
     def __init__(self, setup):
-        self.dt = setup.dt  # Finne annen måte å få tak i denne setup-info?
+        # Missing control that fields add upp
+        # Init state e.t.c. separately
 
         # Open the file and init counters
         self.fid = open(setup.particle_release_file)
         self.particle_counter = 0
         self.release_step = 0
 
-        # Init empty particle release values
-        self._pid, self._start = [], []
-        self._X, self._Y, self._Z = [], [], []
-        self._makestate()
+        # Initiate empty state
+        self.particle_variables = ParticleVariables(setup)
+        self.state = State(setup)
 
-        # Read until first time line
-        for line in self.fid:
-            if line[0] == 'T':
-                break
+        # Read first line
+        line = next(self.fid)
+        next_time = np.datetime64('T'.join(line.split()[1:3]))
+        tdelta = np.timedelta64(next_time - setup.start_time, 's').astype(int)
+        self.next_time = tdelta / setup.dt
+        self.next_line = line
+
+        self.dt = setup.dt
+        self.start_time = setup.start_time
 
     # ------
-    def read_particles(self):  # Leser til neste "T"
+    def release_particles(self, timestep):  # Leser til neste "T"
 
-        # for line in self.fid:
-        while 1:
-            try:
-                line = next(self.fid)
-            except StopIteration:
-                print("==>  end of file")
-
-                # Save final array versions of the accumultators
-                self._makestate()
-
-                # Indicate end of file by impossible value for release_step
-                self.release_step = -99
+        append = dict()
+        for name in self.state.names:
+            append[name] = []
+        while True:
+            line = self.next_line
+            self.next_line = next(self.fid)  # Read one line aheaad
+            w = line.split()
+            timestamp = np.datetime64('T'.join(w[1:3]))
+            release_step = np.timedelta64(timestamp-self.start_time, 's')
+            release_step = release_step.astype(int) / self.dt
+            if release_step > timestep:
+                # Append to state
+                for name in self.state.names:
+                    np.concatenate((self.state[name], append[name]))
+                self.next_time = release_step
                 break
-
-            # Remove trailing white space
-            line = line.strip()
-
-            # Skip blank lines
-            if not line:
-                continue
-
-            # Skip comments
-            if line[0] in ['#', '!']:
-                continue
-
-            if line[0] == 'G':   # Grid coordinates
-                self.particle_counter += 1   # New particle
-
-                # Add particle characteristics to accumulators
-                w = line.split()
-                self._pid.append(self.particle_counter)
-                self._X.append(float(w[1]))
-                self._Y.append(float(w[2]))
-                self._Z.append(float(w[3]))
-                self._start.append(self.release_step)
-
-            if line[0] == "T":  # Time line
-
-                self._makestate()  # Make new state
-
-                # Next release step
-                if line[1] == "R":  # Relative time
-                    w = line.split()
-                    tdelta = int(w[1])
-                    units = w[2]
-                    if units[0] == 'h':
-                        tdelta = tdelta*3600
-                    elif units[0] == 'd':
-                        tdelta = tdelta*24*3600
-                    self.release_step = tdelta // self.dt
-
-                # Initialise accumulators for next step
-                self._pid, self._start = [], []
-                self._X, self._Y, self._Z = [], [], []
-
-                # Pause the file reading, returning control to caller
-                break
-
-    def _makestate(self):
-        self.state = State(
-              ('pid', 'X', 'Y', 'Z', 'start'),
-              (np.array(self._pid, dtype='int'),
-               np.array(self._X, dtype='float32'),
-               np.array(self._Y, dtype='float32'),
-               np.array(self._Z, dtype='float32'),
-               np.array(self._start, dtype='int')))
-
-    # --------
+            mult = int(w[0])
+            self.particle_counter += 1
+            append['pid'].extend(list(
+                range(self.particle_counter, self.particle_counter+mult)))
+            self.particle_counter += mult - 1
+            for i, name in enumerate(self.state.names[1:]):
+                print(i, name, w[i+3])
+                append[name].extend(mult*[self.state.converter[name](w[3+i])])
+            print(append)
 
     def close(self):
         self.fid.close()
@@ -136,10 +124,10 @@ if __name__ == "__main__":
     # Virker ikke med relative adresser fordi feil katalog
 
     import sys
-    from setup import readsup
+    from config import read_config
 
-    setup = readsup('../ladim.sup')
-    setup.particle_release_file = '../input/line.in'
+    setup = read_config('../ladim.sup')
+    setup.particle_release_file = '../input/lice.in'
 
     # Take optional release file from command line
     if len(sys.argv) > 1:
@@ -150,7 +138,7 @@ if __name__ == "__main__":
     while 1:
 
         # print "==> ", p.release_step, p.particle_counter
-        p.read_particles()
+        p.release_particles(0)
         q = p.state
         # print p.X
         for i in range(len(q)):

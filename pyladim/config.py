@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+# import datetime
+import numpy as np
 try:
     import configparser   # python3
 except ImportError:       # python2
@@ -43,32 +44,14 @@ def read_config(config_file):
     print(setup.dt)
 
     start_time = config.get('time', 'start_time')
-    setup['start_time'] = datetime.datetime.strptime(
-        start_time, "%Y-%m-%d %H:%M:%S")
+    setup['start_time'] = np.datetime64(start_time)
 
     stop_time = config.get('time', 'stop_time')
-    nsteps = config.get('time', 'nsteps')
+    setup['stop_time'] = np.datetime64(stop_time)
 
-    # nsteps overrides stop_time
-    if nsteps not in ["", "None", None]:
-        setup['nsteps'] = int(nsteps)
-        # print setup['dt']
-        # print setup['nsteps']
-        setup['stop_time'] = setup.start_time    \
-            + datetime.timedelta(seconds=setup.dt*setup.nsteps)
-
-    elif stop_time not in ["", "None", None]:
-        setup['stop_time'] = datetime.datetime.strptime(
-            stop_time, "%Y-%m-%d %H:%M:%S")
-        total_time = setup.stop_time - setup.start_time
-        setup['nsteps'] = (
-            (total_time.days*86400 + total_time.seconds) // setup.dt)
-
-    else:
-        # Raise exception instead
-        print("***Error in setup: must have nsteps or stop_time")
-        import sys
-        sys.exit(1)
+    total_time = setup.stop_time - setup.start_time
+    total_time = np.timedelta64(total_time, 's').astype('i')
+    setup['nsteps'] = total_time // setup.dt
 
     # ----------
     # Input
@@ -79,17 +62,32 @@ def read_config(config_file):
     setup['particle_release_file'] =        \
         config.get('time', 'particle_release_file')
 
+    # ---------------------
+    # State variables
+    # ---------------------
+
+    pvars = config.get('variables', 'particle_variables')
+    setup['particle_variables'] = []
+    for v in pvars.split():
+        n = v.find(':')
+        setup.particle_variables.append((v[:n], v[n+1:]))
+
+    svars = config.get('variables', 'state_variables')
+    setup['state_variables'] = []
+    for v in svars.split():
+        n = v.find(':')
+        setup.state_variables.append((v[:n], v[n+1:]))
+
     # ----------
     # Output
     # ----------
 
     # Lage seksjon [output] i sup-fil ??
+    setup['output_filename'] = config.get('output', 'output_filename')
 
-    setup['output_filename'] = config.get('time', 'output_filename')
-
-    outper = config.get('time', 'output_period')
-    outper_s = config.get('time', 'output_period_seconds')
-    outper_h = config.get('time', 'output_period_hours')
+    outper = config.get('output', 'output_period')
+    outper_s = config.get('output', 'output_period_seconds')
+    outper_h = config.get('output', 'output_period_hours')
 
     if outper not in ["", None, "None"]:
         outper = int(outper)
@@ -103,7 +101,7 @@ def read_config(config_file):
     setup['Nout'] = 1 + setup.nsteps // outper
 
     # Output variables
-    w = config.get('time', 'output_variables')
+    w = config.get('output', 'output_variables')
     w = w.replace(",", " ")  # replace commas with blanks
     setup['output_variables'] = w.split()
 
@@ -116,16 +114,16 @@ def write_config(setup):
     # Can be improved with ordered_dict (from python 2.7)
     time_keys = ['start_time', 'stop_time', 'dt', 'nsteps']
     input_keys = ['grid_file', 'input_file', 'particle_release_file']
+    variable_keys = ['particle_variables', 'state_variables']
     output_keys = ['output_filename', 'output_period',
                    'Nout', 'output_variables']
 
-    for keylist in [time_keys, input_keys, output_keys]:
+    for keylist in [time_keys, input_keys, variable_keys, output_keys]:
         print(50*"-")
         for key in keylist:
             print("%24s :" % key, getattr(setup, key))
 
     print(50*"-")
-
 
 # -------------
 # Simple test

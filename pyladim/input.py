@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 
 # import datetime
+import numpy as np
 from netCDF4 import Dataset, num2date
 from roppy import SGrid
-
-
-def total_seconds(tdelta):
-    """Total time in seconds of a timedelta"""
-    # Method in python 2.7
-    # Included as a function here for older version
-    return tdelta.days*86400 + tdelta.seconds
 
 
 class ROMS_input(SGrid):
@@ -52,9 +46,9 @@ class ROMS_input(SGrid):
         step = []
         for j in range(len(timevar)):
             # t = timevar[j]
-            otime = num2date(timevar[j], self._time_units)
-            step.append(
-                 int(float(total_seconds(otime - start_time)) / setup.dt))
+            otime = np.datetime64(num2date(timevar[j], self._time_units))
+            dtime = np.timedelta64(otime - start_time, 's').astype(int)
+            step.append(dtime / setup.dt)
 
         # From asserts above: step[0] <= 0 < nsteps <= step[-1]
         # Find fieldnr, step[fieldnr] <= 0 < step[fieldnr+1]

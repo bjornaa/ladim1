@@ -93,7 +93,7 @@ def Z2S(z_rho, X, Y, Z):
 
     # Find integer array K such that
     #   z_rho[K[p]-1, J[p], I[p]] < -Z[p] <= z_rho[K[p], J[p], I[p]]
-    K = np.sum(z_rho[:,J,I] < -Z, axis=0)
+    K = np.sum(z_rho[:, J, I] < -Z, axis=0)
     K = K.clip(1, kmax-1)
     A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K-1, J, I])
     A = A.clip(0, 1)
@@ -143,15 +143,15 @@ def sample3D(F, X, Y, K, A):
     W101 = P*(1-Q)*A
     W111 = P*Q*A
 
-    return (   W000*F[K, J, I]     + W010*F[K, J+1, I]
-            +  W100*F[K, J, I+1]   + W110*F[K, J+1, I+1]
-            +  W001*F[K-1, J, I]   + W011*F[K-1, J+1, I]
-            +  W101*F[K-1, J, I+1] + W111*F[K-1, J+1, I+1] )
-
+    return (W000*F[K, J, I] + W010*F[K, J+1, I] +
+            W100*F[K, J, I+1] + W110*F[K, J+1, I+1] +
+            W001*F[K-1, J, I] + W011*F[K-1, J+1, I] +
+            W101*F[K-1, J, I+1] + W111*F[K-1, J+1, I+1])
 
 # def sample3D(F, X, Y, Z):
 #    K, A = Z2S(z_rho, X, Y, Z)
 #    F0 = sample3D_(F, X, Y, K, A)
+
 
 def sample3DU(U, X, Y, K, A):
     return sample3D(U, X-0.5, Y, K, A)
