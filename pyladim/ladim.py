@@ -62,7 +62,7 @@ for i in range(nsteps+1):
     # Read particles ?
     if i == partini.release_step:
         # Tips: Gjøre begge delet i read_particles
-        partini.release_particles(i)
+        partini.release_particles(setup, i)
         state.addstate(partini.state)
 
     # Save to file

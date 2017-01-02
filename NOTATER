@@ -91,3 +91,10 @@ Ny HP laptop
 3D sampling ser ut til å virke.
 Øker regnetid med 15% i forhold til 2D
 
+
+
+2017-01-02
+----------
+
+Rename setup objekt til config og gjør det slik at
+import config gir tilgang til objektet.

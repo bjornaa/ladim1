@@ -20,7 +20,7 @@ import numpy as np
 # ------------------------
 
 
-def time_step(dtime):
+def time_step(setup, dtime):
     return np.timedelta64(dtime - setup.start_time, 's').astype(int) // setup.dt
 
 
@@ -68,10 +68,9 @@ class State(object):
 
     def __setitem__(self, name, value):
         return setattr(self, name, value)
-    
-    
+
     def __len__(self):
-        return len(getattr(self, self.X))
+        return len(getattr(self, 'X'))
 
     def addstate(self, other):
         """Concatenate states"""
@@ -102,7 +101,7 @@ class ParticleReleaser(object):
                                setup.particle_variables + setup.state_variables)
 
         # print(self.variables)
-        
+
         # Read first line
         line = next(self.fid)
 
@@ -110,15 +109,15 @@ class ParticleReleaser(object):
         # tdelta = np.timedelta64(dtime - setup.start_time, 's')
         # self.next_release = tdelta.astype(int) / setup.dt
 
-        self.next_release = time_step(np.datetime64(line.split()[0]))
+        self.next_release = time_step(setup, np.datetime64(line.split()[0]))
         self.next_line = line
         # print(line, self.next_release)
-        
+
         self.dt = setup.dt
         self.start_time = setup.start_time
-        
+
     # ------
-    def release_particles(self, timestep):
+    def release_particles(self, setup, timestep):
 
         more_particles = dict()
         for name in self.particle_variables.names:
@@ -131,11 +130,11 @@ class ParticleReleaser(object):
             try:
                 line1 = next(self.fid)  # Read one line aheaad
                 self.next_line = line1
-                self.next_release = time_step(np.datetime64(line1.split()[0]))
+                self.next_release = time_step(setup, np.datetime64(line1.split()[0]))
             except StopIteration:  # End of file
                 self.next_release = -999
             # print("release: next = ", self.next_release)
-                
+
             w = line.split()
             parsed_line = dict()
             for i, (name, converter) in enumerate(self.read_variables):
@@ -149,17 +148,17 @@ class ParticleReleaser(object):
 
             for name in self.state.names[1:]:   # excluding pid
                 more_state[name].extend(mult*[parsed_line[name]])
-                    
+
             # Skal pid starte med null (eller 1 som her)
             for m in range(mult):
                 self.particle_counter += 1
                 more_state['pid'].append(self.particle_counter)
-                        
+
             if self.next_release != timestep:  # Finished this time step
                 break
 
             # print(more_state)
-            
+
         # Add to overall state
         for name in self.state.names:
             self.state[name] = np.concatenate((self.state[name], more_state[name]))
@@ -183,7 +182,7 @@ if __name__ == "__main__":
     import sys
     from config import read_config
 
-    
+
     setup = read_config('../ladim.sup')
     setup.particle_release_file = '../input/lice.in'
 
@@ -196,10 +195,10 @@ if __name__ == "__main__":
     while p.next_release >= 0:
 
         print('time_step, number of particles = ', p.next_release, end=', ')
-        p.release_particles(p.next_release)
+        p.release_particles(setup, p.next_release)
         print(p.particle_counter)
         print
-        
+
     p.close()
 
     print(p.particle_counter)
