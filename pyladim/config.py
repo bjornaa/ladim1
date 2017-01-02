@@ -66,17 +66,34 @@ def read_config(config_file):
     # State variables
     # ---------------------
 
+    # Få bedre hva som
     pvars = config.get('variables', 'particle_variables')
     setup['particle_variables'] = []
     for v in pvars.split():
+        converter = float
         n = v.find(':')
-        setup.particle_variables.append((v[:n], v[n+1:]))
+        if n < 0:  # default = float
+            name = v
+        else:
+            name = v[:n]
+            dtype = v[n+1:]
+            if dtype == 'int':
+                converter = int
+        setup.particle_variables.append((name, converter))
 
     svars = config.get('variables', 'state_variables')
     setup['state_variables'] = []
     for v in svars.split():
+        converter = float
         n = v.find(':')
-        setup.state_variables.append((v[:n], v[n+1:]))
+        if n < 0:  # default = float
+            name = v
+        else:
+            name = v[:n]
+            dtype = v[n+1:]
+            if dtype == 'int':
+                converter = int
+        setup.state_variables.append((name, converter))
 
     # ----------
     # Output

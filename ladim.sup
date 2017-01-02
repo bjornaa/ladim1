@@ -15,7 +15,6 @@
 # At least one of stop_time or nsteps must be defined
 
 [time]
-#start_time = 1989-05-24 12:00:00
 start_time = 1989-06-01 12:00:00
 stop_time = 1989-06-15 12:00:00
 dt = 3600
