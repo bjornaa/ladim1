@@ -7,6 +7,7 @@ from trackpart import Euler_Forward
 from input import ROMS_input
 from release import ParticleReleaser
 from config import read_config, write_config
+from state import ParticleVariables, State
 from output import OutPut
 from behaviour import behaviour
 
@@ -29,6 +30,9 @@ nsteps = setup.nsteps
 dt = setup.dt
 
 
+# State
+state = State(setup)    # OBS: Navnekollisjon
+
 # --------------------
 # Input grid and files
 # --------------------
@@ -42,9 +46,6 @@ tunits = inp.nc.variables['ocean_time'].units
 # ----------------------
 
 partini = ParticleReleaser(setup)
-
-# Initial (empty state)
-state = partini.state
 
 # ------------------
 # Init output file
