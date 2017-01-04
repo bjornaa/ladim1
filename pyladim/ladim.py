@@ -7,7 +7,7 @@ from trackpart import Euler_Forward
 from input import ROMS_input
 from release import ParticleReleaser
 from config import read_config, write_config
-from state import ParticleVariables, State
+from ladim_state import ParticleVariables, State
 from output import OutPut
 from behaviour import behaviour
 
@@ -31,6 +31,7 @@ dt = setup.dt
 
 
 # State
+particle_vars = ParticleVariables(setup)
 state = State(setup)    # OBS: Navnekollisjon
 
 # --------------------

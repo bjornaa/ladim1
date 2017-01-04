@@ -16,13 +16,14 @@
 # 2016-03-11 6 3 366 464 5 10147 0 1000
 
 import numpy as np
-from state import ParticleVariables, State
+from ladim_state import ParticleVariables, State
 
 # ------------------------
 
 
 def time_step(setup, dtime):
-    return np.timedelta64(dtime - setup.start_time, 's').astype(int) // setup.dt
+    return (np.timedelta64(dtime - setup.start_time, 's').astype(int) //
+            setup.dt)
 
 
 class ParticleReleaser(object):

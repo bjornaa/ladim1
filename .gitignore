@@ -6,6 +6,7 @@
 
 # Byte-compiled python code
 *.pyc
+__pycache__
 
 # Data files
 #data/*
