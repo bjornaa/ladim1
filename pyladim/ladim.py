@@ -32,7 +32,7 @@ dt = setup.dt
 
 # State
 particle_vars = ParticleVariables(setup)
-state = State(setup)    # OBS: Navnekollisjon
+state = State(setup)
 
 # --------------------
 # Input grid and files
@@ -46,7 +46,7 @@ tunits = inp.nc.variables['ocean_time'].units
 # Particle release file
 # ----------------------
 
-partini = ParticleReleaser(setup)
+partini = ParticleReleaser(setup, particle_vars, state)
 
 # ------------------
 # Init output file
@@ -64,8 +64,8 @@ for i in range(nsteps+1):
     # Read particles ?
     if i == partini.release_step:
         # Tips: Gjøre begge delet i read_particles
-        partini.release_particles(setup, i)
-        state.addstate(partini.state)
+        partini.release_particles(particle_vars, state, i)
+        # state.addstate(partini.state)
 
     # Save to file
     if i % setup.output_period == 0:

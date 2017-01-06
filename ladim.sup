@@ -38,13 +38,13 @@ particle_release_file : input/lice.in
 # ------------------------------
 
 [variables]
-# Use syntax, name:dtype
+# Use syntax, name:dtype [float, int or datetime]
 
-# Particle variables (in addition to release_time)
-particle_variables : farmid:int
+# Particle variablesc(in addition to release_time)
+particle_variables: farmid:int
 
 # Extra state variables (in addition to pid, X, Y, Z)
-state_variables: age:float super:float
+extra_state_variables: age:float super:float
 
 
 # ----------------

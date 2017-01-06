@@ -41,7 +41,6 @@ def read_config(config_file):
     setup = Container()
 
     setup['dt'] = int(config.get('time', 'dt'))
-    print(setup.dt)
 
     start_time = config.get('time', 'start_time')
     setup['start_time'] = np.datetime64(start_time)
@@ -81,8 +80,8 @@ def read_config(config_file):
                 converter = int
         setup.particle_variables.append((name, converter))
 
-    svars = config.get('variables', 'state_variables')
-    setup['state_variables'] = []
+    svars = config.get('variables', 'extra_state_variables')
+    setup['extra_state_variables'] = []
     for v in svars.split():
         converter = float
         n = v.find(':')
@@ -93,7 +92,7 @@ def read_config(config_file):
             dtype = v[n+1:]
             if dtype == 'int':
                 converter = int
-        setup.state_variables.append((name, converter))
+        setup.extra_state_variables.append((name, converter))
 
     # ----------
     # Output
@@ -131,7 +130,7 @@ def write_config(setup):
     # Can be improved with ordered_dict (from python 2.7)
     time_keys = ['start_time', 'stop_time', 'dt', 'nsteps']
     input_keys = ['grid_file', 'input_file', 'particle_release_file']
-    variable_keys = ['particle_variables', 'state_variables']
+    variable_keys = ['particle_variables', 'extra_state_variables']
     output_keys = ['output_filename', 'output_period',
                    'Nout', 'output_variables']
 

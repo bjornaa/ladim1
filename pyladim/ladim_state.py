@@ -31,18 +31,22 @@ class State(object):
     """Class holding model state variables"""
 
     def __init__(self, setup):
-        self.names = ['pid', 'X', 'Y', 'Z']
-        self.converter = {
-            'pid': int,
-            'X': float,
-            'Y': float,
-            'Z': float}
-        for name, dtype in setup.state_variables:
-            self.names.append(name)
+        """Create a State, initially of length zero"""
+        # Standard variables
+        self.standard_names = ['pid', 'X', 'Y', 'Z']
+        self.converter = dict(pid=int, X=float, Y=float, Z=float)
+
+        # Extra variables
+        self.extra_names = []
+        for name, dtype in setup.extra_state_variables:
+            self.extra_names.append(name)
             if dtype == 'int':
                 self.converter[name] = int
             else:
                 self.converter[name] = float
+
+        # Create initial empty state
+        self.names = self.standard_names + self.extra_names
         for name in self.names:
             setattr(self, name, np.array([], dtype=self.converter[name]))
 
