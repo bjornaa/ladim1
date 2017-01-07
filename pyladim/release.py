@@ -68,6 +68,32 @@ class ParticleReleaser(object):
         self.dt = config.dt
         self.start_time = config.start_time
 
+
+    def _line2entry(self, line):
+        entry = dict()
+        w = line.split()
+        for i, name in enumerate(self.release_names):
+            entry[name] = self.converter[name](w[i])
+        return entry
+
+    def scan(self):
+        # Lag wen array av arrayer av dictionary
+        # Bedre bruk namedtuple
+
+        # First line has already been read
+        line0 = self.next_line  # Get first line
+        entry0 = self._line2entry(line0)
+        releases = [entry0]
+
+        for line in self.fid:
+            entry = self._line2entry(line)
+            releases.append(entry)
+
+        self.config['particle_count_max'] = sum(
+            [entry['mult'] for entry in releases])
+
+        self.releases = releases
+
     # ------
     def release_particles(self, particle_vars, state, timestep):
 
@@ -138,17 +164,26 @@ if __name__ == "__main__":
 
     p = ParticleReleaser(config, pvars, state)
 
-    while p.next_release >= 0:
+    p.scan()
 
-        print('time_step, number of particles = ', p.next_release, end=', ')
-        p.release_particles(pvars, state, p.next_release)
-        print(p.particle_count)
-        print
+    for r in p.releases:
+        print(r)
 
-    p.close()
+    particle_count_max = sum([r['mult'] for r in p.releases])
+    print("particle_count_max = ", particle_count_max)
+    print(config.particle_count_max)
 
-    print(p.particle_count)
-    print(state.pid)
-    print(state.X)
-    print(pvars.farmid)
-    print(pvars.release_time)
+    # while p.next_release >= 0:
+    #
+    #     print('time_step, number of particles = ', p.next_release, end=', ')
+    #     p.release_particles(pvars, state, p.next_release)
+    #     print(p.particle_count)
+    #     print
+    #
+    # p.close()
+    #
+    # print(p.particle_count)
+    # print(state.pid)
+    # print(state.X)
+    # print(pvars.farmid)
+    # print(pvars.release_time)

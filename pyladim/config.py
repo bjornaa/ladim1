@@ -29,6 +29,7 @@ def read_config(config_file):
         dt='3600',        # one hour
         stop_time="",     # compute from nsteps
         nsteps="",        # compute from stop_time
+        reference_time=None,
         output_period="",
         output_period_seconds="",
         output_period_hours="",
@@ -100,6 +101,11 @@ def read_config(config_file):
 
     # Lage seksjon [output] i sup-fil ??
     setup['output_filename'] = config.get('output', 'output_filename')
+
+    ref_time = config.get('output', 'reference_time')
+    if not ref_time:
+        ref_time = setup.start_time
+    setup['reference_time'] = np.datetime64(ref_time)
 
     outper = config.get('output', 'output_period')
     outper_s = config.get('output', 'output_period_seconds')

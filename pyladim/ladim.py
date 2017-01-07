@@ -47,6 +47,7 @@ tunits = inp.nc.variables['ocean_time'].units
 # ----------------------
 
 partini = ParticleReleaser(setup, particle_vars, state)
+partini.scan()   # Gjør dette til del av __init__
 
 # ------------------
 # Init output file

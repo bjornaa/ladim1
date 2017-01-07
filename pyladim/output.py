@@ -50,20 +50,21 @@ class OutPut(object):
                      format="NETCDF3_CLASSIC")
 
         # --- Dimensions
-        nc.createDimension('particle_dim', None)  # unlimited
+        nc.createDimension('particle_instance', None)  # unlimited
+        nc.createDimension('particle', setup.particle_count_max)
         nc.createDimension('time', setup.Nout)
 
         # ---- Coordinate variable for time
         v = nc.createVariable('time', 'f8', ('time',))
         v.long_name = 'time'
         v.standard_name = 'time'
-        v.units = 'seconds since %s' % setup.start_time
+        v.units = 'seconds since %s' % setup.reference_time
         # v.calendar = 'proleptic_gregorian'
         # Ha mer fleksibilitet av valg av referansetid
 
         # ---- Particle distribution variables
 
-        v = nc.createVariable('pid', 'i4', ('particle_dim',))
+        v = nc.createVariable('pid', 'i4', ('particle_instance',))
         v.long_name = 'particle identifier'
         v.cf_role = 'trajectory_id'
 
@@ -77,7 +78,7 @@ class OutPut(object):
 
         for var in setup.output_variables:
             print(var)
-            v = nc.createVariable(var, 'f4', ('particle_dim',))
+            v = nc.createVariable(var, 'f4', ('particle_instance',))
             atts = variables_ncatt[var]
             for att in atts:
                 setattr(v, att, atts[att])

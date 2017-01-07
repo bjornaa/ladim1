@@ -70,6 +70,10 @@ extra_state_variables: age:float super:float
 #
 
 output_filename = output/pyladim_out.nc
+
+# reference_time for output, default = start_time
+# reference_time  = 1970-01-01 00:00:00
+
 output_period = 3
 #output_period_hours = 6
 output_variables = X, Y
