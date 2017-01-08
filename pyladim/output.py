@@ -27,8 +27,8 @@ variables_nctype = dict(
 variables_ncatt = dict(
     # pid = dict(long_name     = 'particle identifier',
     #           cf_role       = 'trajectory_id'),
-    X=dict(long_name='grid X-coordinate of particles'),
-    Y=dict(long_name='grid Y-coordinate of particles'),
+    X=dict(long_name='particle X-coordinate'),
+    Y=dict(long_name='particle Y-coordinate'),
     Z=dict(long_name='particle depth',
            standard_name='depth',
            units='m',
@@ -58,24 +58,29 @@ class OutPut(object):
         v = nc.createVariable('time', 'f8', ('time',))
         v.long_name = 'time'
         v.standard_name = 'time'
-        v.units = 'seconds since %s' % setup.reference_time
-        # v.calendar = 'proleptic_gregorian'
-        # Ha mer fleksibilitet av valg av referansetid
-
-        # ---- Particle distribution variables
+        v.units = 'seconds since {:s}'.format(setup.reference_time)
 
         v = nc.createVariable('pid', 'i4', ('particle_instance',))
         v.long_name = 'particle identifier'
         v.cf_role = 'trajectory_id'
 
-        v = nc.createVariable('pstart', 'i4', ('time',))
-        v.long_name = 'start index for particle distribution'
+        v = nc.createVarable('particle_count', 'i4', ('time',))
+        v.long_name = "number of particles at a given time step"
+        v.ragged_row_count = "particle count at nth timestep"
 
-        v = nc.createVariable('pcount', 'i4', ('time',))
-        v.long_name = 'number of particles'
+        # v = nc.createVariable('pstart', 'i4', ('time',))
+        # v.long_name = 'start index for particle distribution'
 
-        # --- Output variables
+        # --- Particle variables
 
+        v = nc.createVariable('farmid', 'i4', ('particle',))
+        v.long_name = "Fish farm location id"
+
+        v = nc.createVariable('release_time', 'f8', ('particle',))
+        v.long_name = 'Time of release'
+        v.units = 'seconds since {:s}'.format(setup.reference_time)
+
+        # --- Particle instance variables
         for var in setup.output_variables:
             print(var)
             v = nc.createVariable(var, 'f4', ('particle_instance',))
@@ -99,6 +104,14 @@ class OutPut(object):
 
     # --------------
 
+    def _write_particle_vars(self):
+        """
+        Write time independent particle variables
+        """
+
+
+
+
     def write(self, state):
         """
         Write a particle distribution
@@ -109,8 +122,8 @@ class OutPut(object):
         nc = self.nc
 
         # Write to time variables
-        nc.variables['pstart'][t] = self.pstart
-        nc.variables['pcount'][t] = Npar
+        # nc.variables['pstart'][t] = self.pstart
+        nc.variables['particle_count'][t] = Npar
         nc.variables['time'][t] = t * self.outstep
 
         # Write to particle properties
