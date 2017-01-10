@@ -15,175 +15,82 @@
 # date clock mult X Y Z farm_id age super
 # 2016-03-11 6 3 366 464 5 10147 0 1000
 
-import numpy as np
-# from ladim_state import ParticleVariables, State
+# import numpy as np
+import pandas as pd
 
 # ------------------------
 
-
-def time_step(config, dtime):
-    return (np.timedelta64(dtime - config.start_time, 's').astype(int) //
-            config.dt)
-
+# Skal ha public:
+# release_steps, slik at en kan sjekke om release_step
+# i så fall kalle generator prel.release()
+# som returnerer dictionary med release_variablene
+# evt, legger de selv til i state
 
 class ParticleReleaser(object):
 
-    def __init__(self, config, particle_vars, state):
-        # Missing control that fields add upp
-        # Init state e.t.c. separately
+    def __init__(self, config):
 
-        # Open the file and init counters
-        self.fid = open(config.particle_release_file)
-        self.particle_count = 0
-        self.release_step = 0
+        # Pandas dataframe
+        self._df = pd.read_csv(
+            config.particle_release_file,
+            names=config.release_format,
+            dtype=config.release_dtype,
+            parse_dates=['release_time'],
+            delim_whitespace=True)
 
-        # Initiate empty state
-        # self.particle_variables = ParticleVariables(config)
-        # self.state = State(config)
-        # TODO: Ikke gjenta eksplisitt her
-        self.release_names = (
-            ['release_time', 'mult'] +
-            ['X', 'Y', 'Z'] +
-            particle_vars.names[1:] +    # Exclude release_time here
-            state.extra_names)
+        # Relative time
+        rel_time = self._df['release_time'] - config.start_time
+        # Convert to seconds
+        rel_time = rel_time.astype('m8[s]').astype('int')
+        # Get model time steps and remove duplicates
+        self._release_steps = rel_time // config.dt
+        self.release_steps = list(self._release_steps.drop_duplicates())
 
-        self.converter = dict(mult=int)
-        for name in state.names:
-            self.converter[name] = state.converter[name]
-        for name in particle_vars.names:
-            self.converter[name] = particle_vars.converter[name]
+        # self.release_steps = release_steps.drop_duplicates()
+        # self.release_steps = release_steps.drop_duplicates()
 
-        # Read first line
-        line = next(self.fid)
+        # Flyttes til state ???
+        self._npids = 0    # Number of particles released
 
-        # dtime = np.datetime64(line.split()[0])
-        # tdelta = np.timedelta64(dtime - config.start_time, 's')
-        # self.next_release = tdelta.astype(int) / config.dt
+    def release(self):
 
-        self.next_release = time_step(config, np.datetime64(line.split()[0]))
-        self.next_line = line
-        # print(line, self.next_release)
+        # Forutsetter at begynner med null
+        for n, timestep in enumerate(self.release_steps):
+            print('tstep = ', timestep)
 
-        self.config = config
-        self.dt = config.dt
-        self.start_time = config.start_time
+            # All entries at the correct time step
+            A = self._df[self._release_steps == timestep]
 
+            V = dict()
+            V['pid'] = []
+            # Skip mult and release_time (always two first)
+            release_keys = list(self._df.columns[2:])
+            for key in release_keys:
+                V[key] = []
+            for i, entry in A.iterrows():
+                mult = entry.mult
+                V['pid'].extend(
+                    list(range(self._npids, self._npids+mult)))
+                self._npids += mult
+                for key in release_keys:
+                    V[key].extend(mult*[entry[key]])
 
-    def _line2entry(self, line):
-        entry = dict()
-        w = line.split()
-        for i, name in enumerate(self.release_names):
-            entry[name] = self.converter[name](w[i])
-        return entry
+            yield V
 
-    def scan(self):
-        # Lag wen array av arrayer av dictionary
-        # Bedre bruk namedtuple
-
-        # First line has already been read
-        line0 = self.next_line  # Get first line
-        entry0 = self._line2entry(line0)
-        releases = [entry0]
-
-        for line in self.fid:
-            entry = self._line2entry(line)
-            releases.append(entry)
-
-        self.config['particle_count_max'] = sum(
-            [entry['mult'] for entry in releases])
-
-        self.releases = releases
-
-    # ------
-    def release_particles(self, particle_vars, state, timestep):
-
-        release_data = dict()
-        release_data['pid'] = []
-        for name in self.release_names:
-            release_data[name] = []
-
-        # Read all lines at this time step + next line
-        while True:
-            line = self.next_line    # From previous
-            try:
-                self.next_line = next(self.fid)   # Read one line aheaad
-                self.next_release = time_step(
-                    self.config, np.datetime64(self.next_line.split()[0]))
-            except StopIteration:  # End of file
-                self.next_release = -999
-
-            # Parse the line
-            w = line.split()
-            parsed_line = dict()
-            for i, name in enumerate(self.release_names):
-                parsed_line[name] = self.converter[name](w[i])
-            mult = parsed_line['mult']
-
-            for i in range(mult):
-                self.particle_count += 1
-                # pid is zero-based
-                release_data['pid'].append(self.particle_count - 1)
-
-            for name in set(self.release_names):
-                release_data[name].extend(mult*[parsed_line[name]])
-
-            break
-
-        # Append to the state
-        for name in particle_vars.names:
-            particle_vars[name] = np.concatenate(
-                (particle_vars[name], release_data[name]))
-        for name in state.names:
-            state[name] = np.concatenate(
-                (state[name], release_data[name]))
-
-    def close(self):
-        self.fid.close()
-
-
-# ==================================================
+# --------------------------------
 
 if __name__ == "__main__":
 
-    # Få referanse til input/*in via ladim.sup
-    # Virker ikke med relative adresser fordi feil katalog
+    from ladim_config import read_config
+    config = read_config('../ladim.yaml')
 
-    import sys
-    from config import read_config
-    from ladim_state import ParticleVariables, State
-
-    config = read_config('../ladim.sup')
     config.particle_release_file = '../input/lice.in'
 
-    pvars = ParticleVariables(config)
-    state = State(config)
+    # Bedre: ParticleReleaser blir en generator
+    p = ParticleReleaser(config)
 
-    # Take optional release file from command line
-    if len(sys.argv) > 1:
-        config.particle_release_file = sys.argv[1]
+    release = p.release()
 
-    p = ParticleReleaser(config, pvars, state)
-
-    p.scan()
-
-    for r in p.releases:
-        print(r)
-
-    particle_count_max = sum([r['mult'] for r in p.releases])
-    print("particle_count_max = ", particle_count_max)
-    print(config.particle_count_max)
-
-    # while p.next_release >= 0:
-    #
-    #     print('time_step, number of particles = ', p.next_release, end=', ')
-    #     p.release_particles(pvars, state, p.next_release)
-    #     print(p.particle_count)
-    #     print
-    #
-    # p.close()
-    #
-    # print(p.particle_count)
-    # print(state.pid)
-    # print(state.X)
-    # print(pvars.farmid)
-    # print(pvars.release_time)
+    # Får bare en release (og det er den første)
+    V0 = next(release)
+    V1 = next(release)
