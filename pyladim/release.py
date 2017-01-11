@@ -26,6 +26,7 @@ import pandas as pd
 # som returnerer dictionary med release_variablene
 # evt, legger de selv til i state
 
+
 class ParticleReleaser(object):
 
     def __init__(self, config):
@@ -37,7 +38,7 @@ class ParticleReleaser(object):
             dtype=config.release_dtype,
             parse_dates=['release_time'],
             delim_whitespace=True)
-        
+
         # Relative time
         rel_time = self._df['release_time'] - config.start_time
 
@@ -46,44 +47,48 @@ class ParticleReleaser(object):
         # Get model time steps and remove duplicates
         self._release_steps = rel_time // config.dt
         self.release_steps = list(self._release_steps.drop_duplicates())
+        self.release_times = list(self._df['release_time'].drop_duplicates())
 
         # self.release_steps = release_steps.drop_duplicates()
         # self.release_steps = release_steps.drop_duplicates()
 
         # Flyttes til state ???
         self._npids = 0    # Number of particles released
+        self._release_index = 0
 
-    def release(self):
+    def __iter__(self):
+        return self
 
-        # Forutsetter at begynner med null
-        for n, timestep in enumerate(self.release_steps):
-            print('release, tstep = ', timestep)
+    def __next__(self):
+        timestep = self.release_steps[self._release_index]
+        print('release: timestep, time = ', timestep,
+              self.release_times[self._release_index])
+        print(type(timestep))
+        self._release_index += 1
 
-            # All entries at the correct time step
-            A = self._df[self._release_steps == timestep]
+        # All entries at the correct time step
+        A = self._df[self._release_steps == timestep]
 
-            V = dict()
-            V['pid'] = []
-            # Skip mult and release_time (always two first)
-            release_keys = list(self._df.columns[2:])
+        V = dict()
+        V['pid'] = []
+        # Skip mult and release_time (always two first)
+        release_keys = list(self._df.columns[2:])
+        for key in release_keys:
+            V[key] = []
+        for i, entry in A.iterrows():
+            mult = entry.mult
+            V['pid'].extend(list(range(self._npids, self._npids+mult)))
+            self._npids += mult
             for key in release_keys:
-                V[key] = []
-            for i, entry in A.iterrows():
-                mult = entry.mult
-                V['pid'].extend(
-                    list(range(self._npids, self._npids+mult)))
-                self._npids += mult
-                for key in release_keys:
-                    V[key].extend(mult*[entry[key]])
-
-            yield V
+                V[key].extend(mult*[entry[key]])
+        return V
 
 # --------------------------------
 
 if __name__ == "__main__":
 
     # Improvements, fjern fil - bruk inline string
-    
+
     from datetime import datetime
 
     # Make a minimal config object
@@ -99,13 +104,11 @@ if __name__ == "__main__":
                                 X=float, Y=float, Z=float,
                                 farmid=int, super=float)
 
-    p = ParticleReleaser(config)
-    release = p.release()    
+    release = ParticleReleaser(config)
+    # release = p.release()
 
     for step in range(10):
         print('step = ', step)
-        if step in p.release_steps:
+        if step in release.release_steps:
             V = next(release)
             print(V)
-
-

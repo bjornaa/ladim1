@@ -48,10 +48,10 @@ def read_config(config_file):
             name, 'float')
 
     # Output
-    config['output_particles'] = conf['output_variables']['particle']
-    config['output_instances'] = conf['output_variables']['instance']
+    config['output_particle'] = conf['output_variables']['particle']
+    config['output_instance'] = conf['output_variables']['instance']
     config['nc_attributes'] = dict()
-    for name in config.output_particles + config.output_instances:
+    for name in config.output_particle + config.output_instance:
         config['nc_attributes'][name] = conf['output_variables'][name]
 
     # Various
@@ -169,10 +169,10 @@ def write_config(config):
     # Kan skrives penere
     print("Output variables")
     print("  Particle variables")
-    for name in config.output_particles:
+    for name in config.output_particle:
         print('    {:20s}:'.format(name), config.nc_attributes[name])
     print("  Particle instance variables")
-    for name in config.output_instances:
+    for name in config.output_instance:
         print('    {:20s}:'.format(name), config.nc_attributes[name])
 
 
