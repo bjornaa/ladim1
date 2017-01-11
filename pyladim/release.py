@@ -37,9 +37,10 @@ class ParticleReleaser(object):
             dtype=config.release_dtype,
             parse_dates=['release_time'],
             delim_whitespace=True)
-
+        
         # Relative time
         rel_time = self._df['release_time'] - config.start_time
+
         # Convert to seconds
         rel_time = rel_time.astype('m8[s]').astype('int')
         # Get model time steps and remove duplicates
@@ -56,7 +57,7 @@ class ParticleReleaser(object):
 
         # Forutsetter at begynner med null
         for n, timestep in enumerate(self.release_steps):
-            print('tstep = ', timestep)
+            print('release, tstep = ', timestep)
 
             # All entries at the correct time step
             A = self._df[self._release_steps == timestep]
@@ -81,16 +82,30 @@ class ParticleReleaser(object):
 
 if __name__ == "__main__":
 
-    from ladim_config import read_config
-    config = read_config('../ladim.yaml')
+    # Improvements, fjern fil - bruk inline string
+    
+    from datetime import datetime
 
+    # Make a minimal config object
+    class Container(object):
+        pass
+    config = Container()
+    config.start_time = datetime(1989, 6, 1, 12)
+    config.dt = 3600
     config.particle_release_file = '../input/lice.in'
+    config.release_format = ['mult', 'release_time', 'X', 'Y', 'Z',
+                             'farmid', 'super']
+    config.release_dtype = dict(mult=int, release_time=str,
+                                X=float, Y=float, Z=float,
+                                farmid=int, super=float)
 
-    # Bedre: ParticleReleaser blir en generator
     p = ParticleReleaser(config)
+    release = p.release()    
 
-    release = p.release()
+    for step in range(10):
+        print('step = ', step)
+        if step in p.release_steps:
+            V = next(release)
+            print(V)
 
-    # Får bare en release (og det er den første)
-    V0 = next(release)
-    V1 = next(release)
+
