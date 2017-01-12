@@ -12,15 +12,26 @@ import datetime
 from netCDF4 import Dataset
 
 
+# Gjør til en iterator
 class OutPut():
 
     def __init__(self, config):
+        self.nc = self._define_netcdf(config)
+        self.outcount = 0    # No output yet
+
+    def close(self):
+        self.nc.close()
+
+    def _define_netcdf(self, config):
+        """Define a NetCDF output file"""
 
         nc = Dataset(config.output_file, mode='w',
                      format="NETCDF3_CLASSIC")
         # --- Dimensions
         nc.createDimension('particle_instance', None)  # unlimited
-        nc.createDimension('particle', 100)
+        nc.createDimension('particle', config.total_particle_count)
+        # Sett output-period i config (bruk naturlig enhet)
+        # regne om til antall tidsteg og få inn under
         nc.createDimension('time', 10)
 
         # ---- Coordinate variable for time
@@ -28,6 +39,11 @@ class OutPut():
         v.long_name = 'time'
         v.standard_name = 'time'
         v.units = 'seconds since {:s}'.format(str(config.reference_time))
+
+        # Particle count
+        v = nc.createVariable('particle_count', 'i4', ('time',))
+        v.long_name = "number of particles in a given timestep"
+        v.ragged_row_count = "particle count at nth timestep"
 
         # Particle variables
         for name in config['output_particle']:
@@ -37,7 +53,6 @@ class OutPut():
             for attr, value in config['nc_attributes'][name].items():
                 if attr != 'ncformat':
                     setattr(v, attr, value)
-        print('particle finshed')
 
         # Instance variables
         for name in config['output_instance']:
@@ -49,19 +64,24 @@ class OutPut():
                     setattr(v, attr, value)
 
         # --- Global attributes
+        # Burde ta f.eks. source fra setup
+        # hvis andre skulle bruke
         nc.Conventions = "CF-1.5"
         nc.institution = "Institute of Marine Research"
         nc.source = "Lagrangian Advection and DIffusion Model, python version"
         nc.history = "Created by pyladim"
         nc.date = str(datetime.date.today())
 
-        nc.close()
+        return nc
+
+        def write(self, state):
+            """Write the model state to NetCDF"""
 
         # --- Initialize
         # self.nc = nc
         # self.outcount = 0
         # self.pstart = 0
-        # self.outstep = config.output_period * config.dt
+        #
         # self.output_variables = config.output_variables
         # self.pvars = config.output_variables
 
@@ -114,4 +134,5 @@ if __name__ == '__main__':
     config_file = '../ladim.yaml'
     config = ladim_config.read_config(config_file)
     config.output_file = '../output/a.nc'
+    config.total_particle_count = 100
     out = OutPut(config)

@@ -31,7 +31,7 @@ class ParticleReleaser(object):
 
     def __init__(self, config):
 
-        # Pandas dataframe
+        # Store the data in a pandas dataframe
         self._df = pd.read_csv(
             config.particle_release_file,
             names=config.release_format,
@@ -41,7 +41,6 @@ class ParticleReleaser(object):
 
         # Relative time
         rel_time = self._df['release_time'] - config.start_time
-
         # Convert to seconds
         rel_time = rel_time.astype('m8[s]').astype('int')
         # Get model time steps and remove duplicates
@@ -49,10 +48,9 @@ class ParticleReleaser(object):
         self.release_steps = list(self._release_steps.drop_duplicates())
         self.release_times = list(self._df['release_time'].drop_duplicates())
 
-        # self.release_steps = release_steps.drop_duplicates()
-        # self.release_steps = release_steps.drop_duplicates()
+        # The total number of particles released during the simulation
+        config['total_particle_count'] = self._pd['mult'].sum()
 
-        # Flyttes til state ???
         self._npids = 0    # Number of particles released
         self._release_index = 0
 
