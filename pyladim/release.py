@@ -70,8 +70,8 @@ class ParticleReleaser(object):
 
         V = dict()
         V['pid'] = []
-        # Skip mult and release_time (always two first)
-        release_keys = list(self._df.columns[2:])
+        # Skip mult (always first)
+        release_keys = list(self._df.columns[1:])
         for key in release_keys:
             V[key] = []
         for i, entry in A.iterrows():

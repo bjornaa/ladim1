@@ -47,7 +47,7 @@ class Configure():
 
         simulation_time = np.timedelta64(
             self['stop_time'] - self['start_time'], 's').astype('int')
-        self['nsteps'] = simulation_time / self['dt']
+        self['nsteps'] = simulation_time // self['dt']
         print("Number of time steps = ", self['nsteps'])
 
         outper = np.timedelta64(*tuple(conf['ymse']['outper']))

@@ -12,19 +12,19 @@ class ROMS_input(SGrid):
 
     """
 
-    def __init__(self, setup, subgrid=None, Vinfo=None, verbose=True):
+    def __init__(self, config, subgrid=None, Vinfo=None, verbose=True):
 
         self.verbose = verbose
 
         # Initiate the SGrid part
         # -----------------------
-        nc0 = Dataset(setup.grid_file)
+        nc0 = Dataset(config.grid_file)
         SGrid.__init__(self, nc0, subgrid, Vinfo)
         nc0.close()
 
         # Open the forcing file
         # ---------------------
-        nc = Dataset(setup.input_file)
+        nc = Dataset(config.input_file)
         self.nc = nc
 
         # Find first/last forcing times
@@ -34,12 +34,12 @@ class ROMS_input(SGrid):
         self._time_units = timevar.units
         time0 = num2date(timevar[0],  self._time_units)
         time1 = num2date(timevar[-1], self._time_units)
-        start_time = setup.start_time
+        start_time = np.datetime64(config.start_time)
 
         # Check that forcing period covers the simulation period
         # ------------------------------------------------------
         assert(time0 <= start_time)
-        assert(setup.stop_time <= time1)
+        assert(config.stop_time <= time1)
 
         # Make a list "step" of the forcing time steps
         # --------------------------------------------
@@ -48,7 +48,7 @@ class ROMS_input(SGrid):
             # t = timevar[j]
             otime = np.datetime64(num2date(timevar[j], self._time_units))
             dtime = np.timedelta64(otime - start_time, 's').astype(int)
-            step.append(dtime / setup.dt)
+            step.append(dtime / config.dt)
 
         # From asserts above: step[0] <= 0 < nsteps <= step[-1]
         # Find fieldnr, step[fieldnr] <= 0 < step[fieldnr+1]

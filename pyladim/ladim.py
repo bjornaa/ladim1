@@ -31,7 +31,6 @@ dt = config.dt
 
 
 # State
-particle_vars = ParticleVariables(config)
 state = State(config)
 
 # --------------------
@@ -46,8 +45,8 @@ tunits = inp.nc.variables['ocean_time'].units
 # Particle release file
 # ----------------------
 
-partini = ParticleReleaser(config, particle_vars, state)
-partini.scan()   # Gjør dette til del av __init__
+partini = ParticleReleaser(config)
+# partini.scan()   # Gjør dette til del av __init__
 
 # ------------------
 # Init output file
@@ -59,14 +58,15 @@ out = OutPut(config)
 # Main time loop
 # ==============
 
+print(type(nsteps))
 for i in range(nsteps+1):
     inp.update(i)
 
     # Read particles ?
-    if i == partini.release_step:
+    if i in partini.release_steps:
         # Tips: Gjøre begge delet i read_particles
-        partini.release_particles(particle_vars, state, i)
-        # state.addstate(partini.state)
+        V = next(partini)
+        state.append(V)
 
     # Save to file
     if i % config.output_period == 0:
