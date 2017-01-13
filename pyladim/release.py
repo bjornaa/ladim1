@@ -49,7 +49,8 @@ class ParticleReleaser(object):
         self.release_times = list(self._df['release_time'].drop_duplicates())
 
         # The total number of particles released during the simulation
-        config['total_particle_count'] = self._pd['mult'].sum()
+        # config['total_particle_count'] = self._df['mult'].sum()
+        config.total_particle_count = self._df['mult'].sum()
 
         self._npids = 0    # Number of particles released
         self._release_index = 0
@@ -96,7 +97,8 @@ if __name__ == "__main__":
     config.start_time = datetime(1989, 6, 1, 12)
     config.dt = 3600
     config.particle_release_file = '../input/lice.in'
-    config.release_format = ['mult', 'release_time', 'X', 'Y', 'Z',
+    config.release_format = ['mult', 'release_time',
+                             'X', 'Y', 'Z',
                              'farmid', 'super']
     config.release_dtype = dict(mult=int, release_time=str,
                                 X=float, Y=float, Z=float,

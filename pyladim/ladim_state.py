@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Classes for Particle and State variables
 
 import numpy as np
@@ -7,48 +5,21 @@ import numpy as np
 # ------------------------
 
 
-class ParticleVariables(object):
-    """Class holding the particle variables"""
+class State:
 
-    def __init__(self, setup):
-        self.names = ['release_time']
-        self.converter = {'release_time': np.datetime64}
-        for name, dtype in setup.particle_variables:
-            self.names.append(name)
-            self.converter[name] = dtype
-        for name in self.names:
-            setattr(self, name, np.array([], dtype=self.converter[name]))
+    def __init__(self, config):
 
-    # Shorthand to use self[name] for getattr(self, name)
-    def __getitem__(self, name):
-        return getattr(self, name)
+        self.position_variables = ['X', 'Y', 'Z']
+        self.ibm_variables = config.ibm_variables
+        self.instance_variables = self.position_variables + self.ibm_variables
 
-    def __setitem__(self, name, value):
-        return setattr(self, name, value)
+        self.pid = np.array([], dtype=int)
+        for name in self.instance_variables:
+            setattr(self, name, np.array([], dtype=float))
 
-
-class State(object):
-    """Class holding model state variables"""
-
-    def __init__(self, setup):
-        """Create a State, initially of length zero"""
-        # Standard variables
-        self.standard_names = ['pid', 'X', 'Y', 'Z']
-        self.converter = dict(pid=int, X=float, Y=float, Z=float)
-
-        # Extra variables
-        self.extra_names = []
-        for name, dtype in setup.extra_state_variables:
-            self.extra_names.append(name)
-            if dtype == 'int':
-                self.converter[name] = int
-            else:
-                self.converter[name] = float
-
-        # Create initial empty state
-        self.names = self.standard_names + self.extra_names
-        for name in self.names:
-            setattr(self, name, np.array([], dtype=self.converter[name]))
+        # Skal disse være her??, trenger ikke lagres,
+        # oppdatere output etter hver release.
+        self.particle_variables = ['release_time', 'farmid']
 
     def __getitem__(self, name):
         return getattr(self, name)
@@ -59,28 +30,20 @@ class State(object):
     def __len__(self):
         return len(getattr(self, 'X'))
 
-    # Sjekk om denne må forbedres
-    def addstate(self, other):
-        """Concatenate states"""
-        # Bør ha kontroll, samme navn, ellers udefinert
-        for v in self.names:
-            setattr(self, v,
-                    np.concatenate((getattr(self, v), getattr(other, v))))
-
-# --------------------------------
-
-#        # Add to overall state
-#        for name in self.state.names:
-#            self.state[name] = np.concatenate(
-#                (self.state[name], more_state[name]))
-#        for name in self.particle_variables.names:
-#            self.particle_variables[name] = np.concatenate(
-#                (self.particle_variables[name], more_particles[name]))
-
-#
-#    def close(self):
-#        self.fid.close()
-
+    def append(self, new):
+        """Append to the state"""
+        nnew = len(new['pid'])
+        self.pid = np.concatenate((self.pid, new['pid']))
+        for name in self.instance_variables:
+            if name in new:
+                self[name] = np.concatenate((self[name], new[name]))
+            else:   # Initialize to zero
+                self[name] = np.concatenate((self[name], np.zeros(nnew)))
+        # Only store new particle variable values
+        # (trenger kanskje ikke lagres her i det hele tatt,
+        #   gå rett til output)
+        for name in self.particle_variables:
+            self[name] = new[name]
 
 # ==================================================
 
@@ -90,12 +53,9 @@ if __name__ == "__main__":
     # Lag et lite test-script uavhengig av hele modellen
 
     #    import sys
-    from config import read_config
+    from ladim_config import read_config
 
-    configuration = read_config('../ladim.sup')
-    pvar = ParticleVariables(configuration)
-    print('\nParticle variables:')
-    print(pvar.names)
+    configuration = read_config('../ladim.yaml')
     state = State(configuration)
-    print('\nState variables:')
-    print(state.names)
+    print('position_variables =', state.position_variables)
+    print('ibm_variables =', state.ibm_variables)

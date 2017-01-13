@@ -27,6 +27,11 @@ files:
     particle_release_file : input/lice.in
     output_file           : output/pyladim_out.nc
 
+state:
+    # pid, X, Y, Z are mandatory and should not be given
+    # Ingen, kan bruke [] eller kutte linjen
+    ibm_variables: ['age', 'super']
+
 particle_release:
     variables: [mult, release_time, X, Y, Z, farmid, super]
     # Converters (if not float)

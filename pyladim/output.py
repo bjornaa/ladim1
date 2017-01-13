@@ -74,8 +74,8 @@ class OutPut():
 
         return nc
 
-        def write(self, state):
-            """Write the model state to NetCDF"""
+    def write(self, state):
+        """Write the model state to NetCDF"""
 
         # --- Initialize
         # self.nc = nc

@@ -6,8 +6,8 @@ from netCDF4 import num2date
 from trackpart import Euler_Forward
 from input import ROMS_input
 from release import ParticleReleaser
-from config import read_config, write_config
-from ladim_state import ParticleVariables, State
+from ladim_config import Configure
+from ladim_state import State
 from output import OutPut
 from behaviour import behaviour
 
@@ -18,27 +18,27 @@ from behaviour import behaviour
 # Read the configuration file
 # --------------------
 
-config_file = 'ladim.sup'      # take from command line
+config_file = 'ladim.yaml'      # take from command line
 
 print(" --- pyladim configuration ----")
-setup = read_config('ladim.sup')
+config = Configure(config_file)
 print("configuration file: ", config_file)
-write_config(setup)
+config.write()
 print(" --- end of configuration ---\n")
 
-nsteps = setup.nsteps
-dt = setup.dt
+nsteps = config.nsteps
+dt = config.dt
 
 
 # State
-particle_vars = ParticleVariables(setup)
-state = State(setup)
+particle_vars = ParticleVariables(config)
+state = State(config)
 
 # --------------------
 # Input grid and files
 # --------------------
 
-inp = ROMS_input(setup)
+inp = ROMS_input(config)
 
 tunits = inp.nc.variables['ocean_time'].units
 
@@ -46,14 +46,14 @@ tunits = inp.nc.variables['ocean_time'].units
 # Particle release file
 # ----------------------
 
-partini = ParticleReleaser(setup, particle_vars, state)
+partini = ParticleReleaser(config, particle_vars, state)
 partini.scan()   # Gjør dette til del av __init__
 
 # ------------------
 # Init output file
 # -----------------
 
-out = OutPut(setup)
+out = OutPut(config)
 
 # ==============
 # Main time loop
@@ -69,9 +69,9 @@ for i in range(nsteps+1):
         # state.addstate(partini.state)
 
     # Save to file
-    if i % setup.output_period == 0:
+    if i % config.output_period == 0:
         print("i = ", i, num2date(i*dt,
-              'seconds since %s' % str(setup.start_time)))
+              'seconds since %s' % str(config.start_time)))
         out.write(state)
 
     # Only use surface forcing presently
