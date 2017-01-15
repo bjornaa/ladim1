@@ -38,6 +38,9 @@ particle_release:
     mult: int
     release_time: str
     farmid: int
+    particle_variables: [release_time, farmid]
+
+
 
 output_variables:
     # Variable names

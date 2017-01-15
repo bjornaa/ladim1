@@ -55,6 +55,11 @@ class ParticleReleaser(object):
         self._npids = 0    # Number of particles released
         self._release_index = 0
 
+        self.particle_variables = dict()
+        print(config.particle_variables)
+        for name in config.particle_variables:
+            self.particle_variables[name] = []
+
     def __iter__(self):
         return self
 
@@ -68,6 +73,11 @@ class ParticleReleaser(object):
         # All entries at the correct time step
         A = self._df[self._release_steps == timestep]
 
+        # Particle variables
+        # for name in self.particle_variables:
+        #    self.particle_variables[name] = A[name]
+
+        # State variables
         V = dict()
         V['pid'] = []
         # Skip mult (always first)
@@ -81,6 +91,7 @@ class ParticleReleaser(object):
             for key in release_keys:
                 V[key].extend(mult*[entry[key]])
         return V
+
 
 # --------------------------------
 
@@ -103,6 +114,7 @@ if __name__ == "__main__":
     config.release_dtype = dict(mult=int, release_time=str,
                                 X=float, Y=float, Z=float,
                                 farmid=int, super=float)
+    config.particle_variables = ['release_time', 'farmid']
 
     release = ParticleReleaser(config)
     # release = p.release()

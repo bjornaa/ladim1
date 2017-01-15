@@ -20,12 +20,14 @@ class Configure():
                      'particle_release_file', 'output_file']:
             self[name] = conf['files'][name]
 
+        prelease = conf['particle_release']
         self['release_format'] = conf['particle_release']['variables']
         print(self.release_format)
         self['release_dtype'] = dict()
         for name in self['release_format']:
             self['release_dtype'][name] = (
                 conf['particle_release'].get(name, 'float'))
+        self['particle_variables'] = prelease['particle_variables']
 
         state = conf['state']
         if state:
@@ -51,9 +53,11 @@ class Configure():
         print("Number of time steps = ", self['nsteps'])
 
         outper = np.timedelta64(*tuple(conf['ymse']['outper']))
-        print(outper)
-        self['outper'] = outper.astype('m8[s]').astype('int')
-        print(self['outper'])
+        outper = outper.astype('m8[s]').astype('int') // self['dt']
+        self['output_period'] = outper
+        print("output period = ", outper)
+        # Den under bare brukt i output, flytt dit
+        self.num_output = self.nsteps // self.output_period
 
     def __setitem__(self, key, value):
         setattr(self, key, value)
@@ -169,6 +173,8 @@ class Configure():
         print("  Particle instance variables")
         for name in self.output_instance:
             print('    {:20s}:'.format(name), self.nc_attributes[name])
+
+        print(self.particle_variables)
 
 
 # def write_config(setup):

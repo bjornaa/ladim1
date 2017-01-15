@@ -22,7 +22,7 @@ config_file = 'ladim.yaml'      # take from command line
 
 print(" --- pyladim configuration ----")
 config = Configure(config_file)
-print("configuration file: ", config_file)
+print(config.particle_variables)
 config.write()
 print(" --- end of configuration ---\n")
 
@@ -53,6 +53,8 @@ partini = ParticleReleaser(config)
 # -----------------
 
 out = OutPut(config)
+# Problem under, får ikke inn multiplisiteten
+# out.write_particle_variables(partini)
 
 # ==============
 # Main time loop
@@ -70,12 +72,13 @@ for i in range(nsteps+1):
 
     # Save to file
     if i % config.output_period == 0:
-        print("i = ", i, num2date(i*dt,
+        print("Output: i = ", i, num2date(i*dt,
               'seconds since %s' % str(config.start_time)))
         out.write(state)
 
     # Only use surface forcing presently
     # Redundant to give both inp, and inp.U ...
+    state.update()
     Euler_Forward(inp, inp.U, inp.V, state.X, state.Y, state.Z, dt=dt)
 
     # Behaviour

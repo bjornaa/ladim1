@@ -9,6 +9,7 @@ class State:
 
     def __init__(self, config):
 
+        self.timestep = 0
         self.position_variables = ['X', 'Y', 'Z']
         self.ibm_variables = config.ibm_variables
         self.instance_variables = self.position_variables + self.ibm_variables
@@ -44,6 +45,10 @@ class State:
         #   gå rett til output)
         for name in self.particle_variables:
             self[name] = new[name]
+
+    def update(self):
+        self.timestep += 1
+
 
 # ==================================================
 

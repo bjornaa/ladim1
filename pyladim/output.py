@@ -17,7 +17,10 @@ class OutPut():
 
     def __init__(self, config):
         self.nc = self._define_netcdf(config)
+        self.instance_variables = config['output_instance']
+        self.instance_count = 0
         self.outcount = 0    # No output yet
+        self.dt = config.dt
 
     def close(self):
         self.nc.close()
@@ -32,7 +35,8 @@ class OutPut():
         nc.createDimension('particle', config.total_particle_count)
         # Sett output-period i config (bruk naturlig enhet)
         # regne om til antall tidsteg og få inn under
-        nc.createDimension('time', 10)
+        print("NUM_OUTPUT = ", config.num_output)
+        nc.createDimension('time', config.num_output)
 
         # ---- Coordinate variable for time
         v = nc.createVariable('time', 'f8', ('time',))
@@ -77,55 +81,29 @@ class OutPut():
     def write(self, state):
         """Write the model state to NetCDF"""
 
-        # --- Initialize
-        # self.nc = nc
-        # self.outcount = 0
-        # self.pstart = 0
-        #
-        # self.output_variables = config.output_variables
-        # self.pvars = config.output_variables
+        t = self.outcount
+        pcount = len(state)
+        pstart = self.instance_count
 
-    # --------------
-    #
-    # def _write_particle_vars(self):
-    #     """
-    #     Write time independent particle variables
-    #     """
-    #
-    #     nc = self.nc
-    #     nc.variables['farmid'][:]) = particle_vars['farmid']
-    #
-    #
-    #
-    # def write(self, state):
-    #     """
-    #     Write a particle distribution
-    #     """
-    #
-    #     Npar = len(state)
-    #     t = self.outcount
-    #     nc = self.nc
-    #
-    #     # Write to time variables
-    #     # nc.variables['pstart'][t] = self.pstart
-    #     nc.variables['particle_count'][t] = Npar
-    #     nc.variables['time'][t] = t * self.outstep
-    #
-    #     # Write to particle properties
-    #     T = slice(self.pstart, self.pstart + Npar)
-    #     nc.variables['pid'][T] = getattr(state, 'pid')
-    #     for var in self.output_variables:
-    #         nc.variables[var][T] = getattr(state, var)
-    #
-    #     # Write
-    #     self.pstart += Npar
-    #     self.outcount += 1
-    #
-    # # --------------
-    #
-    # def close(self):
-    #
-    #     self.nc.close()
+        print("state.timeste = ", state.timestep * self.dt)
+        self.nc.variables['time'][t] = float(state.timestep * self.dt)
+
+        self.nc.variables['particle_count'][t] = pcount
+
+        for name in self.instance_variables:
+            self.nc.variables[name][pstart:pstart+pcount] = state[name]
+
+        self.outcount += 1
+        self.instance_count += pcount
+
+    def write_particle_variables(self, partini):
+
+        for name in partini.particle_variables:
+            # Lage array istedet for list
+            print(len(self.nc.variables[name]), len(partini._df[name][:]))
+            print(partini._df[name])
+            self.nc.variables[name][:] = list(partini._df[name])[:-1]
+
 
 if __name__ == '__main__':
 
