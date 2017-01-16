@@ -99,10 +99,6 @@ class OutPut():
     def write_particle_variables(self, partini):
 
         for name, value in partini.particle_variables.items():
-            if name == 'release_time': continue
-            # Lage array istedet for list
-            print(len(self.nc.variables[name]), len(partini._df[name][:]))
-            print(partini._df[name])
             self.nc.variables[name][:] = value
 
 

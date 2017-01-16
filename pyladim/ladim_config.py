@@ -42,6 +42,12 @@ class Configure():
         self['output_instance'] = conf['output_variables']['instance']
         self['nc_attributes'] = dict()
         for name in self.output_particle + self.output_instance:
+            value = conf['output_variables'][name]
+            if 'units' in value:
+                if value['units'] == 'seconds since reference_time':
+                    print("BÅ")
+                    value['units'] = 'seconds since {:s}'.format(
+                            str(self.reference_time))
             self['nc_attributes'][name] = conf['output_variables'][name]
 
         # Various

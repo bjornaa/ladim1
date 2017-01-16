@@ -15,7 +15,7 @@
 # date clock mult X Y Z farm_id age super
 # 2016-03-11 6 3 366 464 5 10147 0 1000
 
-# import numpy as np
+import numpy as np
 import pandas as pd
 
 # ------------------------
@@ -27,7 +27,7 @@ import pandas as pd
 # evt, legger de selv til i state
 
 
-class ParticleReleaser(object):
+class ParticleReleaser():
 
     def __init__(self, config):
 
@@ -64,7 +64,13 @@ class ParticleReleaser(object):
             print(type(row), row)
             mult = row.mult
             for key, value in self.particle_variables.items():
-                value.extend(mult*[getattr(row, key)])
+                if key == 'release_time':
+                    rtime = getattr(row, key)
+                    rtime = rtime - config.reference_time
+                    rtime = np.timedelta64(rtime, 's').astype('int')
+                    value.extend(mult*[rtime])
+                else:
+                    value.extend(mult*[getattr(row, key)])
 
     def __iter__(self):
         return self
@@ -108,6 +114,7 @@ if __name__ == "__main__":
         pass
     config = Container()
     config.start_time = datetime(1989, 6, 1, 12)
+    config.reference_time = datetime(1989, 6, 1, 12)
     config.dt = 3600
     config.particle_release_file = '../input/lice.in'
     config.release_format = ['mult', 'release_time',
@@ -126,3 +133,6 @@ if __name__ == "__main__":
         if step in release.release_steps:
             V = next(release)
             print(V)
+
+    print()
+    print(release.particle_variables)

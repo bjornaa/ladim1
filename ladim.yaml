@@ -50,7 +50,7 @@ output_variables:
     release_time:
         ncformat: f8
         long_name: particle release time
-        units: seconds
+        units: seconds since reference_time
     # Få til template over
     farmid: {ncformat: i4, long_name: fish farm location number}
     pid: {ncformat: i4, long_name: particle identifier}
