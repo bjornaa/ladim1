@@ -1,5 +1,6 @@
 # Classes for Particle and State variables
 
+from trackpart import Euler_Forward
 import numpy as np
 
 # ------------------------
@@ -21,6 +22,8 @@ class State:
         # Skal disse være her??, trenger ikke lagres,
         # oppdatere output etter hver release.
         self.particle_variables = ['release_time', 'farmid']
+
+        self.dt = config.dt
 
     def __getitem__(self, name):
         return getattr(self, name)
@@ -46,9 +49,9 @@ class State:
         for name in self.particle_variables:
             self[name] = new[name]
 
-    def update(self):
+    def update(self, inp):
         self.timestep += 1
-
+        Euler_Forward(inp, inp.U, inp.V, self.X, self.Y, self.Z, dt=self.dt)
 
 # ==================================================
 

@@ -55,10 +55,16 @@ class ParticleReleaser(object):
         self._npids = 0    # Number of particles released
         self._release_index = 0
 
+        # Save all particle variables
         self.particle_variables = dict()
         print(config.particle_variables)
         for name in config.particle_variables:
             self.particle_variables[name] = []
+        for row in self._df.itertuples():
+            print(type(row), row)
+            mult = row.mult
+            for key, value in self.particle_variables.items():
+                value.extend(mult*[getattr(row, key)])
 
     def __iter__(self):
         return self
@@ -72,10 +78,6 @@ class ParticleReleaser(object):
 
         # All entries at the correct time step
         A = self._df[self._release_steps == timestep]
-
-        # Particle variables
-        # for name in self.particle_variables:
-        #    self.particle_variables[name] = A[name]
 
         # State variables
         V = dict()

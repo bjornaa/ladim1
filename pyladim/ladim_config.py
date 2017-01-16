@@ -57,7 +57,8 @@ class Configure():
         self['output_period'] = outper
         print("output period = ", outper)
         # Den under bare brukt i output, flytt dit
-        self.num_output = self.nsteps // self.output_period
+        # add 1 for output after last step
+        self.num_output = 1 + self.nsteps // self.output_period
 
     def __setitem__(self, key, value):
         setattr(self, key, value)

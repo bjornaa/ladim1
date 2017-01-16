@@ -54,7 +54,7 @@ partini = ParticleReleaser(config)
 
 out = OutPut(config)
 # Problem under, får ikke inn multiplisiteten
-# out.write_particle_variables(partini)
+out.write_particle_variables(partini)
 
 # ==============
 # Main time loop
@@ -78,8 +78,8 @@ for i in range(nsteps+1):
 
     # Only use surface forcing presently
     # Redundant to give both inp, and inp.U ...
-    state.update()
-    Euler_Forward(inp, inp.U, inp.V, state.X, state.Y, state.Z, dt=dt)
+    state.update(inp)
+
 
     # Behaviour
     behaviour(state)
