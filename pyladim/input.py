@@ -3,10 +3,10 @@
 # import datetime
 import numpy as np
 from netCDF4 import Dataset, num2date
-from roppy import SGrid
+from grid import Grid
 
 
-class ROMS_input(SGrid):
+class ROMS_input(Grid):
     """
     Class for ROMS input, updated fields and static grid info
 
@@ -18,9 +18,9 @@ class ROMS_input(SGrid):
 
         # Initiate the SGrid part
         # -----------------------
-        nc0 = Dataset(config.grid_file)
-        SGrid.__init__(self, nc0, subgrid, Vinfo)
-        nc0.close()
+        # nc0 = Dataset(config.grid_file)
+        Grid.__init__(self, config.grid_file, subgrid, Vinfo)
+        # nc0.close()
 
         # Open the forcing file
         # ---------------------

@@ -40,8 +40,6 @@ particle_release:
     farmid: int
     particle_variables: [release_time, farmid]
 
-
-
 output_variables:
     # Variable names
     particle: [release_time, farmid]
@@ -62,9 +60,10 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
-    age: {ncformat: f4, long_name: particle age,
-          units: degree-days}
-    super: {ncformat: f4, long_name: number of individuals}
+    age: {ncformat: f4, long_name: particle age in degree-days,
+          standard_name: integral_of_sea_water_temperature_wrt_time,
+          units: degree_Celsius.days}
+    super: {ncformat: f4, long_name: number of individuals in instance}
 
 # for the time being, => numeric section
 ymse:

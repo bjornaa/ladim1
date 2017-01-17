@@ -3,7 +3,7 @@
 
 # import numpy as np
 from netCDF4 import num2date
-from trackpart import Euler_Forward
+# from trackpart import Euler_Forward
 from input import ROMS_input
 from release import ParticleReleaser
 from ladim_config import Configure
@@ -26,7 +26,7 @@ print(config.particle_variables)
 config.write()
 print(" --- end of configuration ---\n")
 
-nsteps = config.nsteps
+numsteps = config.numsteps
 dt = config.dt
 
 
@@ -60,8 +60,7 @@ out.write_particle_variables(partini)
 # Main time loop
 # ==============
 
-print(type(nsteps))
-for i in range(nsteps+1):
+for i in range(numsteps+1):
     inp.update(i)
 
     # Read particles ?
@@ -79,7 +78,6 @@ for i in range(nsteps+1):
     # Only use surface forcing presently
     # Redundant to give both inp, and inp.U ...
     state.update(inp)
-
 
     # Behaviour
     behaviour(state)

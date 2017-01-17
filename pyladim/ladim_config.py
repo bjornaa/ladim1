@@ -9,143 +9,68 @@ class Configure():
 
     def __init__(self, config_file):
 
-        # Read the configuration file
+        # --- Read the configuration file ---
         with open(config_file) as fp:
             conf = yaml.safe_load(fp)
 
+        # --- Time control ---
         for name in ['start_time', 'stop_time', 'reference_time']:
             self[name] = conf['time_control'][name]
 
+        # --- Files ---
         for name in ['grid_file', 'input_file',
                      'particle_release_file', 'output_file']:
             self[name] = conf['files'][name]
 
-        prelease = conf['particle_release']
-        self['release_format'] = conf['particle_release']['variables']
-        print(self.release_format)
-        self['release_dtype'] = dict()
-        for name in self['release_format']:
-            self['release_dtype'][name] = (
-                conf['particle_release'].get(name, 'float'))
-        self['particle_variables'] = prelease['particle_variables']
+        # --- Time steping ---
+        self.dt = conf['ymse']['dt']
+        simulation_time = np.timedelta64(
+            self.stop_time - self.start_time, 's').astype('int')
+        self.numsteps = simulation_time // self.dt
 
+        # --- Particle release ---
+        prelease = conf['particle_release']
+        self.release_format = conf['particle_release']['variables']
+        self.release_dtype = dict()
+        for name in self.release_format:
+            self.release_dtype[name] = (
+                conf['particle_release'].get(name, 'float'))
+        self.particle_variables = prelease['particle_variables']
+
+        # --- Model state ---
         state = conf['state']
         if state:
             v = state['ibm_variables']
             if v:
-                self['ibm_variables'] = v
+                self.ibm_variables = v
         else:
-            self['ibm_variables'] = []
+            self.ibm_variables = []
 
-        # Output
-        self['output_particle'] = conf['output_variables']['particle']
-        self['output_instance'] = conf['output_variables']['instance']
-        self['nc_attributes'] = dict()
+        # --- Output control ---
+        self.output_particle = conf['output_variables']['particle']
+        self.output_instance = conf['output_variables']['instance']
+        self.nc_attributes = dict()
         for name in self.output_particle + self.output_instance:
             value = conf['output_variables'][name]
             if 'units' in value:
                 if value['units'] == 'seconds since reference_time':
-                    print("BÅ")
                     value['units'] = 'seconds since {:s}'.format(
                             str(self.reference_time))
-            self['nc_attributes'][name] = conf['output_variables'][name]
-
-        # Various
-        self['dt'] = conf['ymse']['dt']
-
-        simulation_time = np.timedelta64(
-            self['stop_time'] - self['start_time'], 's').astype('int')
-        self['nsteps'] = simulation_time // self['dt']
-        print("Number of time steps = ", self['nsteps'])
-
+            self.nc_attributes[name] = conf['output_variables'][name]
         outper = np.timedelta64(*tuple(conf['ymse']['outper']))
         outper = outper.astype('m8[s]').astype('int') // self['dt']
-        self['output_period'] = outper
-        print("output period = ", outper)
-        # Den under bare brukt i output, flytt dit
-        # add 1 for output after last step
-        self.num_output = 1 + self.nsteps // self.output_period
+        self.output_period = outper
+        # Under may be moved to output class
+        self.num_output = 1 + self.numsteps // self.output_period
 
+    # Allow item notation
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
     def __getitem__(self, key):
         return getattr(self, key)
 
-
-#     setup['dt'] = int(self.get('time', 'dt'))
-#
-#
-#     total_time = setup.stop_time - setup.start_time
-#     total_time = np.timedelta64(total_time, 's').astype('i')
-#     setup['nsteps'] = total_time // setup.dt
-#
-#     # ---------------------
-#     # State variables
-#     # ---------------------
-#
-#     # Få bedre hva som
-#     pvars = self.get('variables', 'particle_variables')
-#     setup['particle_variables'] = []
-#     for v in pvars.split():
-#         converter = float
-#         n = v.find(':')
-#         if n < 0:  # default = float
-#             name = v
-#         else:
-#             name = v[:n]
-#             dtype = v[n+1:]
-#             if dtype == 'int':
-#                 converter = int
-#         setup.particle_variables.append((name, converter))
-#
-#     svars = self.get('variables', 'extra_state_variables')
-#     setup['extra_state_variables'] = []
-#     for v in svars.split():
-#         converter = float
-#         n = v.find(':')
-#         if n < 0:  # default = float
-#             name = v
-#         else:
-#             name = v[:n]
-#             dtype = v[n+1:]
-#             if dtype == 'int':
-#                 converter = int
-#         setup.extra_state_variables.append((name, converter))
-#
-#     # ----------
-#     # Output
-#     # ----------
-#
-#     # Lage seksjon [output] i sup-fil ??
-#     setup['output_filename'] = self.get('output', 'output_filename')
-#
-#     ref_time = self.get('output', 'reference_time')
-#     if not ref_time:
-#         ref_time = setup.start_time
-#     setup['reference_time'] = np.datetime64(ref_time)
-#
-#     outper = self.get('output', 'output_period')
-#     outper_s = self.get('output', 'output_period_seconds')
-#     outper_h = self.get('output', 'output_period_hours')
-#
-#     if outper not in ["", None, "None"]:
-#         outper = int(outper)
-#     elif outper_s not in ["", None, "None"]:
-#         outper = int(outper_s) // setup.dt
-#     elif outper_h not in ["", None, "None"]:
-#         outper = int(outper_h) * 3600 // setup.dt
-#     setup['output_period'] = outper
-#
-#     # Number of time frames in output, add one for initial distribution
-#     setup['Nout'] = 1 + setup.nsteps // outper
-#
-#     # Output variables
-#     w = self.get('output', 'output_variables')
-#     w = w.replace(",", " ")  # replace commas with blanks
-#     setup['output_variables'] = w.split()
-#
-# # --------------
+# --------------
 
     def write(self):
 
@@ -176,30 +101,18 @@ class Configure():
         print("Output variables")
         print("  Particle variables")
         for name in self.output_particle:
-            print('    {:20s}:'.format(name), self.nc_attributes[name])
+            print("    {:s}".format(name))
+            for item in self.nc_attributes[name].items():
+                print('        {:15s}: {:s}'.format(*item))
+            # print('    {:20s}:'.format(name), self.nc_attributes[name])
         print("  Particle instance variables")
         for name in self.output_instance:
-            print('    {:20s}:'.format(name), self.nc_attributes[name])
+            print("    {:s}".format(name))
+            for item in self.nc_attributes[name].items():
+                print('        {:15s}: {:s}'.format(*item))
 
         print(self.particle_variables)
 
-
-# def write_config(setup):
-#     # Make an explicit sequence of keys
-#     # Can be improved with ordered_dict (from python 2.7)
-#     time_keys = ['start_time', 'stop_time', 'dt', 'nsteps']
-#     input_keys = ['grid_file', 'input_file', 'particle_release_file']
-#     variable_keys = ['particle_variables', 'extra_state_variables']
-#     output_keys = ['output_filename', 'output_period',
-#                    'Nout', 'output_variables']
-#
-#     for keylist in [time_keys, input_keys, variable_keys, output_keys]:
-#         print(50*"-")
-#         for key in keylist:
-#             print("%24s :" % key, getattr(setup, key))
-#
-#     print(50*"-")
-#
 # # -------------
 # # Simple test
 # # -------------
