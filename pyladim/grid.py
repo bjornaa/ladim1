@@ -10,12 +10,22 @@ Grid class for LADIM, simplified from roppy
 # 2010-09-30
 # -----------------------------------
 
+# import sys
+import logging
 # import numpy as np
 from netCDF4 import Dataset
 
 from roppy import s_stretch, sdepth
 # from roppy.depth import sdepth, zslice, s_stretch
 # from roppy.sample import sample2D, bilin_inv
+
+alogger = logging.getLogger(__name__)
+# logger.setLevel(logging.INFO)
+ch = logging.StreamHandler()
+# ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+alogger.addHandler(ch)
 
 
 class Grid(object):
@@ -46,7 +56,11 @@ class Grid(object):
 
     def __init__(self, grid_file, subgrid=[], Vinfo=None, Vfile=None):
 
-        ncid = Dataset(grid_file)
+        try:
+            ncid = Dataset(grid_file)
+        except OSError:
+            alogger.error('Grid file {} not found'.format(grid_file))
+            raise SystemExit(1)
 
         # Subgrid, only considers internal grid cells
         # 1 <= i0 < i1 <= imax-1, default=end points
@@ -65,10 +79,10 @@ class Grid(object):
         self.i0, self.i1, self.j0, self.j1 = limits
 
         # Slices
-        # rho-points
+        #   rho-points
         self.I = slice(self.i0, self.i1)
         self.J = slice(self.j0, self.j1)
-        # U and V-points
+        #   U and V-points
         self.Iu = slice(self.i0-1, self.i1)
         self.Ju = self.J
         self.Iv = self.I

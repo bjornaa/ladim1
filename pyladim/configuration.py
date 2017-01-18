@@ -41,6 +41,7 @@ class Configure():
 
         # --- Files ---
         logger.info('Configuration: Files')
+        logger.info('    {:15s}: {}'.format('config_file', config_file))
         for name in ['grid_file', 'input_file',
                      'particle_release_file', 'output_file']:
             self[name] = conf['files'][name]

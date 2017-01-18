@@ -1,6 +1,6 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
+import sys
 # import numpy as np
 from netCDF4 import num2date
 # from trackpart import Euler_Forward
@@ -18,12 +18,14 @@ from behaviour import behaviour
 # Read the configuration file
 # --------------------
 
-config_file = 'ladim.yaml'      # take from command line
+if len(sys.argv) > 0:   # configuration file from command line
+    config_file = sys.argv[1]
+else:
+    config_file = 'ladim.yaml'
 
 print(" --- pyladim configuration ----")
-config = Configure(config_file)
-# print(config.particle_variables)
-# config.write()
+config = Configure(config_file, loglevel='INFO')
+
 print(" --- end of configuration ---\n")
 
 numsteps = config.numsteps

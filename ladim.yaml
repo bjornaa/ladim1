@@ -25,11 +25,13 @@ files:
     grid_file             : input/ocean_avg_0014.nc
     input_file            : input/ocean_avg_0014.nc
     # particle_release_file : input/lice.in
-    particle_release_file : input/line.in
+    # particle_release_file : input/line.in
     # particle_release_file : input/streak.in
+    particle_release_file : input/point.in
     # output_file           : output/pyladim_out.nc
     # output_file           : output/streak.nc
-    output_file           : output/line.nc
+    # output_file           : output/line.nc
+    output_file           : output/point.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given

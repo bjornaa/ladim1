@@ -14,7 +14,8 @@ from particlefile import ParticleFile
 # Files
 # particle_file = '../output/pyladim_out.nc'
 # particle_file = '../output/streak.nc'
-particle_file = '../output/line.nc'
+# particle_file = '../output/line.nc'
+particle_file = '../output/point.nc'
 roms_file = '../input/ocean_avg_0014.nc'
 
 # Subgrid definition
