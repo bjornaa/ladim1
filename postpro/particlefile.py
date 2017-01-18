@@ -11,7 +11,7 @@ from netCDF4 import Dataset, num2date
 #                 0  if p is not released (yet)
 #                 -1 if p is deactivated
 # Bedre navn: status?, activity_status
-#  first_time(p) : First time frame it is active
+#  first_time(p) : First time times it is active
 #  last_time(p)  : Last time it is active
 #
 
@@ -21,28 +21,30 @@ class ParticleFile(object):
     def __init__(self, filename):
         self.nc = Dataset(filename)
         # Change Time to time (or allow both)
-        self.nFrames = len(self.nc.dimensions['time'])
+        self.ntimes = len(self.nc.dimensions['time'])
+        self.particle_count = self.nc.variables['particle_count'][:]
 
     def get_time(self, n):
         tvar = self.nc.variables['time']
         return num2date(tvar[n], tvar.units)
 
     def get_position(self, n):
-        """Get particle positions at n-th time frame"""
+        """Get particle positions at n-th time times"""
         f = self.nc
-        p0 = f.variables['pstart'][n]
-        Npart = f.variables['pcount'][n]
-        X = f.variables['X'][p0:p0+Npart]
-        Y = f.variables['Y'][p0:p0+Npart]
+        start = self.particle_count[:n-1].sum()
+        count = self.particle_count[n]
+        X = f.variables['X'][start:start+count]
+        Y = f.variables['Y'][start:start+count]
         return X, Y
 
     def get_variable(self, n, vname):
         """Get values of a particle variable"""
         f = self.nc
-        p0 = f.variables['pstart'][n]
-        Npart = f.variables['pcount'][n]
+        start = self.particle_count[:n].sum()
+        count = self.particle_count[n]
+        # print('start, count =', start, count)
         # put in some error control
-        return f.variables[vname][p0:p0+Npart]
+        return f.variables[vname][start:start+count]
 
     # Alternativ: gi en default verdi om ikke aktiv
     #    Evt. raise exception
@@ -86,10 +88,11 @@ class ParticleFile(object):
         # particle is alive for n in [first_time:last_time]
         # or to the end if last_time == 0
 
-        for n in range(self.nFrames):
-            pstart = f.variables['pstart'][n]
-            pcount = f.variables['pcount'][n]
-            pid = f.variables['pid'][pstart:pstart+pcount][:]
+        for n in range(self.ntimes):
+            # Kan speede opp, trenger ikke summere alt hver gang
+            start = self.particle_count[:n].sum()
+            count = self.particle_count[n]
+            pid = f.variables['pid'][start:start+count]
 
             if pid[-1] < p:  # particle not released yet
                 continue
@@ -103,8 +106,8 @@ class ParticleFile(object):
                 last_time = n     #
                 break             # No need for more cycles
 
-            X.append(f.variables['X'][pstart + index])
-            Y.append(f.variables['Y'][pstart + index])
+            X.append(f.variables['X'][start + index])
+            Y.append(f.variables['Y'][start + index])
 
         return X, Y, first_time, last_time
 
@@ -116,7 +119,7 @@ class ParticleFile(object):
     def read_tracks(self, P):
         """Get particle positions along tracks
 
-        Returns an array of shape (len(P),nFrames)
+        Returns an array of shape (len(P),ntimes)
         with NaN where particles are undefined
 
         """
@@ -126,14 +129,14 @@ class ParticleFile(object):
 
         f = self.nc
 
-        X = np.nan + np.zeros((self.nFrames, nP))
-        Y = np.nan + np.zeros((self.nFrames, nP))
+        X = np.nan + np.zeros((self.ntimes, nP))
+        Y = np.nan + np.zeros((self.ntimes, nP))
 
-        for n in range(self.nFrames):
-
-            pstart = f.variables['pstart'][n]
-            pcount = f.variables['pcount'][n]
-            tslice = slice(pstart, pstart+pcount)   # time slice
+        for n in range(self.ntimes):
+            # Kan speede opp, trenger ikke summere alt hver gang
+            start = self.particle_count[:n].sum()
+            count = self.particle_count[n]
+            tslice = slice(start, start+count)   # time slice
             pid = f.variables['pid'][tslice]
 
             I = pid.searchsorted(P+1)

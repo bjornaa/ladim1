@@ -48,7 +48,9 @@ class Configure():
 
         # --- Time steping ---
         logger.info('Configuration: Time Stepping')
-        self.dt = conf['ymse']['dt']
+        # Read time step and convert to seconds
+        dt = np.timedelta64(*tuple(conf['ymse']['dt']))
+        self.dt = dt.astype('m8[s]').astype('int')
         self.simulation_time = np.timedelta64(
             self.stop_time - self.start_time, 's').astype('int')
         self.numsteps = self.simulation_time // self.dt
@@ -81,9 +83,16 @@ class Configure():
             self.ibm_variables = []
         logger.info('    ibm_variables: {}'.format(self.ibm_variables))
 
+        # --- Forcing ---
+        logger.info('Configuration: Forcing')
+        self.velocity = conf['forcing']['velocity']
+        logger.info('    {:15s}: {}'.format('velocity', self.velocity))
+        self.ibm_forcing = conf['forcing']['ibm_forcing']
+        logger.info('    {:15s}: {}'.format('ibm_forcing', self.ibm_forcing))
+
         # --- Output control ---
         logger.info('Configuration: Output Control')
-        outper = np.timedelta64(*tuple(conf['ymse']['outper']))
+        outper = np.timedelta64(*tuple(conf['output_variables']['outper']))
         outper = outper.astype('m8[s]').astype('int') // self['dt']
         self.output_period = outper
         logger.info('    {:15s}: {} timesteps'.format(

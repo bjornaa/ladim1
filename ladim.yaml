@@ -24,13 +24,17 @@ time_control:
 files:
     grid_file             : input/ocean_avg_0014.nc
     input_file            : input/ocean_avg_0014.nc
-    particle_release_file : input/lice.in
-    output_file           : output/pyladim_out.nc
+    # particle_release_file : input/lice.in
+    particle_release_file : input/line.in
+    # particle_release_file : input/streak.in
+    # output_file           : output/pyladim_out.nc
+    # output_file           : output/streak.nc
+    output_file           : output/line.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: ['age', 'super']
+    ibm_variables: [age, super]
 
 particle_release:
     variables: [mult, release_time, X, Y, Z, farmid, super]
@@ -40,7 +44,14 @@ particle_release:
     farmid: int
     particle_variables: [release_time, farmid]
 
+forcing:
+    # mapping: model name -> name in input file
+    velocity: {U: u, V: v}
+    ibm_forcing: {temp: temp}
+
 output_variables:
+    # Output period, format [value, unit], unit = s, m, h, or d
+    outper: [3, h]
     # Variable names
     particle: [release_time, farmid]
     instance: [pid, X, Y, Z, age, super]
@@ -67,5 +78,5 @@ output_variables:
 
 # for the time being, => numeric section
 ymse:
-    dt: 3600
-    outper: [3, h]
+    # Model time step, [value, unit]
+    dt: [60, m]

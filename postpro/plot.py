@@ -11,14 +11,15 @@ from particlefile import ParticleFile
 # ---------------
 
 # Files
-particle_file = '../output/pyladim_out.nc'
+# particle_file = '../output/pyladim_out.nc'
+particle_file = '../output/streak.nc'
 roms_file = '../input/ocean_avg_0014.nc'
 
 # Subgrid definition
 i0, j0 = 70, 80
 i1, j1 = 150, 133
 
-t = 30     # time step 31
+t = 100
 
 # ----------------
 
@@ -31,7 +32,7 @@ g = roppy.SGrid(f0, subgrid=(i0, i1, j0, j1))
 # print particle_file
 pf = ParticleFile(particle_file)
 
-Ntimes = pf.nFrames
+# Ntimes = pf.nFrames
 
 
 # Create a figure

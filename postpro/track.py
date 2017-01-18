@@ -8,9 +8,9 @@ from netCDF4 import Dataset
 import roppy.mpl_util
 from particlefile import ParticleFile
 
-pid0 = 8222
+pid0 = 0   # Must use zero for streak line
 
-particle_file = "../output/pyladim_out.nc"
+particle_file = "../output/line.nc"
 roms_file = '../input/ocean_avg_0014.nc'
 
 # Subgrid definition

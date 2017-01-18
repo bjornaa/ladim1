@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
 # Make tracks from several particles
+# BÅ: Does not work 2017-01-18
 
-import numpy as np
+# import numpy as np
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 import roppy.mpl_util
 from particlefile import ParticleFile
 
-# pids = [10, 8222]
-pids = np.arange(10, 10000, 1000)
+pids = [10, 8222]
+# pids = np.arange(10, 10000, 1000)
 
-particle_file = "../output/pyladim_out.nc"
+particle_file = "../output/line.nc"
 roms_file = '../input/ocean_avg_0014.nc'
 
 # Subgrid definition

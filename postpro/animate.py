@@ -12,7 +12,9 @@ from particlefile import ParticleFile
 # ---------------
 
 # Files
-particle_file = '../output/pyladim_out.nc'
+# particle_file = '../output/pyladim_out.nc'
+# particle_file = '../output/streak.nc'
+particle_file = '../output/line.nc'
 roms_file = '../input/ocean_avg_0014.nc'
 
 # Subgrid definition
@@ -30,7 +32,7 @@ g = roppy.SGrid(f0, subgrid=(i0, i1, j0, j1))
 # print particle_file
 pf = ParticleFile(particle_file)
 
-Ntimes = pf.nFrames
+Ntimes = pf.ntimes
 
 
 def animate():

@@ -1,23 +1,24 @@
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset, num2date
 
-f0 = Dataset('../input/ocean_avg_0014.nc')  # For bathymetry and land contour
-f = Dataset('../output/pyladim_out.nc')     # Particle output file
+t = 20
 
-t = 30    # 31st time step
+f0 = Dataset('../input/ocean_avg_0014.nc')  # For bathymetry and land contour
+# f = Dataset('../output/pyladim_out.nc')     # Particle output file
+f = Dataset('../output/streak.nc')     # Particle output file
+
+timevar = f.variables['time']
+
+timestr = str(num2date(timevar[t], timevar.units))
 
 # Indirect addressing
-p0 = f.variables['pstart'][t]
-Npart = f.variables['pcount'][t]
-tid = f.variables['time'][t]
-tunit = f.variables['time'].units
-# print p0, Npart
-
-timestr = num2date(tid, tunit)
+acount = f.variables['particle_count'][:t+1]
+start = acount[:-1].sum()
+count = acount[-1]
 
 # Particle positions
-X = f.variables['X'][p0:p0+Npart]
-Y = f.variables['Y'][p0:p0+Npart]
+X = f.variables['X'][start:start+count]
+Y = f.variables['Y'][start:start+count]
 
 H = f0.variables['h'][:, :]
 

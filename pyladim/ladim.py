@@ -6,7 +6,7 @@ from netCDF4 import num2date
 # from trackpart import Euler_Forward
 from input import ROMS_input
 from release import ParticleReleaser
-from ladim_config import Configure
+from configuration import Configure
 from ladim_state import State
 from output import OutPut
 from behaviour import behaviour
@@ -22,8 +22,8 @@ config_file = 'ladim.yaml'      # take from command line
 
 print(" --- pyladim configuration ----")
 config = Configure(config_file)
-print(config.particle_variables)
-config.write()
+# print(config.particle_variables)
+# config.write()
 print(" --- end of configuration ---\n")
 
 numsteps = config.numsteps
