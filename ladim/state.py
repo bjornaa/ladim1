@@ -1,6 +1,6 @@
 # Classes for Particle and State variables
 
-from trackpart import Euler_Forward
+from ladim.trackpart import Euler_Forward
 import numpy as np
 
 # ------------------------

@@ -30,8 +30,16 @@ class Configure():
         logger.setLevel(loglevel)
 
         # --- Read the configuration file ---
-        with open(config_file) as fp:
-            conf = yaml.safe_load(fp)
+        try:
+            with open(config_file) as fp:
+                conf = yaml.safe_load(fp)
+        except FileNotFoundError:
+            logger.error('Configuration file {} not found'.format(config_file))
+            raise SystemExit(1)
+        except yaml.parser.ParserError:
+            logger.error(
+                'Can not parse configuration file {}'.format(config_file))
+            raise SystemExit(2)
 
         # --- Time control ---
         logger.info('Configuration: Time Control')

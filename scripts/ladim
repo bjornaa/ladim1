@@ -4,21 +4,25 @@ import sys
 # import numpy as np
 from netCDF4 import num2date
 # from trackpart import Euler_Forward
-from input import ROMS_input
-from release import ParticleReleaser
-from configuration import Configure
-from ladim_state import State
-from output import OutPut
-from behaviour import behaviour
+import ladim
+from ladim.input import ROMS_input
+from ladim.release import ParticleReleaser
+from ladim.configuration import Configure
+from ladim.state import State
+from ladim.output import OutPut
+from ladim.behaviour import behaviour
 
 # ==================
 # Initiate the model
 # ==================
 
+print("Starting LADIM")
+
+
 # Read the configuration file
 # --------------------
 
-if len(sys.argv) > 0:   # configuration file from command line
+if len(sys.argv) > 1:   # configuration file from command line
     config_file = sys.argv[1]
 else:
     config_file = 'ladim.yaml'
@@ -63,6 +67,8 @@ out.write_particle_variables(partini)
 # ==============
 
 for i in range(numsteps+1):
+
+    # Update forcing
     inp.update(i)
 
     # Read particles ?
@@ -81,7 +87,7 @@ for i in range(numsteps+1):
     # Redundant to give both inp, and inp.U ...
     state.update(inp)
 
-    # Behaviour
+    # Indiviual behaviour
     behaviour(state)
 
 

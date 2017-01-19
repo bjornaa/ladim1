@@ -1,5 +1,5 @@
 
-import numpy as np
+# import numpy as np
 # import matplotlib.pyplot as plt
 # from netCDF4 import Dataset
 
@@ -7,7 +7,7 @@ import numpy as np
 # from roppy import SGrid, sample2D
 from roppy import sample2D
 # from sample_roms import Z2S, sample3DU, sample3DV, sample2D
-from sample_roms import Z2S, sample3DU, sample3DV
+from ladim.sample_roms import Z2S, sample3DU, sample3DV
 
 # ---------------------
 

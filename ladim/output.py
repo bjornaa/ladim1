@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Output module for the (py)ladim particle tracking model"""
 
 # ------------------------------------
