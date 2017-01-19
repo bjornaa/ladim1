@@ -38,6 +38,8 @@ class ROMS_input(Grid):
 
         # Check that forcing period covers the simulation period
         # ------------------------------------------------------
+        #print(time0, start_time)
+        #print(config.stop_time, time1)
         assert(time0 <= start_time)
         assert(config.stop_time <= time1)
 

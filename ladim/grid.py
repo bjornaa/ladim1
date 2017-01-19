@@ -120,15 +120,16 @@ class Grid(object):
             self.N = len(self.Cs_r)
 
             # Vertical transform
-            self.Vtransform = 1  # Default
+            self.Vtransform = f0.variables['Vtransform'].getValue()
+            #self.Vtransform = 1  # Default
             # Look for standard_name attribute of variable s_rho
-            try:
-                v = f0.variables['s_rho']
-                if v.standard_name[-1] == '2':
-                    self.Vtransform = 2
+            #try:
+                # v = f0.variables['s_rho']
+                # if v.standard_name[-1] == '2':
+                #    self.Vtransform = 2
             # No variable s_rho or no standard_name attribute
-            except (KeyError, RuntimeError):
-                pass              # keep old default Vtransform = 1
+            # except (KeyError, RuntimeError):
+            #    pass              # keep old default Vtransform = 1
 
         # Read some variables
         self.H = ncid.variables['h'][self.J, self.I]
