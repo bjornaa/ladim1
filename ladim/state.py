@@ -21,7 +21,7 @@ class State:
 
         # Skal disse være her??, trenger ikke lagres,
         # oppdatere output etter hver release.
-        self.particle_variables = ['release_time', 'farmid']
+        # self.particle_variables = ['release_time', 'farmid']
 
         self.dt = config.dt
 
@@ -46,8 +46,8 @@ class State:
         # Only store new particle variable values
         # (trenger kanskje ikke lagres her i det hele tatt,
         #   gå rett til output)
-        for name in self.particle_variables:
-            self[name] = new[name]
+        # for name in self.particle_variables:
+        #    self[name] = new[name]
 
     def update(self, inp):
         self.timestep += 1

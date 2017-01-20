@@ -1,7 +1,7 @@
 import pprint
 import yaml
 
-f = open('ladim.yaml')
+f = open('../ladim.yaml')
 
 A = yaml.safe_load(f)
 

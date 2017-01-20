@@ -55,11 +55,11 @@ class ParticleReleaser():
 
         # Save all particle variables
         self.particle_variables = dict()
-        print(config.particle_variables)
+        # print(config.particle_variables)
         for name in config.particle_variables:
             self.particle_variables[name] = []
         for row in self._df.itertuples():
-            print(type(row), row)
+            # print(type(row), row)
             mult = row.mult
             for key, value in self.particle_variables.items():
                 if key == 'release_time':
@@ -77,7 +77,7 @@ class ParticleReleaser():
         timestep = self.release_steps[self._release_index]
         print('release: timestep, time = ', timestep,
               self.release_times[self._release_index])
-        print(type(timestep))
+        # print(type(timestep))
         self._release_index += 1
 
         # All entries at the correct time step

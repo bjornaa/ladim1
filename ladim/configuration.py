@@ -76,7 +76,7 @@ class Configure():
         self.release_dtype = dict()
         for name in self.release_format:
             self.release_dtype[name] = (
-                conf['particle_release'].get(name, 'float'))
+                conf['particle_release'].get(name, float))
             logger.info('    {:15s}: {}'.
                         format(name, self.release_dtype[name]))
         self.particle_variables = prelease['particle_variables']
@@ -85,9 +85,7 @@ class Configure():
         logger.info('Configuration: Model State Variables')
         state = conf['state']
         if state:
-            v = state['ibm_variables']
-            if v:
-                self.ibm_variables = v
+            self.ibm_variables = state['ibm_variables']
         else:
             self.ibm_variables = []
         logger.info('    ibm_variables: {}'.format(self.ibm_variables))

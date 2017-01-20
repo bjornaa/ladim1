@@ -83,7 +83,6 @@ class OutPut():
         pcount = len(state)
         pstart = self.instance_count
 
-        print("state.timeste = ", state.timestep * self.dt)
         self.nc.variables['time'][t] = float(state.timestep * self.dt)
 
         self.nc.variables['particle_count'][t] = pcount

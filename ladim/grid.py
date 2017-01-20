@@ -110,8 +110,7 @@ class Grid(object):
                 self.hc = f0.variables['hc'].getValue()
             except KeyError:
                 print("No vertical information")
-                import sys
-                sys.exit(1)
+                raise SystemExit(3)
 
             self.Cs_r = f0.variables['Cs_r'][:]
             self.Cs_w = f0.variables['Cs_w'][:]
@@ -120,16 +119,10 @@ class Grid(object):
             self.N = len(self.Cs_r)
 
             # Vertical transform
-            self.Vtransform = f0.variables['Vtransform'].getValue()
-            #self.Vtransform = 1  # Default
-            # Look for standard_name attribute of variable s_rho
-            #try:
-                # v = f0.variables['s_rho']
-                # if v.standard_name[-1] == '2':
-                #    self.Vtransform = 2
-            # No variable s_rho or no standard_name attribute
-            # except (KeyError, RuntimeError):
-            #    pass              # keep old default Vtransform = 1
+            try:
+                self.Vtransform = f0.variables['Vtransform'].getValue()
+            except KeyError:
+                self.Vtransform = 1   # Default = old way
 
         # Read some variables
         self.H = ncid.variables['h'][self.J, self.I]
