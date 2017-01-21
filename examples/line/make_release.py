@@ -10,7 +10,7 @@ y0, y1 = 100, 100
 Npart = 8000
 
 # Fixed particle depth
-Z = 0.0    
+Z = 5
 
 X = np.linspace(x0, x1, Npart)
 Y = np.linspace(y0, y1, Npart)

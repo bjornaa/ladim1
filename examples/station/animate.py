@@ -3,7 +3,7 @@ import itertools
 import matplotlib; matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
-import roppy
+# import roppy
 import roppy.mpl_util
 from particlefile import ParticleFile
 
@@ -12,12 +12,12 @@ from particlefile import ParticleFile
 # ---------------
 
 # Files
-particle_file = 'line.nc'
+particle_file = 'station.nc'
 grid_file = '../../input/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 70, 150
-j0, j1 = 73, 135
+i0, i1 = 100, 135
+j0, j1 = 85, 110
 
 # ----------------
 

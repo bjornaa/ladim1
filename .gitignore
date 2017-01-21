@@ -25,6 +25,8 @@ doc/build
 input/*
 !input/README
 !input/*py
+*.in
+
 
 # Output directory  (except README file)
 output/*
