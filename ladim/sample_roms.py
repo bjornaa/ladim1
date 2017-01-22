@@ -153,12 +153,14 @@ def sample3D(F, X, Y, K, A):
 #    F0 = sample3D_(F, X, Y, K, A)
 
 
-def sample3DU(U, X, Y, K, A):
-    return sample3D(U, X-0.5, Y, K, A)
+# TODO: Handle i0, j0 correctly
+def sample3DUV(U, V, X, Y, K, A):
+    return (sample3D(U, X-0.5, Y, K, A),
+            sample3D(V, X, Y-0.5, K, A))
 
 
-def sample3DV(V, X, Y, K, A):
-    return sample3D(V, X, Y-0.5, K, A)
+def sample3DUV2():
+    pass
 
 
 def sample2D(F, X, Y):

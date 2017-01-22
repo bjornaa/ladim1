@@ -69,6 +69,14 @@ class Configure():
         logger.info('    {:15s}: {}'.format('number of time steps',
                     self.numsteps))
 
+        # Grid
+        logger.info('Configuration: Grid')
+        self.subgrid = []
+        logger.info('    {:15s}: {}'.format('subgrid', self.subgrid))
+        self.Vinfo = {}
+        logger.info('    {:15s}: {}'.format('vertical information',
+                                            self.Vinfo))
+
         # --- Particle release ---
         logger.info('Configuration: Particle Releaser')
         prelease = conf['particle_release']

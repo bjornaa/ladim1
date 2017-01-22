@@ -5,6 +5,7 @@ import sys
 from netCDF4 import num2date
 # from trackpart import Euler_Forward
 import ladim
+from ladim.grid import Grid
 from ladim.input import ROMS_input
 from ladim.release import ParticleReleaser
 from ladim.configuration import Configure
@@ -43,9 +44,17 @@ state = State(config)
 # Input grid and files
 # --------------------
 
-inp = ROMS_input(config)
+grid = Grid(config)
 
-tunits = inp.nc.variables['ocean_time'].units
+forcing = ROMS_input(config)
+
+
+tunits = forcing.nc.variables['ocean_time'].units
+
+# ------------
+# Initiate grid
+# ------------
+
 
 # ----------------------
 # Particle release file
@@ -69,7 +78,7 @@ out.write_particle_variables(partini)
 for i in range(numsteps+1):
 
     # Update forcing
-    inp.update(i)
+    forcing.update(i)
 
     # Read particles ?
     if i in partini.release_steps:
@@ -85,7 +94,7 @@ for i in range(numsteps+1):
 
     # Only use surface forcing presently
     # Redundant to give both inp, and inp.U ...
-    state.update(inp)
+    state.update(forcing)
 
     # Indiviual behaviour
     behaviour(state)
@@ -95,5 +104,5 @@ for i in range(numsteps+1):
 # Clean up
 # ========
 
-inp.close()
+forcing.close()
 out.close()

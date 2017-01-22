@@ -18,6 +18,7 @@ from netCDF4 import Dataset
 from roppy import s_stretch, sdepth
 # from roppy.depth import sdepth, zslice, s_stretch
 # from roppy.sample import sample2D, bilin_inv
+import ladim.sample_roms as sample_roms
 
 alogger = logging.getLogger(__name__)
 # logger.setLevel(logging.INFO)
@@ -28,7 +29,7 @@ ch.setFormatter(formatter)
 alogger.addHandler(ch)
 
 
-class Grid(object):
+class Grid():
 
     """Simple ROMS grid object
 
@@ -54,12 +55,13 @@ class Grid(object):
 
     # Lagrer en del unødige attributter
 
-    def __init__(self, grid_file, subgrid=[], Vinfo=None, Vfile=None):
+    def __init__(self, config):
+        # def __init__(self, grid_file, subgrid=[], Vinfo=None, Vfile=None):
 
         try:
-            ncid = Dataset(grid_file)
+            ncid = Dataset(config.grid_file)
         except OSError:
-            alogger.error('Grid file {} not found'.format(grid_file))
+            alogger.error('Grid file {} not found'.format(config.grid_file))
             raise SystemExit(1)
 
         # Subgrid, only considers internal grid cells
@@ -67,8 +69,8 @@ class Grid(object):
         # 1 <= j0 < j1 <= jmax-1, default=end points
         jmax, imax = ncid.variables['h'].shape
         whole_grid = [1, imax-1, 1, jmax-1]
-        if subgrid:
-            limits = list(subgrid)
+        if config.subgrid:
+            limits = list(config.subgrid)
         else:
             limits = whole_grid
         # Allow None if no imposed limitation
@@ -90,8 +92,8 @@ class Grid(object):
 
         # Vertical grid
 
-        if Vinfo:
-            Vinfo = self._Vinfo
+        if config.Vinfo:
+            Vinfo = config.Vinfo
             self.N = Vinfo['N']
             self.hc = Vinfo['hc']
             self.Vstretching = Vinfo.get('Vstretching', 1)
@@ -100,27 +102,22 @@ class Grid(object):
                                   stagger='rho', Vstretching=self.Vstretching)
             self.Cs_w = s_stretch(self.N, Vinfo['theta_s'], Vinfo['theta_b'],
                                   stagger='w', Vstretching=self.Vstretching)
-        else:
-            if Vfile:
-                f0 = Dataset(self._Vfile)  # separate file
-            else:
-                f0 = ncid                  # use the file itself
 
             try:
-                self.hc = f0.variables['hc'].getValue()
+                self.hc = ncid.variables['hc'].getValue()
             except KeyError:
                 print("No vertical information")
                 raise SystemExit(3)
 
-            self.Cs_r = f0.variables['Cs_r'][:]
-            self.Cs_w = f0.variables['Cs_w'][:]
+            self.Cs_r = ncid.variables['Cs_r'][:]
+            self.Cs_w = ncid.variables['Cs_w'][:]
 
             # Vertical grid size
             self.N = len(self.Cs_r)
 
             # Vertical transform
             try:
-                self.Vtransform = f0.variables['Vtransform'].getValue()
+                self.Vtransform = ncid.variables['Vtransform'].getValue()
             except KeyError:
                 self.Vtransform = 1   # Default = old way
 
@@ -138,9 +135,15 @@ class Grid(object):
                           stagger='w', Vtransform=self.Vtransform)
 
         # Close the file(s)
-        if f0 != ncid:
-            f0.close()
         ncid.close()
+
+        config.grid = self.z
+
+        def sample3DUV(self, U, V, X, Y, K, A):
+            return (sample_roms.samle3D(
+                    U, V, X-self.i0-0.5, Y-self.j0, K, A),
+                    sample_roms.sample3D(
+                    U, V, X-self.i0, Y-self.j0-0.5, K, A))
 
 # --------------------------------------------------------
 

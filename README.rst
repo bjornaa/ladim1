@@ -1,4 +1,4 @@
-LADIM aka LADIM3 aka pyladim 
+LADIM aka LADIM3 aka pyladim
 ============================
 
 This is a developing new version of
@@ -24,11 +24,10 @@ Source code
 -----------
 
 The code is open source using the MIT License. It is available from
-`github<https://github.com/bjornaa/ladim>`_
+`github <https://github.com/bjornaa/ladim>`_
 
 ::
 
   Bjørn Ådlandsvik <bjorn@imr.no>
   Institute of Marine Research
   Bergen, Norway
-
