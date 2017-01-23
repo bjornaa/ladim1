@@ -13,11 +13,11 @@ from particlefile import ParticleFile
 
 # Files
 particle_file = 'streak.nc'
-grid_file = '../../input/ocean_avg_0014.nc'
+grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
 i0, i1 = 100, 130
-j0, j1 = 90, 110
+j0, j1 = 90, 115
 
 # ----------------
 

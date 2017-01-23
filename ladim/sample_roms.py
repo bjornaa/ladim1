@@ -84,7 +84,7 @@ def Z2S(z_rho, X, Y, Z):
     """
 
     kmax, jmax, imax = z_rho.shape
-    pmax = Z.shape
+    # pmax = Z.shape
 
     # Find rho-based horizontal grid cell
     # i.e. closest rho-point
@@ -163,36 +163,36 @@ def sample3DUV2():
     pass
 
 
-def sample2D(F, X, Y):
-    """Bilinear sample of a 2D field
-
-    *F* : 2D array
-
-    *X*, *Y* : position in grid coordinates, scalars or compatible arrays
-
-    Note reversed axes, for integers i and j we have
-      ``sample2D(F, i, j) = F[j,i]``
-
-    Using linear interpolation
-
-    """
-
-    Z = np.add(X, Y)    # Test for compatibility
-    if np.isscalar(Z):  # Both X and Y are scalars
-        I = int(X)
-        J = int(Y)
-        P = X - I
-        Q = Y - J
-    else:
-        # Make arrays of common shape
-        X0 = X + np.zeros_like(Z)
-        Y0 = Y + np.zeros_like(Z)
-        I = X0.astype('int')
-        J = Y0.astype('int')
-        P = X0 - I
-        Q = Y0 - J
-
-    W00 = (1-P)*(1-Q)
-    W01 = (1-P)*Q
-    W10 = P*(1-Q)
-    W11 = P*Q
+# def sample2D(F, X, Y):
+#     """Bilinear sample of a 2D field
+#
+#     *F* : 2D array
+#
+#     *X*, *Y* : position in grid coordinates, scalars or compatible arrays
+#
+#     Note reversed axes, for integers i and j we have
+#       ``sample2D(F, i, j) = F[j,i]``
+#
+#     Using linear interpolation
+#
+#     """
+#
+#     Z = np.add(X, Y)    # Test for compatibility
+#     if np.isscalar(Z):  # Both X and Y are scalars
+#         I = int(X)
+#         J = int(Y)
+#         P = X - I
+#         Q = Y - J
+#     else:
+#         # Make arrays of common shape
+#         X0 = X + np.zeros_like(Z)
+#         Y0 = Y + np.zeros_like(Z)
+#         I = X0.astype('int')
+#         J = Y0.astype('int')
+#         P = X0 - I
+#         Q = Y0 - J
+#
+#     W00 = (1-P)*(1-Q)
+#     W01 = (1-P)*Q
+#     W10 = P*(1-Q)
+#     W11 = P*Q

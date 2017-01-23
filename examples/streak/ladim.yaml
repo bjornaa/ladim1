@@ -15,8 +15,8 @@ time_control:
     reference_time: *time0
 
 files:
-    grid_file             : ../../input/ocean_avg_0014.nc
-    input_file            : ../../input/ocean_avg_0014.nc
+    grid_file             : ../data/ocean_avg_0014.nc
+    input_file            : ../data/ocean_avg_0014.nc
     particle_release_file : streak.in
     output_file           : streak.nc
 

@@ -13,7 +13,7 @@ from particlefile import ParticleFile
 
 # Files
 particle_file = 'station.nc'
-grid_file = '../../input/ocean_avg_0014.nc'
+grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
 i0, i1 = 100, 135

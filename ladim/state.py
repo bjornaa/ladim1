@@ -49,9 +49,9 @@ class State:
         # for name in self.particle_variables:
         #    self[name] = new[name]
 
-    def update(self, inp):
+    def update(self, config, grid, forcing):
         self.timestep += 1
-        Euler_Forward(inp, inp.U, inp.V, self.X, self.Y, self.Z, dt=self.dt)
+        Euler_Forward(config, grid, forcing, self)
 
 # ==================================================
 

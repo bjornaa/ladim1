@@ -1,31 +1,34 @@
 # -*- coding: utf-8 -*-
 
 # import datetime
+import glob
 import numpy as np
-from netCDF4 import Dataset, num2date
-from ladim.grid import Grid
+from netCDF4 import Dataset, MFDataset, num2date
+# from ladim.grid import Grid
+from ladim.sample_roms import Z2S, sample3DUV
 
 
-class ROMS_input(Grid):
+class ROMS_forcing():
     """
-    Class for ROMS input, updated fields and static grid info
+    Class for ROMS forcing
 
     """
 
-    def __init__(self, config, subgrid=None, Vinfo=None, verbose=True):
+    def __init__(self, config, grid):
 
-        self.verbose = verbose
+        self._grid = grid  # Get the grid object, make private?
 
-        # Initiate the SGrid part
-        # -----------------------
-        # nc0 = Dataset(config.grid_file)
-        Grid.__init__(self, config.grid_file, subgrid, Vinfo)
-        # nc0.close()
-
-        # Open the forcing file
-        # ---------------------
-        nc = Dataset(config.input_file)
-        self.nc = nc
+        # Test for glob, use MFDataset if needed
+        files = glob.glob(config.input_file)
+        if len(files) == 0:
+            print("No input file:", config.input_file)
+            raise SystemExit(3)
+        elif len(files) == 1:
+            nc = Dataset(files[0])
+        else:   # Multiple files
+            files.sort()
+            nc = MFDataset(files)
+        self._nc = nc
 
         # Find first/last forcing times
         # -----------------------------
@@ -38,6 +41,8 @@ class ROMS_input(Grid):
 
         # Check that forcing period covers the simulation period
         # ------------------------------------------------------
+        # Use logging module for this
+
         assert(time0 <= start_time)
         assert(config.stop_time <= time1)
 
@@ -92,23 +97,25 @@ class ROMS_input(Grid):
             self.T1, self.U1, self.V1 = self._readfield(fieldnr)
             # print step[fieldnr-1], " < ", t, " <= ", step[fieldnr]
             self._timespan = step[fieldnr] - step[fieldnr-1]
+            self.dT = (self.T1 - self.T0) / self._timespan
+            self.dU = (self.U1 - self.U0) / self._timespan
+            self.dV = (self.V1 - self.V0) / self._timespan
             self._fieldnr = fieldnr
 
         # Linear interpolation in time
         # print "fieldnr ... = ", fieldnr, step[fieldnr]-t, self._timespan
-        a = float(step[fieldnr]-t) / self._timespan
-        self.F = a*self.T0 + (1-a)*self.T1
-        self.U = a*self.U0 + (1-a)*self.U1
-        self.V = a*self.V0 + (1-a)*self.V1
+        self.F += self.dT
+        self.U += self.dU
+        self.V += self.dV
 
     # --------------
 
     def _readfield(self, n):
         """Read fields at time frame = n"""
-        T = self.nc.variables['ocean_time'][n]  # Read new fields
-        U = self.nc.variables['u'][n, :, self.Ju, self.Iu]
-        V = self.nc.variables['v'][n, :, self.Jv, self.Iv]
-        if self.verbose:
+        T = self._nc.variables['ocean_time'][n]  # Read new fields
+        U = self._nc.variables['u'][n, :, self._grid.Ju, self._grid.Iu]
+        V = self._nc.variables['v'][n, :, self._grid.Jv, self._grid.Iv]
+        if True:
             print("Reading ROMS input, input time = ",
                   num2date(self._timevar[n], self._time_units))
         return T, U, V
@@ -118,4 +125,12 @@ class ROMS_input(Grid):
     def close(self):
 
         # Close the ROMS grid file
-        self.nc.close()
+        self._nc.close()
+
+    def sample_velocity(self, state):
+        X = state['X'] - self._grid.i0
+        Y = state['Y'] - self._grid.j0
+        Z = state['Z']   # Use negative depth (for now)
+        # Save K, A for sampling of scalar fields
+        K, A = Z2S(self._grid.z_r, X, Y, Z)
+        return sample3DUV(self.U, self.V, state['X'], state['Y'], K, A)

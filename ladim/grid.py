@@ -18,7 +18,7 @@ from netCDF4 import Dataset
 from roppy import s_stretch, sdepth
 # from roppy.depth import sdepth, zslice, s_stretch
 # from roppy.sample import sample2D, bilin_inv
-import ladim.sample_roms as sample_roms
+# import ladim.sample_roms as sample_roms
 
 alogger = logging.getLogger(__name__)
 # logger.setLevel(logging.INFO)
@@ -29,6 +29,8 @@ ch.setFormatter(formatter)
 alogger.addHandler(ch)
 
 
+# Make this a ROMS_grid class
+# Inherit from a more general grid class
 class Grid():
 
     """Simple ROMS grid object
@@ -103,18 +105,11 @@ class Grid():
             self.Cs_w = s_stretch(self.N, Vinfo['theta_s'], Vinfo['theta_b'],
                                   stagger='w', Vstretching=self.Vstretching)
 
-            try:
-                self.hc = ncid.variables['hc'].getValue()
-            except KeyError:
-                print("No vertical information")
-                raise SystemExit(3)
-
+        else:
+            self.hc = ncid.variables['hc'].getValue()
             self.Cs_r = ncid.variables['Cs_r'][:]
             self.Cs_w = ncid.variables['Cs_w'][:]
-
-            # Vertical grid size
             self.N = len(self.Cs_r)
-
             # Vertical transform
             try:
                 self.Vtransform = ncid.variables['Vtransform'].getValue()
@@ -137,13 +132,35 @@ class Grid():
         # Close the file(s)
         ncid.close()
 
-        config.grid = self.z
+        # config.grid = self.z
 
-        def sample3DUV(self, U, V, X, Y, K, A):
-            return (sample_roms.samle3D(
-                    U, V, X-self.i0-0.5, Y-self.j0, K, A),
-                    sample_roms.sample3D(
-                    U, V, X-self.i0, Y-self.j0-0.5, K, A))
+    def sample_metric(self, X, Y):
+        """Sample the metric coefficients
+
+        Changes slowly, so using neareast neighbour
+        """
+        I = X.round().astype(int) - self.i0
+        J = Y.round().astype(int) - self.j0
+
+        # Metric is conform for PolarStereographic
+        A = self.pm[J, I]
+        return A, A
+
+    def sample_depth(self, X, Y):
+        I = X.round().astype(int) - self.i0
+        J = Y.round().astype(int) - self.j
+        return self.H[J, I]
+
+    def ingrid(self, X, Y):
+        """Returns True for points inside the subgrid"""
+        return ((self.i0-0.5 <= X) & (X <= self.i1-0.5) &
+                (self.j0-0.5 <= Y) & (Y <= self.j0-0.5))
+
+    def onland(self, X, Y):
+        """Returns True for points at land"""
+        I = X.round().astype(int) - self.i0
+        J = Y.round().astype(int) - self.j
+        return (self.M[J, I] < 1)
 
 # --------------------------------------------------------
 

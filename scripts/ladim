@@ -6,7 +6,7 @@ from netCDF4 import num2date
 # from trackpart import Euler_Forward
 import ladim
 from ladim.grid import Grid
-from ladim.input import ROMS_input
+from ladim.forcing import ROMS_forcing
 from ladim.release import ParticleReleaser
 from ladim.configuration import Configure
 from ladim.state import State
@@ -46,10 +46,10 @@ state = State(config)
 
 grid = Grid(config)
 
-forcing = ROMS_input(config)
+forcing = ROMS_forcing(config, grid)
 
 
-tunits = forcing.nc.variables['ocean_time'].units
+# tunits = forcing._nc.variables['ocean_time'].units
 
 # ------------
 # Initiate grid
@@ -94,7 +94,7 @@ for i in range(numsteps+1):
 
     # Only use surface forcing presently
     # Redundant to give both inp, and inp.U ...
-    state.update(forcing)
+    state.update(config, grid, forcing)
 
     # Indiviual behaviour
     behaviour(state)

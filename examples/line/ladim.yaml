@@ -1,7 +1,7 @@
 # Configuration file for ladim
 #
 # Line source example
-# 
+#
 
 
 time_control:
@@ -15,8 +15,8 @@ time_control:
     reference_time: *time0
 
 files:
-    grid_file             : ../../input/ocean_avg_0014.nc
-    input_file            : ../../input/ocean_avg_0014.nc
+    grid_file             : ../data/ocean_avg_0014.nc
+    input_file            : ../data/ocean_avg_*.nc
     particle_release_file : line.in
     output_file           : line.nc
 
@@ -36,7 +36,7 @@ particle_release:
 forcing:
     # mapping: model name -> name in input file
     velocity: {U: u, V: v}
-    ibm_forcing: {temp: temp}
+    ibm_forcing: {}
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
