@@ -1,0 +1,8 @@
+examples/data
+
+Placeholder for input data for the examples
+
+The examples line, streak and station uses ocean_avg_0014.nc
+
+This dataset is available with anonymous ftp
+from ftp.imr.no/bjorn/ladim-data

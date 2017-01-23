@@ -16,8 +16,8 @@ particle_file = 'line.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 55, 160
-j0, j1 = 70, 150
+i0, i1 = 58, 150
+j0, j1 = 60, 140
 
 # ----------------
 

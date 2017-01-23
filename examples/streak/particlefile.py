@@ -29,7 +29,7 @@ class ParticleFile(object):
     def get_position(self, n):
         """Get particle positions at n-th time times"""
         f = self.nc
-        start = self.particle_count[:n-1].sum()
+        start = self.particle_count[:n].sum()
         count = self.particle_count[n]
         X = f.variables['X'][start:start+count]
         Y = f.variables['Y'][start:start+count]
