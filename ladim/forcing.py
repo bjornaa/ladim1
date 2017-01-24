@@ -88,6 +88,10 @@ class ROMS_forcing():
             self.F = self.T1
             self.U = self.U1
             self.V = self.V1
+            # Første gang
+            self.dF = 0
+            self.dU = 0
+            self.dV = 0
             return None
         if t > step[fieldnr]:  # Need new fields
             fieldnr = fieldnr + 1
@@ -127,10 +131,15 @@ class ROMS_forcing():
         # Close the ROMS grid file
         self._nc.close()
 
-    def sample_velocity(self, state):
-        X = state['X'] - self._grid.i0
-        Y = state['Y'] - self._grid.j0
-        Z = state['Z']   # Use negative depth (for now)
+    # def sample_velocity(self, state):
+    #     X = state['X'] - self._grid.i0
+    #     Y = state['Y'] - self._grid.j0
+    #     Z = state['Z']   # Use negative depth (for now)
+    def sample_velocity(self, X, Y, Z, tstep=0):
         # Save K, A for sampling of scalar fields
         K, A = Z2S(self._grid.z_r, X, Y, Z)
-        return sample3DUV(self.U, self.V, state['X'], state['Y'], K, A)
+        if tstep < 0.001:
+            return sample3DUV(self.U, self.V, X, Y, K, A)
+        else:
+            return sample3DUV(self.U+tstep*self.dU, self.V+tstep*self.dV,
+                              X, Y, K, A)

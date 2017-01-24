@@ -135,6 +135,9 @@ class Configure():
             for item in self.nc_attributes[name].items():
                 logger.info(12*' ' + '{:11s}: {:s}'.format(*item))
 
+        # Advection  (Ta fra YAML file)
+        self.advection = 'RK4'
+
     # Allow item notation
     def __setitem__(self, key, value):
         setattr(self, key, value)

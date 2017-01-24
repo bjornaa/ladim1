@@ -1,6 +1,6 @@
 # Classes for Particle and State variables
 
-from ladim.trackpart import Euler_Forward
+from ladim.trackpart import TrackPart
 import numpy as np
 
 # ------------------------
@@ -23,7 +23,9 @@ class State:
         # oppdatere output etter hver release.
         # self.particle_variables = ['release_time', 'farmid']
 
+        self.track = TrackPart(config)
         self.dt = config.dt
+
 
     def __getitem__(self, name):
         return getattr(self, name)
@@ -51,7 +53,8 @@ class State:
 
     def update(self, config, grid, forcing):
         self.timestep += 1
-        Euler_Forward(config, grid, forcing, self)
+        self.track.move(grid, forcing, self)
+        # RK2(config, grid, forcing, self)
 
 # ==================================================
 
