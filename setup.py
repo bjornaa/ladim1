@@ -7,7 +7,7 @@ setup(
    description='Lagrangian Advection and DIffusion Model',
    author='Bjørn Ådlandsvik',
    author_email='bjorn@imr.no',
-   packages=['ladim'],
+   packages=['ladim', 'postladim'],
    install_requires=['numpy', 'pandas', 'pyyaml', 'roppy'], 
    scripts=['scripts/ladim']
 )

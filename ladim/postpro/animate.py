@@ -5,30 +5,32 @@ import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 import roppy
 import roppy.mpl_util
-from postladim.particlefile import ParticleFile
+from particlefile import ParticleFile
 
 # ---------------
 # User settings
 # ---------------
 
 # Files
-particle_file = 'line.nc'
-grid_file = '../data/ocean_avg_0014.nc'
+# particle_file = '../output/pyladim_out.nc'
+# particle_file = '../output/streak.nc'
+# particle_file = '../output/line.nc'
+particle_file = '../output/point.nc'
+roms_file = '../input/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 58, 150
-j0, j1 = 60, 140
+i0, j0 = 70, 80
+i1, j1 = 150, 133
 
 # ----------------
 
 # ROMS grid, plot domain
 
-# Slight overkill to use roppy, could be more stand alone
-f0 = Dataset(grid_file)
+f0 = Dataset(roms_file)
 g = roppy.SGrid(f0, subgrid=(i0, i1, j0, j1))
 
-
-# particle_file
+#
+# print particle_file
 pf = ParticleFile(particle_file)
 
 Ntimes = pf.ntimes
@@ -41,37 +43,33 @@ def animate():
         if t == 0:
             time.sleep(0.5)
         X, Y = pf.get_position(t)
-        timestring = pf.get_time(t)
+        tstring = pf.get_time(t)
         h[0].set_xdata(X)
         h[0].set_ydata(Y)
-        ax.set_title(timestring)
+        ax.set_title(tstring)
         fig.canvas.draw()
 
 # Create a figure
 
-fig = plt.figure(figsize=(12, 10))
+fig = plt.figure(figsize=(12, 8))
 ax = fig.add_subplot(1, 1, 1)
 
 # Make background map
 cmap = plt.get_cmap('Blues')
 h = ax.contourf(g.X, g.Y, g.h, cmap=cmap, alpha=0.3)
+# fig.colorbar(h)
 roppy.mpl_util.landmask(g, (0.6, 0.8, 0.0))
-ax.contour(g.X, g.Y, g.lat_rho, levels=range(57, 64),
-           colors='black', linestyles=':')
-ax.contour(g.X, g.Y, g.lon_rho, levels=range(-4, 10, 2),
-           colors='black', linestyles=':')
-
 
 # Plot initial particle distribution
 X, Y = pf.get_position(0)
-timestring = pf.get_time(0)
+X, Y = X, Y
+tstring = pf.get_time(0)
 h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
-ax.set_title(timestring)
+ax.set_title(tstring)
 
 # Do the animation
 fig.canvas.manager.window.after(100, animate)
 
 # Show the results
 plt.axis('image')
-plt.axis((i0+1, i1-1, j0+1, j1-1))
 plt.show()
