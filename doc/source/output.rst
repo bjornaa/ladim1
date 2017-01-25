@@ -16,13 +16,15 @@ For particle tracking the CF-standard defines a format for
 for our purpose since we are more interested in the geographical distribution
 of particles at a given time that the individual trajectories.
 Chris Baker at NOAA has an interesting discussion on this topic and a
-suggestion at github
-https://github.com/NOAA-ORR-ERD/nc_particles/blob/master/nc_particle_standard.md .
+suggestion at `github
+<https://github.com/NOAA-ORR-ERD/nc_particles/blob/master/
+nc_particle_standard.md>`_.
 The new LADIM format is closely related to this suggestion.
 
 The format uses an indexed ragged array representation, suitable for
 both version 3 and 4 of the NetCDF standard. The dimensions are
-`time`, `particle` and `particle_instance`. The particle dimension indexes the
+``time``, ``particle`` and ``particle_instance``. The particle dimension
+indexes the
 individual particles, while the particle_instance indexes the instances i.e.
 a particle at a given time. The number of times is defined by the length of the
 simulation and the frequency of output, both are determined by the configuration.
@@ -32,8 +34,8 @@ uncertain as particles may be removed from the computation by leaving the area,
 stranding, or becoming inactive for biological reasons. The particle_instance
 dimension is therefore the single unlimited dimension.
 
-The indirect indexing is given by the variable `particle_count(time)`.
-The particle distribution at timestep n (counting from inital time n=0) can be
+The indirect indexing is given by the variable ``particle_count(time)``.
+The particle distribution at timestep ``n`` (counting from inital time n=0) can be
 retrieved by the following python code::
 
   nc = Dataset(particle_file)
@@ -42,7 +44,7 @@ retrieved by the following python code::
   count = particle_count[n]
   X = nc.variables['X'][start:start+count]
 
-Note that some software uses 1-based indexing (matlab, fortran by default)
+Note that some languages uses 1-based indexing (MATLAB, fortran by default)
 In MATLAB the code is::
 
   % Should be checked by someone who knows matlab
@@ -64,13 +66,13 @@ larger than the number of active particles at the time. It also
 has the property that if a particle is released before another
 particle, it has lower ``pid``.
 
-The particles identifiers at a given time frame `n` can be found from the
-output file as ``pid_n = pid[start:start+count]``. It has
-the following properties::
+The particle identifiers at a given time frame has the following properties,
 
-  - pid_n is a sorted integer array
-  - pid_n[p] = pid[start+p] >= p with equality
-     if all earlier particles are active at time frame n.
+* pid[start:start+count] is a sorted integer array.
+* pid[start+p] >= p
+  with equality if and only if all earlier particles are alive at the time frame.
+
+These properties can be used to extract the individual trajectories, if needed.
 
 Example CDL
 -----------
