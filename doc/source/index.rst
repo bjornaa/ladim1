@@ -12,10 +12,8 @@ Contents:
    :maxdepth: 2
 
    intro.rst
-   tutorial
-   configuration
-   particle release
-   output format
+   manual.rst
+
 
 
 

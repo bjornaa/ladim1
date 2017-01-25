@@ -1,128 +1,115 @@
 Output format
 =============
 
-The particle distributions are written to netCDF files.
+The particle distributions are written to NetCDF files.
+The frequency of output, the variables included and their attributes
+are determined by the configuration file.
 
-===Litt diskusjon om ulik tankegang for partikkelfordelinger
-
-Different formats may be available in the future
-(in particular ROMS float format)
-
-
-LADIM format
-------------
-
-This is a modfication of the LADIM 2 format.
-It is not backwards compatible, but scripts should be
-easy to modify. The change is done to follow the CF-standard
+This is a not backwards compatible modification of the old LADIM format.
+The fundamental data structure is the same, so cripts should be easy to modify.
+The change is done to follow the CF-standard
 as far as possible, and to increase flexibility.
 
-The format is close to the format of "Indexed ragged array
-representation of trajectories" as described in appendix H.4.4 in the
-CF-documentation version 1.6.
-http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html#idp8399648
-There are however modifications, as we are more interested in the
-distribution of the particles at a fixed time than to follow the
-individual trajectories.
 
-The dimensions are ``time`` and ``particle_dim``. NetCDF 3 format allows only
-one unlimited dimension. As the duration and output frequency are
-known at the start of a ladim simulation, the particle dimension may
-be unlimited. 
+For particle tracking the CF-standard defines a format for
+"Indexed ragged array representation of trajectories". This is not suitable
+for our purpose since we are more interested in the geographical distribution
+of particles at a given time that the individual trajectories.
+Chris Baker at NOAA has an interesting discussion on this topic and a
+suggestion at github
+https://github.com/NOAA-ORR-ERD/nc_particles/blob/master/nc_particle_standard.md .
+The new LADIM format is closely related to this suggestion.
 
-An example of the structure of the output file `pyladim_out.nc` is
-shown below, in NetCDF CFL format::
+The format uses an indexed ragged array representation, suitable for
+both version 3 and 4 of the NetCDF standard. The dimensions are
+`time`, `particle` and `particle_instance`. The particle dimension indexes the
+individual particles, while the particle_instance indexes the instances i.e.
+a particle at a given time. The number of times is defined by the length of the
+simulation and the frequency of output, both are determined by the configuration.
+The number of particles is given by the sum of the multiplicities in the
+particle release file, also known in advance. The number of instances is more
+uncertain as particles may be removed from the computation by leaving the area,
+stranding, or becoming inactive for biological reasons. The particle_instance
+dimension is therefore the single unlimited dimension.
 
-  netcdf pyladim_out {
-  dimensions:
-        particle_dim = UNLIMITED ; // (1130000 currently)
-        time = 113 ;
-  variables:
-        double time(time) ;
-                time:long_name = "time" ;
-                time:standard_name = "time" ;
-                time:units = "seconds since 1989-06-01 12:00:00" ;
-        int pstart(time) ;
-                pstart:long_name = "start index for particle distribution" ;
-        int pcount(time) ;
-                pcount:long_name = "number of particles" ;
-        int pid(particle_dim) ;
-                pid:long_name = "particle identifier" ;
-                pid:cf_role = "trajectory_id" ;
-        float X(particle_dim) ;
-                X:long_name = "grid X-coordinate of particles" ;
-        float Y(particle_dim) ;
-                Y:long_name = "grid Y-coordinate of particles" ;
+The indirect indexing is given by the variable `particle_count(time)`.
+The particle distribution at timestep n (counting from inital time n=0) can be
+retrieved by the following python code::
 
-  // global attributes:
-                :Conventions = "CF-1.5" ;
-                :institution = "Institute of Marine Research" ;
-                :source = "Lagrangian Advection and DIffusion Model, python version" ;
-                :history = "2012-11-28 created by pyladim" ;
-  }
+  nc = Dataset(particle_file)
+  particle_count = nc.variables['particle_count'][:n+1]
+  start = np.sum(particle_count[:n])
+  count = particle_count[n]
+  X = nc.variables['X'][start:start+count]
 
+Note that some software uses 1-based indexing (matlab, fortran by default)
+In MATLAB the code is::
 
-
-
-[===LARMOD. For larmod som kjøres fra symbioses-grensesnitt, larmod vet ikke
-nødvendigvis hvor lang simuleringen blir. Bruker derfor NetCDF-4 og
-begge dimensjoner ubegrenset]
-
-The arrays ``pstart(time)`` and ``pcount(time)`` are used to adress the
-particle distributions. For a particle variable, for instance
-``X(particle_dim)``, the values at time ``t`` is found as (python index
-notation)::
-
-  X[pstart[t] : pstart[t]+pcount[t]]
-
+  % Should be checked by someone who knows matlab
+  particle_count = ncread(particle_file, 'particle_count', 1, n+1)
+  start = 1 + sum(particle_count(1:n))
+  count = particle_count(n+1)
+  X = ncread(particle_file, 'X', start, count)
 
 
 Particle identifier
 -------------------
 
 The particle identifier, ``pid`` should always be present in the output
-file. It is a particle number, starting with 1 and increasing as the
+file. It is a particle number, starting with 0 and increasing as the
 particles are released. The ``pid`` follows the particle and is not
-reused if the particle becomes inactive.  In particular, ``max(pid)`` is
-the total number of particles involved in the simulation and may be
-larger than the number of active particles at a given time. It also
+reused if the particle becomes inactive.  In particular, ``max(pid) + 1`` is
+the total number of particles involved so far in the simulation and may be
+larger than the number of active particles at the time. It also
 has the property that if a particle is released before another
 particle, it has lower ``pid``.
 
 The particles identifiers at a given time frame `n` can be found from the
-output file as ``pid_n = pid[pstart[n]:pstart[n]+pcount[n]]``. It has
+output file as ``pid_n = pid[start:start+count]``. It has
 the following properties::
 
-  - pid_n is a sorted integer array 
-  - pid_n[p] = pid[pstart[n]+p] >= p+1 with equality
+  - pid_n is a sorted integer array
+  - pid_n[p] = pid[start+p] >= p with equality
      if all earlier particles are active at time frame n.
 
 Example CDL
 -----------
+
+Ta mer fullstendig eksempel, med super og age
 ::
 
-  netcdf larmod_out {
+  netcdf out {
   dimensions:
-        particle_dim = UNLIMITED ; // (868 currently)
-        time = UNLIMITED ; // (217 currently)
+	  particle_instance = UNLIMITED ; // (450 currently)
+	  particle = 240 ;
+	  time = 9 ;
   variables:
-        double time(time) ;
-                time:long_name = "time" ;
-                time:units = "seconds since 1970-01-01 00:00:00" ;
-        int pstart(time) ;
-                pstart:long_name = "start index for particle distribution" ;
-        int pcount(time) ;
-                pcount:long_name = "number of particles" ;
-        int pid(particle_dim) ;
-                pid:long_name = "particle identifier" ;
-        float lon(particle_dim) ;
-                lon:long_name = "longitude" ;
-                lon:units = "degrees_east" ;
-        float lat(particle_dim) ;
-                lat:long_name = "latitude" ;
-                lat:units = "degrees_north" ;
+	  double time(time) ;
+		  time:long_name = "time" ;
+		  time:standard_name = "time" ;
+		  time:units = "seconds since 2015-03-31 13:00:00" ;
+	  int particle_count(time) ;
+		  particle_count:long_name = "number of particles in a given timestep" ;
+		  particle_count:ragged_row_count = "particle count at nth timestep" ;
+	  double release_time(particle) ;
+		  release_time:units = "seconds since 2015-03-31 13:00:00" ;
+		  release_time:long_name = "particle release time" ;
+	  int pid(particle_instance) ;
+		  pid:long_name = "particle identifier" ;
+	  float X(particle_instance) ;
+		  X:long_name = "particle X-coordinate" ;
+	  float Y(particle_instance) ;
+		  Y:long_name = "particle Y-coordinate" ;
+	  float Z(particle_instance) ;
+		  Z:long_name = "particle depth" ;
+		  Z:positive = "down" ;
+		  Z:units = "m" ;
+		  Z:standard_name = "depth_below_surface" ;
 
   // global attributes:
-                :history = "2013-05-10: created by LARMOD" ;
+		:Conventions = "CF-1.5" ;
+		:institution = "Institute of Marine Research" ;
+		:source = "Lagrangian Advection and DIffusion Model, python version" ;
+		:history = "Created by pyladim" ;
+		:date = "2017-01-24" ;
   }
-
