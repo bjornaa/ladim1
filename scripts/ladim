@@ -31,7 +31,7 @@ else:
 config = Configure(config_file, loglevel='INFO')
 
 numsteps = config.numsteps
-# dt = config.dt
+dt = config.dt
 
 
 # State
