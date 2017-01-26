@@ -28,13 +28,10 @@ if len(sys.argv) > 1:   # configuration file from command line
 else:
     config_file = 'ladim.yaml'
 
-print(" --- pyladim configuration ----")
 config = Configure(config_file, loglevel='INFO')
 
-print(" --- end of configuration ---\n")
-
 numsteps = config.numsteps
-dt = config.dt
+# dt = config.dt
 
 
 # State
@@ -60,8 +57,7 @@ forcing = ROMS_forcing(config, grid)
 # Particle release file
 # ----------------------
 
-partini = ParticleReleaser(config)
-# partini.scan()   # Gjør dette til del av __init__
+partini = ParticleReleaser(config, loglevel='INFO')
 
 # ------------------
 # Init output file
