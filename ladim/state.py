@@ -30,7 +30,8 @@ class State:
         self.dt = config.dt
 
         if config.ibm_module:
-            self.ibm = importlib.import_module('ladim.' + config.ibm_module)
+            self.ibm = importlib.import_module(
+                'ladim.ibms.' + config.ibm_module)
         else:
             self.ibm = None
 
