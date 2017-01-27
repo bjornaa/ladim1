@@ -1,7 +1,10 @@
 # Classes for Particle and State variables
 
+import importlib
 from ladim.trackpart import TrackPart
 import numpy as np
+
+
 
 # ------------------------
 
@@ -26,6 +29,10 @@ class State:
         self.track = TrackPart(config)
         self.dt = config.dt
 
+        if config.ibm_module:
+            self.ibm = importlib.import_module('ladim.' + config.ibm_module)
+        else:
+            self.ibm = None
 
     def __getitem__(self, name):
         return getattr(self, name)
@@ -54,7 +61,9 @@ class State:
     def update(self, config, grid, forcing):
         self.timestep += 1
         self.track.move(grid, forcing, self)
-        # RK2(config, grid, forcing, self)
+        if self.ibm:
+            self.ibm.update_ibm(self, forcing)
+
 
 # ==================================================
 

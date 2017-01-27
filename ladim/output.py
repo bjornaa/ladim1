@@ -94,7 +94,6 @@ class OutPut():
         self.instance_count += pcount
 
     def write_particle_variables(self, partini):
-
         for name, value in partini.particle_variables.items():
             self.nc.variables[name][:] = value
 

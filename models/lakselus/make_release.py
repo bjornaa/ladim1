@@ -13,8 +13,8 @@ hour = datetime.timedelta(seconds=3600)
 
 times = [time0 + n*hour for n in range(24)]
 
-format1 = "5 {:s} 379 539 5\n"  
-format2 = "5 {:s} 381 523 5\n"  
+format1 = "5 {:s} 379 739 5 10041  1000\n"
+format2 = "5 {:s} 381 823 5 23303  2000\n"
 
 for t in times:
     print(t)

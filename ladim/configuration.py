@@ -71,11 +71,23 @@ class Configure():
 
         # Grid
         logger.info('Configuration: Grid')
-        self.subgrid = []
+        try:
+            self.subgrid = conf['grid']['subgrid']
+        except KeyError:
+            self.subgrid = []
         logger.info('    {:15s}: {}'.format('subgrid', self.subgrid))
         self.Vinfo = {}
         logger.info('    {:15s}: {}'.format('vertical information',
                                             self.Vinfo))
+
+        # IBM
+        try:
+            self.ibm_module = conf['ibm']['ibm_module']
+            logger.info('Configuration: IBM')
+            logger.info('    {:15s}: {}'.format('ibm_module', self.ibm_module))
+        # Skille på om ikke gitt, eller om navnet er feil
+        except KeyError:
+            self.ibm_module = ''
 
         # --- Particle release ---
         logger.info('Configuration: Particle Releaser')

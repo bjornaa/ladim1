@@ -15,8 +15,7 @@ time_control:
     # Start and stop of simulation
     # use an alias &t0 if used again
     start_time: &time0 2015-03-31 13:00:00
-    #stop_time:  2015-04-01 12:00:00
-    stop_time:  2015-03-31 21:00:00
+    stop_time:  2015-03-31 15:00:00
     # Reference time for netcdf output
     # by default set to start_time
     # can be overridden explicitly
@@ -28,30 +27,39 @@ files:
     particle_release_file : release.in
     output_file           : out.nc
 
+grid:
+    # Format = [i0, i1, j0, j1]
+    subgrid: [200, 500, 600, 850]
+
+# Samle IBM-variablene her
+ibm:
+    # IBM-module, omit or '' for no IBM
+    ibm_module: luseibm
+
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: []
+    ibm_variables: [super, age]
 
 particle_release:
-    variables: [mult, release_time, X, Y, Z]
+    variables: [mult, release_time, X, Y, Z, farmid, super]
     # Converters (if not float)
     mult: int
     release_time: str
-    # farmid: int
-    particle_variables: [release_time]
+    farmid: int
+    particle_variables: [release_time, farmid]
 
 forcing:
     # mapping: model name -> name in input file
     velocity: {U: u, V: v}
-    ibm_forcing: {}
+    ibm_forcing: {temp: temp}
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [1, h]
     # Variable names
-    particle: [release_time]
-    instance: [pid, X, Y, Z]
+    particle: [release_time, farmid]
+    instance: [pid, X, Y, Z, super, age]
     # NetCDF arguments
     release_time:
         ncformat: f8
@@ -68,6 +76,12 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
+    age:
+        ncformat: f4
+        long_name: particle age in degree-days
+        units: Celcius days
+        standard_name: integral_of_sea_water_temperature_wrt_time
+    super: {ncformat: f4, long_name: number of individuals in instance}
 
 # for the time being, => numeric section
 ymse:
