@@ -56,13 +56,13 @@ def surface_light(dtime, lat):
     v = asind(height)  # sun height [deg]
     # print(height, v)
 
-    if (v >= 0.):
+    if v >= 0.:
         slig = maxlight*(height/h12) + twilight
-    elif (v >= -6.):
+    elif v >= -6.:
         slig = ((twilight - .048)/6.)*(6.+v)+.048
-    elif (v >= -12.):
+    elif v >= -12.:
         slig = ((.048 - 1.15e-4)/6.)*(12.+v)+1.15e-4
-    elif (v >= -18):
+    elif v >= -18:
         slig = (((1.15e-4)-1.15e-5)/6.)*(18.+v)+1.15e-5
     else:
         slig = 1.15e-5

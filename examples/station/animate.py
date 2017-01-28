@@ -59,6 +59,7 @@ roppy.mpl_util.landmask(g, (0.6, 0.8, 0.0))
 # Plot initial particle distribution
 X, Y = pf.get_position(0)
 timestring = pf.get_time(0)
+# noinspection PyRedeclaration
 h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(timestring)
 

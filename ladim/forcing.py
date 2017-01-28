@@ -9,7 +9,7 @@ from netCDF4 import Dataset, MFDataset, num2date
 from ladim.sample_roms import Z2S, sample3DUV, sample3D
 
 
-class ROMS_forcing():
+class ROMS_forcing:
     """
     Class for ROMS forcing
 
@@ -67,7 +67,7 @@ class ROMS_forcing():
         # --------------------------------------------------
         n = 0
         while step[n+1] <= 0:
-            n = n + 1
+            n += 1
         fieldnr = n
         # print step[fieldnr], step[fieldnr+1]
         self._timespan = step[fieldnr+1] - step[fieldnr]
@@ -111,7 +111,7 @@ class ROMS_forcing():
             for name in self.ibm_forcing:
                 self['d'+name] = 0
         if t > step[fieldnr]:  # Need new fields
-            fieldnr = fieldnr + 1
+            fieldnr += 1
             self.T0 = self.T1
             self.U0 = self.U1
             self.V0 = self.V1

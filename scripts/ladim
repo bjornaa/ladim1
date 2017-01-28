@@ -4,7 +4,7 @@ import sys
 # import numpy as np
 from netCDF4 import num2date
 # from trackpart import Euler_Forward
-import ladim
+# import ladim
 from ladim.grid import Grid
 from ladim.forcing import ROMS_forcing
 from ladim.release import ParticleReleaser

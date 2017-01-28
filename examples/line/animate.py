@@ -65,6 +65,7 @@ ax.contour(g.X, g.Y, g.lon_rho, levels=range(-4, 10, 2),
 # Plot initial particle distribution
 X, Y = pf.get_position(0)
 timestring = pf.get_time(0)
+# noinspection PyRedeclaration
 h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(timestring)
 

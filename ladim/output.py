@@ -11,7 +11,7 @@ from netCDF4 import Dataset
 
 
 # Gjør til en iterator
-class OutPut():
+class OutPut:
 
     def __init__(self, config):
         self.nc = self._define_netcdf(config)

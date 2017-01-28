@@ -23,7 +23,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-class Configure():
+class Configure:
 
     def __init__(self, config_file, loglevel=logging.WARNING):
 

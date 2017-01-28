@@ -299,8 +299,8 @@ def bilin_inv(f, g, F, G, maxiter=7, tol=1.0e-7):
         # incr = - np.dot(Jinv, [Fs-f, Gs-g])
         # x = x + incr[0], y = y + incr[1]
         det = Fx*Gy - Fy*Gx
-        x = x - (Gy*(Fs-f) - Fy*(Gs-g)) / det
-        y = y - (-Gx*(Fs-f) + Fx*(Gs-g)) / det
+        x -= (Gy*(Fs-f) - Fy*(Gs-g)) / det
+        y -= (-Gx*(Fs-f) + Fx*(Gs-g)) / det
 
     return x, y
 

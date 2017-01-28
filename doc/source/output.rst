@@ -115,3 +115,5 @@ Ta mer fullstendig eksempel, med super og age
 		:history = "Created by pyladim" ;
 		:date = "2017-01-24" ;
   }
+
+

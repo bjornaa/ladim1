@@ -55,7 +55,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-class ParticleReleaser():
+class ParticleReleaser:
     """Particle Release Class"""
 
     def __init__(self, config, loglevel=logging.INFO):

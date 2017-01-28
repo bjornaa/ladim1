@@ -53,7 +53,7 @@ L2 = 2*sigma
 for j in range(j0, j1):
     for i in range(i0, i1):
         A[j-j0, i-i0] = np.sum(np.exp(- ((i-X)/L2)**2 - ((j-Y)/L2)**2))
-A = A / (np.pi * L2**2)
+A /= (np.pi * L2**2)
 
 print(np.sum(A))
 

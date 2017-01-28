@@ -3,7 +3,7 @@ import itertools
 import matplotlib; matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
-import roppy
+# import roppy
 import roppy.mpl_util
 from particlefile import ParticleFile
 
