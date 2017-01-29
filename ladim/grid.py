@@ -32,7 +32,7 @@ alogger.addHandler(ch)
 
 # Make this a ROMS_grid class
 # Inherit from a more general grid class
-class Grid():
+class Grid:
 
     """Simple ROMS grid object
 
@@ -51,7 +51,7 @@ class Grid():
     More arguments::
 
     >>> fid = Dataset(roms_file)
-    >>> Vinfo = {'N' : 32, 'hc' : 10, 'theta_s' : 0.8, 'theta_b' : 0.4}
+    >>> Vinfo = {'N': 32, 'hc': 10, 'theta_s': 0.8, 'theta_b': 0.4}
     >>> grd = SGrid(fid, subgrid=(100, 121, 60, 161), Vinfo=Vinfo)
 
     """
@@ -164,5 +164,5 @@ class Grid():
     def onland(self, X, Y):
         """Returns True for points at land"""
         I = X.round().astype(int) - self.i0
-        J = Y.round().astype(int) - self.j
+        J = Y.round().astype(int) - self.j0
         return (self.M[J, I] < 1)

@@ -90,7 +90,7 @@ for i in range(numsteps+1):
 
     # Only use surface forcing presently
     # Redundant to give both inp, and inp.U ...
-    state.update(config, grid, forcing)
+    state.update(grid, forcing)
 
     # Indiviual behaviour
     behaviour(state)

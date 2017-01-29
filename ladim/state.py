@@ -60,7 +60,7 @@ class State:
         # for name in self.particle_variables:
         #    self[name] = new[name]
 
-    def update(self, config, grid, forcing):
+    def update(self, grid, forcing):
         self.timestep += 1
         self.track.move(grid, forcing, self)
         if self.ibm:

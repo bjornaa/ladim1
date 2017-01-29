@@ -100,7 +100,7 @@ class OutPut:
 
 if __name__ == '__main__':
 
-    import ladim_config
+    import configuration
 
     config_file = '../ladim.yaml'
     config = ladim_config.read_config(config_file)
