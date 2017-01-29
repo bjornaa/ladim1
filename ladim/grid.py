@@ -19,6 +19,7 @@ from roppy import s_stretch, sdepth
 # from roppy.depth import sdepth, zslice, s_stretch
 # from roppy.sample import sample2D, bilin_inv
 # import ladim.sample_roms as sample_roms
+from ladim.sample import sample2D
 
 alogger = logging.getLogger(__name__)
 # logger.setLevel(logging.INFO)
@@ -132,8 +133,6 @@ class Grid():
         # Close the file(s)
         ncid.close()
 
-        # config.grid = self.z
-
     def sample_metric(self, X, Y):
         """Sample the metric coefficients
 
@@ -147,9 +146,15 @@ class Grid():
         return A, A
 
     def sample_depth(self, X, Y):
+        """Return the depth of grid cells"""
         I = X.round().astype(int) - self.i0
-        J = Y.round().astype(int) - self.j
+        J = Y.round().astype(int) - self.j0
         return self.H[J, I]
+
+    def lonlat(self, X, Y):
+        """Return the longitude and latitude from grid coordinates"""
+        return (sample2D(self.lon_rho, X-self.i0, Y-self.j0),
+                sample2D(self.lat_rho, X-self.i0, Y-self.j0))
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
@@ -161,71 +166,3 @@ class Grid():
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j
         return (self.M[J, I] < 1)
-
-# --------------------------------------------------------
-
-    #
-    #     # Shape of the grid
-    #     self.shape = (self.j1-self.j0, self.i1-self.i0)
-    #
-
-    #     # Grid cell centers
-    #     self.X = np.arange(self.i0, self.i1)
-    #     self.Y = np.arange(self.j0, self.j1)
-    #     # Grid cell boundaries = psi-points
-    #     self.Xb = np.arange(self.i0-0.5, self.i1)
-    #     self.Yb = np.arange(self.j0-0.5, self.j1)
-    #
-    # # ------------------------------------
-    #
-    #
-    #         # Close separate file
-    #         if self._Vfile:
-    #             f0.close()
-    #
-    # # --------------
-    # # Lazy reading
-    # # ---------------
-    #
-    # # Some 2D fields from the file
-    # # Only read if (and when) needed
-    #
-    # # Doing the following for a list of fields
-    # # @_Lazy
-    # # def field(self):
-    # #     return self.ncid.variables['field'][self.J, self.I]
-    #
-    # for _field in ['h', 'mask_rho', 'lon_rho', 'lat_rho',
-    #                'pm', 'pn', 'angle', 'f']:
-    #     exec("%s = lambda self: self.ncid.variables['%s'][self.J, self.I]"
-    #          % (_field, _field))
-    #     exec("%s = _Lazy(%s)" % (_field, _field))
-    #
-    # # 3D depth structure
-    # @_Lazy
-    # def z_r(self):
-    #     if self.vertical:
-    #         return sdepth(self.h, self.hc, self.Cs_r,
-    #                       stagger='rho', Vtransform=self.Vtransform)
-    #
-    # @_Lazy
-    # def z_w(self):
-    #     if self.vertical:
-    #         return sdepth(self.h, self.hc, self.Cs_w,
-    #                       stagger='w', Vtransform=self.Vtransform)
-    #
-    # # ---------------------------------
-    # # Wrappers for romsutil functions
-    # # ---------------------------------
-    #
-    # def zslice(self, F, z):
-    #     if self.vertical:
-    #         return zslice(F, self.z_r, -abs(z))
-    #
-    # def xy2ll(self, x, y):
-    #     return (sample2D(self.lon_rho, x-self.i0, y-self.j0),
-    #             sample2D(self.lat_rho, x-self.i0, y-self.j0))
-    #
-    # def ll2xy(self, lon, lat):
-    #     y, x = bilin_inv(lon, lat, self.lon_rho, self.lat_rho)
-    #     return x + self.i0, y + self.j0

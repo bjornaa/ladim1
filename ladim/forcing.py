@@ -45,6 +45,8 @@ class ROMS_forcing:
         # print(time0)
         # print(time1)
         start_time = np.datetime64(config.start_time)
+        self.time = start_time
+        self.dt = np.timedelta64(int(config.dt), 's')  # or use
 
         # Check that forcing period covers the simulation period
         # ------------------------------------------------------
@@ -97,6 +99,8 @@ class ROMS_forcing:
         # dt = self.dt
         step = self._step
         fieldnr = self._fieldnr
+        self.time += self.dt  # et tidsteg for tidlig ??
+        # print('forcing-update: tid = ', self.time)
 
         if t == step[fieldnr]:  # No interpolation necessary
             self.F = self.T1
@@ -137,6 +141,7 @@ class ROMS_forcing:
 
     # --------------
 
+    # Tåpelig å bruke T slik
     def _read_velocity(self, n):
         """Read fields at time frame = n"""
         # Need a switch for reading W

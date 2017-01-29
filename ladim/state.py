@@ -28,8 +28,11 @@ class State:
         self.dt = config.dt
 
         if config.ibm_module:
-            self.ibm = importlib.import_module(
+            ibm_module = importlib.import_module(
                 'ladim.ibms.' + config.ibm_module)
+            # Initiate IBM object
+            self.ibm = ibm_module.IBM(config)
+
         else:
             self.ibm = None
 
