@@ -52,7 +52,7 @@ particle_release:
 forcing:
     # mapping: model name -> name in input file
     velocity: {U: u, V: v}
-    ibm_forcing: {temp: temp}
+    ibm_forcing: {temp: temp, salt: salt}
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d

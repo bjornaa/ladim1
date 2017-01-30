@@ -11,7 +11,7 @@ from ladim.release import ParticleReleaser
 from ladim.configuration import Configure
 from ladim.state import State
 from ladim.output import OutPut
-from ladim.behaviour import behaviour
+# from ladim.behaviour import behaviour
 
 # ==================
 # Initiate the model
@@ -88,12 +88,11 @@ for i in range(numsteps+1):
               'seconds since %s' % str(config.start_time)))
         out.write(state)
 
-    # Only use surface forcing presently
-    # Redundant to give both inp, and inp.U ...
+    # --- Update the model state ---
     state.update(grid, forcing)
 
-    # Indiviual behaviour
-    behaviour(state)
+    # Individual behaviour
+    # behaviour(state)
 
 
 # ========

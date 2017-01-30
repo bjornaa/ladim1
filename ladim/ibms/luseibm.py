@@ -15,6 +15,7 @@ class IBM:
 
         self.k = 0.2             # Light extinction coefficient
         self.swim_vel = 5E-4     # m/s
+        self.vertical_diffusion = True
         self.D = 1E-3            # Vertical mixing [m*2/s]
 
         self.dt = config.dt

@@ -15,6 +15,8 @@ class State:
         self.position_variables = ['X', 'Y', 'Z']
         self.ibm_variables = config.ibm_variables
         self.instance_variables = self.position_variables + self.ibm_variables
+        print("self.instance_variables")
+        print(self.instance_variables)
 
         self.pid = np.array([], dtype=int)
         for name in self.instance_variables:
@@ -64,7 +66,7 @@ class State:
         self.timestep += 1
         self.track.move(grid, forcing, self)
         if self.ibm:
-            self.ibm.update_ibm(self, forcing)
+            self.ibm.update_ibm(grid, self, forcing)
 
 
 # ==================================================

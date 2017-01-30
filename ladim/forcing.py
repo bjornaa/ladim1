@@ -81,6 +81,7 @@ class ROMS_forcing:
         self.T1, self.U1, self.V1 = self._read_velocity(fieldnr)
 
         for name in self.ibm_forcing:
+            print(self.ibm_forcing)
             print("XXX", name)
             print(name+'1')
             self[name + '1'] = self._read_field(name, fieldnr)

@@ -153,8 +153,8 @@ class Grid:
 
     def lonlat(self, X, Y):
         """Return the longitude and latitude from grid coordinates"""
-        return (sample2D(self.lon_rho, X-self.i0, Y-self.j0),
-                sample2D(self.lat_rho, X-self.i0, Y-self.j0))
+        return (sample2D(self.lon, X-self.i0, Y-self.j0),
+                sample2D(self.lat, X-self.i0, Y-self.j0))
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
