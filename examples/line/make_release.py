@@ -7,7 +7,7 @@ x0, x1 = 68, 123
 y0, y1 = 95, 90
 
 # Number of particles along the line
-Npart = 8000
+Npart = 10000
 
 # Fixed particle depth
 Z = 5

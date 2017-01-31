@@ -4,34 +4,34 @@
 # på 16 norske stasjoner
 # Meteorological report series, 1988-7
 # University of Bergen
-# import datetime
+
 import numpy as np
 
 pi = np.pi
+rad = pi / 180.0
+deg = 180 / pi
 sin = np.sin
 cos = np.cos
-rad = np.pi / 180.0
-deg = 180/pi
 
 
 def surface_light(dtime, lon, lat):
+    """Surface light in absence of clouds"""
 
     maxlight = 1500  # value between 200 and 2000
+    twilight = 5.76
 
+    # --- Time handling ----
     # Convert from datetime64 to datetime
     dtime = dtime.astype(object)
-
     time_tuple = dtime.timetuple()
     # day of year, original does not consider leap years
     yday = time_tuple.tm_yday
     # hours in UTC (as output from oceanographic model)
     hours = time_tuple.tm_hour
 
-    twilight = 5.76
-
     phi = lat*rad
 
-    # delta = declineation
+    # Compute declineation = delta
     a0 = 0.3979
     a1 = 0.9856 * rad   # day-1
     a2 = 1.9171 * rad
@@ -39,25 +39,30 @@ def surface_light(dtime, lon, lat):
     sindelta = a0*sin(a1*(yday-80) + a2*(sin(a1*yday)-a3))
     cosdelta = (1-sindelta**2)**0.5
 
-
     # True Sun Time [degrees](=0 with sun in North, 15 deg/hour
-    b0 = 0.4083
-    b1 = 1.7958
-    b2 = 2.4875
-    b3 = 1.0712 * rad   # day-1
-    TST = (hours*15 + lon - b0*np.cos(a1*(yday-80)) -
-           b1*np.cos(a1*(yday-80)) + b2*np.sin(b3*(yday-80)))
+    # b0 = 0.4083
+    # b1 = 1.7958
+    # b2 = 2.4875
+    # b3 = 1.0712 * rad   # day-1
+    # TST = (hours*15 + lon - b0*np.cos(a1*(yday-80)) -
+    #        b1*np.cos(a1*(yday-80)) + b2*np.sin(b3*(yday-80)))
+
     # TST = 15 * hours  # Recover values from the fortran code
-    # Simplify to hours*15 + lon,
+
+    # Simplified formula
     # correct at spring equinox (yday=80) neglecting +/- 3 deg = 12 min
+    TST = hours*15 + lon
 
     # Sun height  [degrees]
     # sinheight = sindelta*sin(phi) - cosdelta*cos(phi)*cos(15*hours*rad)
     sinheight = sindelta*sin(phi) - cosdelta*cos(phi)*cos(TST*rad)
     height = np.arcsin(sinheight) * deg
 
-    # sine of sun height at noon
+    # sine of sun height at noon, h12
     sinh12 = sindelta*sin(phi) + cosdelta*cos(phi)
+
+    # Do we need the surface light?
+    # a treshold on sun heigth might be enough
 
     # Surface light
     slight = np.zeros_like(lat, dtype=float)

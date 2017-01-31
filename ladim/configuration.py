@@ -58,7 +58,7 @@ class Configure:
         # --- Time steping ---
         logger.info('Configuration: Time Stepping')
         # Read time step and convert to seconds
-        dt = np.timedelta64(*tuple(conf['ymse']['dt']))
+        dt = np.timedelta64(*tuple(conf['numerics']['dt']))
         self.dt = dt.astype('m8[s]').astype('int')
         self.simulation_time = np.timedelta64(
             self.stop_time - self.start_time, 's').astype('int')
@@ -147,8 +147,27 @@ class Configure:
             for item in self.nc_attributes[name].items():
                 logger.info(12*' ' + '{:11s}: {:s}'.format(*item))
 
-        # Advection  (Ta fra YAML file)
-        self.advection = 'RK4'
+        # Numerics,
+        # dt already read
+        logger.info('Configuration: Numerics')
+        try:
+            self.advection = conf['numerics']['advection']
+        except KeyError:
+            self.advection = 'RK4'
+        logger.info('    {:15s}: {}'.format('advection', self.advection))
+        try:
+            diffusion = conf['numerics']['diffusion']
+        except KeyError:
+            diffusion = 0.0
+        if diffusion > 0:
+            self.diffusion = True
+            self.diffusion_coefficient = diffusion
+            logger.info('    {:15s}: {}'.format(
+                        'diffusion coefficient',
+                        self.diffusion_coefficient))
+        else:
+            self.diffusion = False
+            logger.info('    no diffusion')
 
     # Allow item notation
     def __setitem__(self, key, value):

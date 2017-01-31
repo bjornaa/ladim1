@@ -78,7 +78,14 @@ output_variables:
           units: degree_Celsius.days}
     super: {ncformat: f4, long_name: number of individuals in instance}
 
-# for the time being, => numeric section
-ymse:
+
+numerics:
     # Model time step, [value, unit]
-    dt: [60, m]
+    dt: [1, h]
+    # Advection method: options =
+    #        EF = Euler-Forward,
+    #        RK2, RK4 = Runge-Kutta 2nd or 4th order
+    advection: RK4
+    # Horizontal diffusion coefficient [m2.s-1]
+    #         zero = no diffusion
+    diffusion_coefficient: 1.0

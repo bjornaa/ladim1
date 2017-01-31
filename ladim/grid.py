@@ -156,13 +156,21 @@ class Grid:
         return (sample2D(self.lon, X-self.i0, Y-self.j0),
                 sample2D(self.lat, X-self.i0, Y-self.j0))
 
+    # Feil ?, skal være pluss
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
         return ((self.i0-0.5 <= X) & (X <= self.i1-0.5) &
                 (self.j0-0.5 <= Y) & (Y <= self.j0-0.5))
 
     def onland(self, X, Y):
-        """Returns True for points at land"""
+        """Returns True for points on land"""
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j0
         return (self.M[J, I] < 1)
+
+    # Funker ikke ??
+    def atsea(self, X, Y):
+        """Returns True for points at sea"""
+        I = X.round().astype(int) - self.i0
+        J = Y.round().astype(int) - self.j0
+        return (self.M[J, I] > 0)

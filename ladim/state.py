@@ -64,7 +64,7 @@ class State:
 
     def update(self, grid, forcing):
         self.timestep += 1
-        self.track.move(grid, forcing, self)
+        self.track.move_particles(grid, forcing, self)
         if self.ibm:
             self.ibm.update_ibm(grid, self, forcing)
 

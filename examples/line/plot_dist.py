@@ -18,7 +18,7 @@ i0, i1 = 58, 150
 j0, j1 = 60, 140
 
 # timestamp
-t = -1   # Last
+t = 50   # Last
 
 
 # ----------------
@@ -50,10 +50,10 @@ ax.contour(g.X, g.Y, g.lon_rho, levels=range(-4, 10, 2),
 
 # Plot initial particle distribution
 X, Y = pf.get_position(t)
-timestring = pf.get_time(t)
+# timestring = pf.get_time(t)
 # noinspection PyRedeclaration
 h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
-ax.set_title(timestring)
+# ax.set_title(timestring)
 
 # Show the results
 plt.axis('image')

@@ -61,7 +61,13 @@ output_variables:
         units: m
         positive: down
 
-# for the time being, => numeric section
-ymse:
+numerics:
     # Model time step, [value, unit]
     dt: [1, h]
+    # Advection method: options =
+    #        EF = Euler-Forward,
+    #        RK2, RK4 = Runge-Kutta 2nd or 4th order
+    advection: RK4
+    # Horizontal diffusion coefficient [m2.s-1]
+    #         zero = no diffusion
+    diffusion: 1000.0

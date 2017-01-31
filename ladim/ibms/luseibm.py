@@ -31,8 +31,8 @@ class IBM:
         state.age += temp * state.dt / 86400
 
         # Light at depth
-        _, lat = grid.lonlat(state.X, state.Y)  # ignore longitude
-        light0 = light.surface_light(forcing.time, lat)
+        lon, lat = grid.lonlat(state.X, state.Y)
+        light0 = light.surface_light(forcing.time, lon, lat)
         Eb = light0 * np.exp(-self.k*state.Z)
 
         # Swimming velocity
@@ -48,5 +48,8 @@ class IBM:
             rand = np.random.normal(size=len(W))
             W += rand * (2*self.D/self.dt)**0.5
 
-        # Update vertical position
+        # Update vertical position, using reflextive boundary condition
         state.Z += W * self.dt
+        # Reflective boundary condition at surface
+        I = state.Z > 0
+        state.Z[I] = - state.Z[I]
