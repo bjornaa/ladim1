@@ -45,7 +45,7 @@ particle_release:
     variables: [mult, release_time, X, Y, Z, farmid, super]
     # Converters (if not float)
     mult: int
-    release_time: str
+    release_time: np.datetime64
     farmid: int
     particle_variables: [release_time, farmid]
 

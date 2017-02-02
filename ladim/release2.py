@@ -51,7 +51,7 @@
 
 import logging
 import numpy as np
-import pandas as pd
+# import pandas as pd
 
 # ------------------------
 
@@ -73,67 +73,123 @@ class ParticleReleaser:
         # logger.setLevel(logging.INFO)
 
         # Store the data in a pandas dataframe
-        #self._df = pd.read_csv(
+        # self._df = pd.read_csv(
         #    config.particle_release_file,
         #    names=config.release_format,
         #    dtype=config.release_dtype,
         #    parse_dates=['release_time'],
         #    delim_whitespace=True)
 
+        # På nytt, men lager dict av arrayer/lister
+        V = dict()
+        for key in config.release_format:
+            V[key] = []
+        with open(config.particle_release_file) as f:
+            for line in f:
+                w = line.split()
+                # Handle time format in two words, yyyy-mm-dd hh:mm:ss
+                if len(w) == len(config.release_format) + 1:
+                    w[1] = 'T'.join(w[1:3])
+                    w.pop(2)
+                for i, key in enumerate(config.release_format):
+                    V[key].append(config.release_dtype[key](w[i]))
+
+        for key in config.release_format:
+            V[key] = np.array(V[key])
+
+        print(V['release_time'])
+
+        # --- Read the particle release file ---
+        # rows = []
+        # with open(config.particle_release_file) as f:
+        #     for line in f:
+        #         w = line.split()
+        #         row = dict()
+        #         # Handle time format in two words, yyyy-mm-dd hh:mm:ss
+        #         if len(w) == len(config.release_format) + 1:
+        #             w[1] = 'T'.join(w[1:3])
+        #             w.pop(2)
+        #         for i, var in enumerate(config.release_format):
+        #             row[var] = config.release_dtype[var](w[i])
+        #         rows.append(row)
+
+        # rows = np.array(rows)
+        # print(rows.dtype, rows[-1])
+
+        self.times = V['release_time']
+
+        # self.times = np.array([row['release_time'] for row in rows])
+        # self.unique_times = np.unique(self.times)
+        # print(self.unique_times)
+        # print(release_time)
+        # print(release_time.dtype)
+
+        # Error hvis ingen partikkelutslipp
         # Time control
-        if self._df.release_time[0] < config.start_time:
-            logger.warning('Ignoring particles release before start')
-            self._df = self._df[self._df.release_time >= config.start_time]
-        if self._df.release_time.iloc[-1] >= config.stop_time:
-            logger.warning('Ignoring particles release after stop')
-            self._df = self._df[self._df.release_time < config.stop_time]
-        # May be modified with restart
-        if self._df.release_time[0] > config.start_time:
+        print(self.times[0], self.times[-1])
+        if self.times[0] < config.start_time:
+            logger.warning('Ignoring particle release before start')
+        if self.times[-1] >= config.stop_time:
+            logger.warning('Ignoring particle release after stop')
+        valid = ((self.times >= config.start_time) &
+                 (self.times < config.stop_time))
+        self.times = self.times[valid]
+        print(len(self.times))
+        # self.unique_times = np.unique(self.times)
+        self.unique_times = np.unique(self.times)
+
+        if self.times[0] > config.start_time:
             logger.warning('No particles at start time')
 
         logger.info('First particle release at {}'.
-                    format(str(self._df.release_time[0])))
+                    format(str(self.times[0])))
         logger.info('Last particle release at  {}'.
-                    format(self._df.release_time.iloc[-1]))
-        logger.info('Number of particle releases = {}'.format(len(self._df)))
+                    format(self.times[-1]))
+        logger.info('Number of particle releases = {}'.
+                    format(len(self.unique_times)))
+
+        # rows = rows[valid]
+        # print(len(rows))
+
+        # print(len(self.unique_times))
 
         # Relative time
-        rel_time = self._df['release_time'] - config.start_time
+        # rel_time = self._df['release_time'] - config.start_time
         # Convert to seconds
-        rel_time = rel_time.astype('m8[s]').astype('int')
+        # rel_time = rel_time.astype('m8[s]').astype('int')
         # Get model time steps and remove duplicates
-        self._release_steps = rel_time // config.dt
-        self.release_steps = list(self._release_steps.drop_duplicates())
-        self.release_times = list(self._df['release_time'].drop_duplicates())
+        # self._release_steps = rel_time // config.dt
+        # self.release_steps = list(self._release_steps.drop_duplicates())
+        # self.release_times = list(self._df['release_time'].drop_duplicates())
 
         # The total number of particles released during the simulation
         # config['total_particle_count'] = self._df['mult'].sum()
-        config.total_particle_count = self._df['mult'].sum()
-        logger.info('Total number of particles in simulation: {}'.
-                    format(config.total_particle_count))
+        # config.total_particle_count = self._df['mult'].sum()
+        # logger.info('Total number of particles in simulation: {}'.
+    #                format(config.total_particle_count))
 
-        self._npids = 0    # Number of particles released
-        self._release_index = 0
-
-        # Save all particle variables
-        self.particle_variables = dict()
-        # print(config.particle_variables)
-        for name in config.particle_variables:
-            self.particle_variables[name] = []
-        for row in self._df.itertuples():
-            # print(type(row), row)
-            mult = row.mult
-            for key, value in self.particle_variables.items():
-                if key == 'release_time':
-                    rtime = getattr(row, key)
-                    rtime = rtime - config.reference_time
-                    rtime = np.timedelta64(rtime, 's').astype('int')
-                    value.extend(mult*[rtime])
-                else:
-                    value.extend(mult*[getattr(row, key)])
-
-    def __iter__(self):
-        return self
+    #     self._npids = 0    # Number of particles released
+    #     self._release_index = 0
+    #
+    #     # Save all particle variables
+    #     self.particle_variables = dict()
+    #     # print(config.particle_variables)
+    #     for name in config.particle_variables:
+    #         self.particle_variables[name] = []
+    #     for row in self._df.itertuples():
+    #         # print(type(row), row)
+    #         mult = row.mult
+    #         for key, value in self.particle_variables.items():
+    #             if key == 'release_time':
+    #                 rtime = getattr(row, key)
+    #                 rtime = rtime - config.reference_time
+    #                 rtime = np.timedelta64(rtime, 's').astype('int')
+    #                 value.extend(mult*[rtime])
+    #             else:
+    #                 value.extend(mult*[getattr(row, key)])
+    #
+    # def __iter__(self):
+    #     return self
 
     def __next__(self):
         timestep = self.release_steps[self._release_index]
@@ -173,15 +229,15 @@ if __name__ == "__main__":
     class Container(object):
         pass
     config = Container()
-    config.start_time = datetime(1989, 6, 1, 12)
-    config.reference_time = datetime(1989, 6, 1, 12)
-    config.stop_time = datetime(1989, 6, 6, 0)
+    config.start_time = datetime(2015, 3, 31, 12)
+    # config.reference_time = config.start_time
+    config.stop_time = datetime(2015, 4, 4, 0)
     config.dt = 3600
     config.particle_release_file = '../models/lakselus/release.in'
     config.release_format = ['mult', 'release_time',
                              'X', 'Y', 'Z',
                              'farmid', 'super']
-    config.release_dtype = dict(mult=int, release_time=str,
+    config.release_dtype = dict(mult=int, release_time=np.datetime64,
                                 X=float, Y=float, Z=float,
                                 farmid=int, super=float)
     config.particle_variables = ['release_time', 'farmid']
