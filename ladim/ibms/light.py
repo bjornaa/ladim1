@@ -84,9 +84,9 @@ def surface_light(dtime, lon, lat):
 if __name__ == '__main__':
 
     dtime = np.datetime64('2014-06-23 12')
-    lat = 60
-    print(surface_light(dtime, lat))
+    lon, lat = 0, 60
+    print(surface_light(dtime, lon, lat))
 
     dtime = np.datetime64('2014-06-23 18')
-    lat = 60
-    print(surface_light(dtime, lat))
+    lon, lat = 0, 60
+    print(surface_light(dtime, lon, lat))

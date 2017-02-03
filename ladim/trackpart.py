@@ -28,14 +28,14 @@ class TrackPart:
         # --- Advection ---
         if self.advect:
             Uadv, Vadv = self.advect(grid, forcing, state)
-            U = U + Uadv
-            V = V + Vadv
+            U += Uadv
+            V += Vadv
 
         # --- Diffusion ---
         if self.diffusion:
             Udiff, Vdiff = self.diffuse()
-            U = U + Udiff
-            V = V + Vdiff
+            U += Udiff
+            V += Vdiff
 
         # --- Move the particles
 
@@ -59,7 +59,7 @@ class TrackPart:
         """Euler-Forward advection"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
-        # dt = self.dt
+        dt = self.dt
         # pm, pn = grid.sample_metric(X, Y)
 
         U, V = forcing.sample_velocity(X, Y, Z)

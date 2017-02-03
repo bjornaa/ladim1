@@ -8,5 +8,5 @@ setup(
    author_email='bjorn@imr.no',
    packages=['ladim', 'postladim', 'ladim.ibms'],
    # install_requires=['numpy', 'netcdf4', 'pandas', 'pyyaml', 'roppy'],
-   scripts=['scripts/ladim']
+   scripts=['scripts/ladim'], requires=['numpy']
 )

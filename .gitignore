@@ -16,7 +16,7 @@ examples/data/*
 *.nc
 
 # Release files
-*.in
+*.rls
 
 
 # Build directories

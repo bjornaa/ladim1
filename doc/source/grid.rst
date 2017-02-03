@@ -7,7 +7,7 @@ The grid module defines the coordinate system and provide methods for
 interfacing the grid.
 
 Horizontal coordinate system
------------------------------
+----------------------------
 
 The coordinate system should be curvilinear orthogonal. Grids as used by
 ROMS for instance are suitable. The coordinates should have integer values at
@@ -31,7 +31,7 @@ The vertical coordinate system is simply the depth in meters, with positive
 values downwards.
 
 Grid class
------------
+----------
 
 The grid is defined by a class having the following public attributes and methods.
 

@@ -4,7 +4,7 @@ import datetime
 # 1 particle per hour from 2 locations
 # Fixed depth at 5 m
 
-f1 = open('release.in', mode='w')
+f1 = open('salmon_lice.rls', mode='w')
 
 mult = 1
 

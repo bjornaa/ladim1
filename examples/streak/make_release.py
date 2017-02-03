@@ -11,6 +11,6 @@ x, y = 115, 100
 z = 5
 
 times = arange(start_time, stop_time, dtype='datetime64[h]')
-with open('streak.in', mode='w') as f:
+with open('streak.rls', mode='w') as f:
     for t in times:
         f.write('1 {:s} {:7.3f} {:7.3f} {:6.1f}\n'.format(t, x, y, z))

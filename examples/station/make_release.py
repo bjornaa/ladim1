@@ -14,7 +14,7 @@ mult = 1
 
 Z = linspace(0, zmax, num_particles)
 
-with open('station.in', mode='w') as f:
+with open('station.rls', mode='w') as f:
     for z in Z:
         f.write('{:d} {:s} {:7.3f} {:7.3f} {:6.2f}\n'.
                 format(mult, start_time, x, y, z))

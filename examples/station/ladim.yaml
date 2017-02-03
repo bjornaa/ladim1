@@ -17,7 +17,7 @@ time_control:
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_0014.nc
-    particle_release_file : station.in
+    particle_release_file : station.rls
     output_file           : station.nc
 
 state:

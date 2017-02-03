@@ -1,8 +1,7 @@
-import time
 import matplotlib.pyplot as plt
-from netCDF4 import Dataset
-import roppy
 import roppy.mpl_util
+from netCDF4 import Dataset
+
 from postladim.particlefile import ParticleFile
 
 # ---------------

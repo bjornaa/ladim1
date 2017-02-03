@@ -166,11 +166,11 @@ class Grid:
         """Returns True for points on land"""
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j0
-        return (self.M[J, I] < 1)
+        return self.M[J, I] < 1
 
     # Funker ikke ??
     def atsea(self, X, Y):
         """Returns True for points at sea"""
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j0
-        return (self.M[J, I] > 0)
+        return self.M[J, I] > 0
