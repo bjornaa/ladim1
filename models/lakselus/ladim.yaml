@@ -45,7 +45,7 @@ particle_release:
     variables: [mult, release_time, X, Y, Z, farmid, super]
     # Converters (if not float)
     mult: int
-    release_time: np.datetime64
+    release_time: time
     farmid: int
     particle_variables: [release_time, farmid]
 
@@ -83,7 +83,8 @@ output_variables:
         standard_name: integral_of_sea_water_temperature_wrt_time
     super: {ncformat: f4, long_name: number of individuals in instance}
 
-# for the time being, => numeric section
-ymse:
+numerics:
     # Model time step, [value, unit]
     dt: [600, s]
+    advection: RK4
+    diffusion: 10

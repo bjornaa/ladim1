@@ -44,7 +44,7 @@ class Configure:
         # --- Time control ---
         logger.info('Configuration: Time Control')
         for name in ['start_time', 'stop_time', 'reference_time']:
-            self[name] = conf['time_control'][name]
+            self[name] = np.datetime64(conf['time_control'][name])
             logger.info('    {:15s}: {}'.format(name, self[name]))
 
         # --- Files ---
@@ -69,7 +69,7 @@ class Configure:
         logger.info('    {:15s}: {}'.format('number of time steps',
                     self.numsteps))
 
-        # Grid
+        # --- Grid ---
         logger.info('Configuration: Grid')
         try:
             self.subgrid = conf['grid']['subgrid']
@@ -80,7 +80,7 @@ class Configure:
         logger.info('    {:15s}: {}'.format('vertical information',
                                             self.Vinfo))
 
-        # IBM
+        # --- IBM ---
         try:
             self.ibm_module = conf['ibm']['ibm_module']
             logger.info('Configuration: IBM')
@@ -94,9 +94,11 @@ class Configure:
         prelease = conf['particle_release']
         self.release_format = conf['particle_release']['variables']
         self.release_dtype = dict()
+        # Map from str to converter
+        type_mapping = dict(int=int, float=float, time=np.datetime64)
         for name in self.release_format:
-            self.release_dtype[name] = (
-                conf['particle_release'].get(name, float))
+            self.release_dtype[name] = type_mapping[
+                conf['particle_release'].get(name, 'float')]
             logger.info('    {:15s}: {}'.
                         format(name, self.release_dtype[name]))
         self.particle_variables = prelease['particle_variables']
@@ -147,8 +149,8 @@ class Configure:
             for item in self.nc_attributes[name].items():
                 logger.info(12*' ' + '{:11s}: {:s}'.format(*item))
 
-        # Numerics,
-        # dt already read
+        # --- Numerics ---
+        # dt belongs here, but is already read
         logger.info('Configuration: Numerics')
         try:
             self.advection = conf['numerics']['advection']
@@ -168,6 +170,8 @@ class Configure:
         else:
             self.diffusion = False
             logger.info('    no diffusion')
+
+    # -------------------------------------
 
     # Allow item notation
     def __setitem__(self, key, value):

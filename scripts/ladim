@@ -77,7 +77,8 @@ for i in range(numsteps+1):
     forcing.update(i)
 
     # Read particles ?
-    if i in partini.release_steps:
+    # unique_steps ikke godt navn eksternt
+    if i in partini.unique_steps:
         # Tips: Gjøre begge delet i read_particles
         V = next(partini)
         state.append(V)

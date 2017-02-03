@@ -4,36 +4,24 @@
 .#*
 \#*
 
-# Byte-compiled python code
+# Python stuff
 *.pyc
 __pycache__
 *.egg-info/*
 dist/*
 
 # Data files
-#data/*
-#*.nc
+examples/data/*
+!examples/data/README
+*.nc
+
+# Release files
+*.in
+
 
 # Build directories
 build/
 doc/build
-
-# Object code
-*.o
-
-# Input directory (except README file)
-input/*
-!input/README
-!input/*py
-*.in
-
-
-# Output directory  (except README file)
-output/*
-!output/README
-
-# Figures in the postpro directory
-postpro/*.png
 
 # Latex-stuff
 *.tex
@@ -41,5 +29,5 @@ postpro/*.png
 *.log
 *.out
 
-# NetCDF
-*.nc
+# pycharm stuff
+.idea
