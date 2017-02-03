@@ -49,10 +49,10 @@ import numpy as np
 # ------------------------
 
 logger = logging.getLogger(__name__)
-ch = logging.StreamHandler()
-formatter = logging.Formatter('%(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+# ch = logging.StreamHandler()
+# formatter = logging.Formatter('%(levelname)s - %(message)s')
+# ch.setFormatter(formatter)
+# logger.addHandler(ch)
 
 
 class ParticleReleaser:
@@ -61,14 +61,16 @@ class ParticleReleaser:
     def __init__(self, config, loglevel=logging.INFO):
 
         # print("loglevel = ", loglevel)
-        # raise SystemExit
         logger.setLevel(loglevel)
-        # logger.setLevel(logging.INFO)
+
+        # release_type = config.release_type
 
         # På nytt, men lager dict av arrayer/lister
         V = dict()
         for key in config.release_format:
             V[key] = []
+
+        # --- Read the particle release file ---
 
         with open(config.particle_release_file) as f:
             for line in f:
@@ -82,8 +84,40 @@ class ParticleReleaser:
 
         for key in config.release_format:
             V[key] = np.array(V[key])
-        self.release_data = V
 
+        # --- Fill in if continuous release ---
+
+        if config.release_type == 'continuous':
+            time0 = V['release_time'][0]
+            cont_times = np.arange(
+                time0, config.stop_time, config.release_frequency)
+
+            B = dict()     # Block to repeat
+            W = dict()
+            for key in config.release_format:
+                W[key] = []
+                if key != 'release_time':
+                    B[key] = []
+            count = 0  # Number of times to repeat
+            utimes = np.unique(V['release_time'])
+            for t in cont_times:
+                if t in utimes:
+                    I = (V['release_time'] == t)
+                    count = np.sum(I)
+                    for key in config.release_format:
+                        if key != 'release_time':
+                            B[key] = list(V[key][I])
+                W['release_time'].extend(count*[t])
+
+                for key in config.release_format:
+                    if key != 'release_time':
+                        W[key].extend(B[key])
+
+            for key in config.release_format:
+                W[key] = np.array(W[key])
+            V = W
+
+        self.release_data = V
         self.times = V['release_time']
 
         # Error hvis ingen partikkelutslipp
@@ -132,6 +166,9 @@ class ParticleReleaser:
             self.particle_variables[name] = []
 
     # ---------------------
+    # --- Update method ---
+    # ---------------------
+
     def __next__(self):
         timestep = self.steps[self._release_index]
         logger.info('release: timestep, time = {}, {}'.
@@ -152,13 +189,16 @@ class ParticleReleaser:
             V[key] = duplicate(self.release_data[key][I], mult)
         V['pid'] = list(range(self._npids, self._npids+count))
 
+        self._npids += count
+
         return V
 
-
+# ------------------
 # Utility functions
 # -----------------
 
 
+# Can np.repeat be used instead ??
 def duplicate(A, M):
     """Repeat each element in sequence a variable number of times
 
@@ -168,7 +208,7 @@ def duplicate(A, M):
     """
     # Should check for same shape
     S = []
-    for a, m in zip(A, M):
+    for a, m in zip(np.asarray(A), np.asarray(M)):
         S.extend(m*[a])
     return S
 

@@ -17,8 +17,8 @@ time_control:
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_0014.nc
-    particle_release_file : streak.rls
-    output_file           : streak.nc
+    particle_release_file : streak2.rls
+    output_file           : streak2.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given
@@ -26,6 +26,9 @@ state:
     ibm_variables: []
 
 particle_release:
+    # type = continuous or discrete [default]
+    release_type: 'continuous'
+    release_frequency: [1, h]
     variables: [mult, release_time, X, Y, Z]
     # Data type [int, float, time], default = float
     mult: int

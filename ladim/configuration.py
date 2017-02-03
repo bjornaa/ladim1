@@ -92,6 +92,16 @@ class Configure:
         # --- Particle release ---
         logger.info('Configuration: Particle Releaser')
         prelease = conf['particle_release']
+        try:
+            self.release_type = prelease['release_type']
+        except KeyError:
+            self.release_type = 'discrete'
+        logger.info('    {:15s}: {}'.format('release_type', self.release_type))
+        if self.release_type == 'continuous':
+            self.release_frequency = np.timedelta64(
+                *tuple(prelease['release_frequency']))
+            logger.info('        {:11s}: {}'.format(
+                        'release_frequency', str(self.release_frequency)))
         self.release_format = conf['particle_release']['variables']
         self.release_dtype = dict()
         # Map from str to converter
