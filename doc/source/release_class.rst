@@ -1,8 +1,6 @@
 Release module
 ==============
 
-Presently this module relies on the panda package.
-
 During initialization, this class has the responsibility to
 warn about any mismatches in timing between the simulation
 and particle release.
@@ -18,4 +16,4 @@ Public attributes are: [need only one of these]
 
 It is implemented as an iterator. The __next__ method,
 returns a dictionary of release information to be used by
-the state-modules append method.
+the State class' append method.

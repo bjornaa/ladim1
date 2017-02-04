@@ -31,3 +31,6 @@ doc/build
 
 # pycharm stuff
 .idea
+
+# pytest?
+.cache

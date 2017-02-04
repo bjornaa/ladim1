@@ -48,7 +48,8 @@ import numpy as np
 
 # ------------------------
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('auda')
+# logger = logging.getLogger(__name__)
 # ch = logging.StreamHandler()
 # formatter = logging.Formatter('%(levelname)s - %(message)s')
 # ch.setFormatter(formatter)
@@ -122,7 +123,7 @@ class ParticleReleaser:
 
         # Error hvis ingen partikkelutslipp
         # Time control
-        print(self.times[0], self.times[-1])
+        # print(self.times[0], self.times[-1])
         if self.times[0] < config.start_time:
             logger.warning('Ignoring particle release before start')
         if self.times[-1] >= config.stop_time:
@@ -130,7 +131,7 @@ class ParticleReleaser:
         valid = ((self.times >= config.start_time) &
                  (self.times < config.stop_time))
         self.times = self.times[valid]
-        print(len(self.times))
+        # print(len(self.times))
         # self.unique_times = np.unique(self.times)
         self.unique_times = np.unique(self.times)
 
@@ -144,8 +145,8 @@ class ParticleReleaser:
         logger.info('Number of particle releases = {}'.
                     format(len(self.unique_times)))
 
-        print(self.unique_times.dtype)
-        print(type(config.start_time))
+        # print(self.unique_times.dtype)
+        # print(type(config.start_time))
         rel_time = self.times - config.start_time
         rel_time = rel_time.astype('m8[s]').astype('int')  # Convert to seconds
         self.steps = rel_time // config.dt
@@ -170,7 +171,11 @@ class ParticleReleaser:
     # ---------------------
 
     def __next__(self):
-        timestep = self.steps[self._release_index]
+
+        try:
+            timestep = self.unique_steps[self._release_index]
+        except IndexError:
+            raise StopIteration
         logger.info('release: timestep, time = {}, {}'.
                     format(timestep, self.times[self._release_index]))
         # print(type(timestep))
