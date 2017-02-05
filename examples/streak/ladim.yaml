@@ -17,8 +17,8 @@ time_control:
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_0014.nc
-    particle_release_file : streak2.rls
-    output_file           : streak2.nc
+    particle_release_file : streak.rls
+    output_file           : streak.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given

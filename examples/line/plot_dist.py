@@ -32,7 +32,7 @@ g = roppy.SGrid(f0, subgrid=(i0, i1, j0, j1))
 # particle_file
 pf = ParticleFile(particle_file)
 
-Ntimes = pf.ntimes
+# Ntimes = pf.ntimes
 
 fig = plt.figure(figsize=(12, 10))
 ax = fig.add_subplot(1, 1, 1)
@@ -48,7 +48,7 @@ ax.contour(g.X, g.Y, g.lon_rho, levels=range(-4, 10, 2),
 
 
 # Plot initial particle distribution
-X, Y = pf.get_position(t)
+X, Y = pf.position(t)
 # timestring = pf.get_time(t)
 # noinspection PyRedeclaration
 h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)

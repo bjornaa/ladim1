@@ -30,7 +30,7 @@ g = roppy.SGrid(f0, subgrid=(i0, i1, j0, j1))
 # particle_file
 pf = ParticleFile(particle_file)
 
-Ntimes = pf.ntimes
+Ntimes = pf.num_times
 
 
 def animate():
@@ -39,8 +39,8 @@ def animate():
         t = (t + 1) % Ntimes
         if t == 0:
             time.sleep(0.5)
-        X, Y = pf.get_position(t)
-        timestring = pf.get_time(t)
+        X, Y = pf.position(t)
+        timestring = pf.time(t)
         h[0].set_xdata(X)
         h[0].set_ydata(Y)
         ax.set_title(timestring)
@@ -57,8 +57,8 @@ h = ax.contourf(g.X, g.Y, g.h, cmap=cmap, alpha=0.3)
 roppy.mpl_util.landmask(g, (0.6, 0.8, 0.0))
 
 # Plot initial particle distribution
-X, Y = pf.get_position(0)
-timestring = pf.get_time(0)
+X, Y = pf.position(0)
+timestring = pf.time(0)
 # noinspection PyRedeclaration
 h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(timestring)
