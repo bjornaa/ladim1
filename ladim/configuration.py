@@ -73,7 +73,7 @@ class Configure:
         logger.info('Configuration: Grid')
         try:
             self.subgrid = conf['grid']['subgrid']
-        except KeyError:
+        except (KeyError, TypeError):
             self.subgrid = []
         logger.info('    {:15s}: {}'.format('subgrid', self.subgrid))
         self.Vinfo = {}

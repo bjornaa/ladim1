@@ -14,9 +14,10 @@ class IBM:
         # tempB = 7.0  # setter default temperatur
 
         self.k = 0.2             # Light extinction coefficient
-        self.swim_vel = 5E-4     # m/s
+        self.swim_vel = 5e-4     # m/s
         self.vertical_diffusion = True
-        self.D = 1E-3            # Vertical mixing [m*2/s]
+        self.D = 1e-4            # Vertical mixing [m*2/s]
+        # Ingrid har 1e-3
 
         self.dt = config.dt
         self.mortality_factor = np.exp(-mortality*self.dt/86400)
@@ -37,11 +38,11 @@ class IBM:
 
         # Swimming velocity
         W = np.zeros_like(state.X)
-        # Upwards if light enough
-        W[Eb >= 0.01] = self.swim_vel
+        # Upwards if light enough (decreasing depth)
+        W[Eb >= 0.01] = - self.swim_vel
         # Downwards if salinity < 20
         salt = forcing.sample_field(state.X, state.Y, state.Z, 'salt')
-        W[salt < 20] = -self.swim_vel
+        W[salt < 20] = self.swim_vel
 
         # Random diffusion velocity
         if self.vertical_diffusion:
@@ -51,5 +52,5 @@ class IBM:
         # Update vertical position, using reflextive boundary condition
         state.Z += W * self.dt
         # Reflective boundary condition at surface
-        I = state.Z > 0
+        I = state.Z < 0
         state.Z[I] = - state.Z[I]

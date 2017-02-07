@@ -1,23 +1,22 @@
-import datetime
-
 # Continuos release,
 # 1 particle per hour from 2 locations
 # Fixed depth at 5 m
 
+f0 = open('anlegg.dat')
 f1 = open('salmon_lice.rls', mode='w')
 
-mult = 1
+mult = 5
 
-time0 = datetime.datetime(2015, 3, 31, 13)
-hour = datetime.timedelta(seconds=3600)
+next(f0)  # Skip initial line
+for line in f0:
+    w = line.split(',')
+    farmid = int(w[0])
+    x = float(w[1])
+    y = float(w[2])
+    z = 5
+    super = float(w[4])
+    timestamp = w[5]
+    f1.write("{:d} {:s} {:f} {:f} {:f} {:d} {:f}\n".format(
+             mult, timestamp, x, y, z, farmid, super))
 
-times = [time0 + n*hour for n in range(24)]
-
-format1 = "5 {:s} 379 739 5 10041  1000\n"
-format2 = "5 {:s} 381 823 5 23303  2000\n"
-
-for t in times:
-    print(t)
-    tt = 'T'.join(str(t).split())
-    f1.write(format1.format(tt))
-    f1.write(format2.format(tt))
+f1.close()

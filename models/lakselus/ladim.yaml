@@ -14,22 +14,23 @@
 time_control:
     # Start and stop of simulation
     # use an alias &t0 if used again
-    start_time: &time0 2015-03-31 13:00:00
-    stop_time:  2015-03-31 15:00:00
+    start_time: &time0 2015-04-01 00:00:00
+    stop_time:  2015-04-01 03:00:00
     # Reference time for netcdf output
     # by default set to start_time
     # can be overridden explicitly
     reference_time: *time0
 
 files:
-    grid_file             : /scratch/Data/NK800/file_0001.nc
+    grid_file             : /scratch/Data/NK800/file_0000.nc
     input_file            : /scratch/Data/NK800/file_????.nc
     particle_release_file : salmon_lice.rls
     output_file           : out.nc
 
 grid:
     # Format = [i0, i1, j0, j1]
-    subgrid: [200, 500, 600, 850]
+    # subgrid: [300, 450, 500, 600]
+    subgrid: [200, 750, 300, 900]
 
 # Samle IBM-variablene her
 ibm:
@@ -42,6 +43,8 @@ state:
     ibm_variables: [super, age]
 
 particle_release:
+    release_type: continuous
+    release_frequency: [1, h]
     variables: [mult, release_time, X, Y, Z, farmid, super]
     # Converters (if not float)
     mult: int

@@ -165,6 +165,17 @@ class ParticleReleaser:
         self.particle_variables = dict()
         for name in config.particle_variables:
             self.particle_variables[name] = []
+        for i in range(len(self.times)):
+            mult = self.release_data['mult'][i]
+            for key, value in self.particle_variables.items():
+                # TODO: make an automatic test for time
+                if key != 'release_time':
+                    value.extend(mult*[self.release_data[key][i]])
+                else:
+                    rtime = self.release_data[key][i]
+                    rtime = rtime - config.reference_time
+                    rtime = rtime.astype('timedelta64[s]').astype('int')
+                    value.extend(mult*[rtime])
 
     # ---------------------
     # --- Update method ---
