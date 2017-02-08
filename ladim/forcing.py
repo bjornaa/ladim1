@@ -149,6 +149,14 @@ class ROMS_forcing:
         T = self._nc.variables['ocean_time'][n]  # Read new fields
         U = self._nc.variables['u'][n, :, self._grid.Ju, self._grid.Iu]
         V = self._nc.variables['v'][n, :, self._grid.Jv, self._grid.Iv]
+        # Remove masking
+        if np.ma.is_masked(U):
+            U = U.data
+        if np.ma.is_masked(V):
+            V = V.data
+        # If necessary put U,V = zero on land and land boundaries
+        U = self._grid.Mu * U
+        V = self._grid.Mv * V
         if True:
             print("Reading ROMS input, input time = ",
                   num2date(self._timevar[n], self._time_units))
@@ -171,15 +179,10 @@ class ROMS_forcing:
 
     def close(self):
 
-        # Close the ROMS grid file
         self._nc.close()
 
-    # def sample_velocity(self, state):
-    #     X = state['X'] - self._grid.i0
-    #     Y = state['Y'] - self._grid.j0
-    #     Z = state['Z']   # Use negative depth (for now)
     def sample_velocity(self, X, Y, Z, tstep=0):
-        # Save K, A for sampling of scalar fields
+
         i0 = self._grid.i0
         j0 = self._grid.j0
         K, A = Z2S(self._grid.z_r, X-i0, Y-j0, Z)
@@ -189,6 +192,7 @@ class ROMS_forcing:
             return sample3DUV(self.U+tstep*self.dU, self.V+tstep*self.dV,
                               X-i0, Y-j0, K, A)
 
+    # Simplify to grid cell
     def sample_field(self, X, Y, Z, name):
         # should not be necessary to repeat
         i0 = self._grid.i0

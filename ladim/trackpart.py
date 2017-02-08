@@ -59,7 +59,7 @@ class TrackPart:
         """Euler-Forward advection"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
-        dt = self.dt
+        # dt = self.dt
         # pm, pn = grid.sample_metric(X, Y)
 
         U, V = forcing.sample_velocity(X, Y, Z)
@@ -80,8 +80,6 @@ class TrackPart:
         Y1 = Y + 0.5 * V * pn * dt
 
         U, V = forcing.sample_velocity(X1, Y1, Z, tstep=0.5)
-        # X += U * pm * dt
-        # Y += V * pn * dt
         return U, V
 
     def RK4(self, grid, forcing, state):

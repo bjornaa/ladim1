@@ -5,7 +5,7 @@
 f0 = open('anlegg.dat')
 f1 = open('salmon_lice.rls', mode='w')
 
-mult = 5
+mult = 1
 
 next(f0)  # Skip initial line
 for line in f0:

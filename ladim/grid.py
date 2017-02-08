@@ -12,7 +12,7 @@ Grid class for LADIM, simplified from roppy
 
 # import sys
 import logging
-# import numpy as np
+import numpy as np
 from netCDF4 import Dataset
 
 from roppy import s_stretch, sdepth
@@ -70,6 +70,7 @@ class Grid:
         # Subgrid, only considers internal grid cells
         # 1 <= i0 < i1 <= imax-1, default=end points
         # 1 <= j0 < j1 <= jmax-1, default=end points
+        # Here, imax, jmax refers to whole grid
         jmax, imax = ncid.variables['h'].shape
         whole_grid = [1, imax-1, 1, jmax-1]
         if config.subgrid:
@@ -82,6 +83,8 @@ class Grid:
                 limits[ind] = whole_grid[ind]
 
         self.i0, self.i1, self.j0, self.j1 = limits
+        self.imax = self.i1 - self.i0
+        self.jmax = self.j1 - self.j0
 
         # Slices
         #   rho-points
@@ -119,7 +122,9 @@ class Grid:
 
         # Read some variables
         self.H = ncid.variables['h'][self.J, self.I]
-        self.M = ncid.variables['mask_rho'][self.J, self.I]
+        self.M = ncid.variables['mask_rho'][self.J, self.I].astype(int)
+        # self.Mu = ncid.variables['mask_u'][self.Ju, self.Iu]
+        # self.Mv = ncid.variables['mask_v'][self.Jv, self.Iv]
         self.pm = ncid.variables['pm'][self.J, self.I]
         self.pn = ncid.variables['pn'][self.J, self.I]
         self.lon = ncid.variables['lon_rho'][self.J, self.I]
@@ -129,6 +134,19 @@ class Grid:
                           stagger='rho', Vtransform=self.Vtransform)
         self.z_w = sdepth(self.H, self.hc, self.Cs_w,
                           stagger='w', Vtransform=self.Vtransform)
+
+        M = self.M
+        Mu = np.zeros((self.jmax, self.imax+1), dtype=int)
+        Mu[:, 1:-1] = M[:, :-1] * M[:, 1:]
+        Mu[:, 0] = M[:, 0]
+        Mu[:, -1] = M[:, -1]
+        self.Mu = Mu
+
+        Mv = np.zeros((self.jmax+1, self.imax), dtype=int)
+        Mv[1:-1, :] = M[:-1, :] * M[1:, :]
+        Mv[0, :] = M[0, :]
+        Mv[-1, :] = M[-1, :]
+        self.Mv = Mv
 
         # Close the file(s)
         ncid.close()
@@ -168,7 +186,7 @@ class Grid:
         J = Y.round().astype(int) - self.j0
         return self.M[J, I] < 1
 
-    # Funker ikke ??
+    # Error if point outside
     def atsea(self, X, Y):
         """Returns True for points at sea"""
         I = X.round().astype(int) - self.i0

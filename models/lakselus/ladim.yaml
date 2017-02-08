@@ -29,8 +29,8 @@ files:
 
 grid:
     # Format = [i0, i1, j0, j1]
-    # subgrid: [300, 450, 500, 600]
-    subgrid: [200, 750, 300, 900]
+    subgrid: [350, 400, 510, 550]
+    # subgrid: [200, 750, 300, 900]
 
 # Samle IBM-variablene her
 ibm:
@@ -89,5 +89,5 @@ output_variables:
 numerics:
     # Model time step, [value, unit]
     dt: [600, s]
-    advection: RK4
+    advection: RK2
     diffusion: 10
