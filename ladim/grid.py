@@ -192,3 +192,141 @@ class Grid:
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j0
         return self.M[J, I] > 0
+
+# ---------------------------------------------
+#      More low-level functions
+#      more or less from the roppy package
+#      https://github.com/bjornaa/roppy
+# ----------------------------------------------
+
+def s_stretch(N, theta_s, theta_b, stagger='rho', Vstretching=1):
+    """Compute a s-level stretching array
+
+    *N* : Number of vertical levels
+
+    *theta_s* : Surface stretching factor
+
+    *theta_b* : Bottom stretching factor
+
+    *stagger* : "rho"|"w"
+
+    *Vstretching* : 1|2|4
+
+    """
+
+    if stagger == 'rho':
+        S = -1.0 + (0.5+np.arange(N))/N
+    elif stagger == "w":
+        S = np.linspace(-1.0, 0.0, N+1)
+    else:
+        raise ValueError("stagger must be 'rho' or 'w'")
+
+    if Vstretching == 1:
+        cff1 = 1.0 / np.sinh(theta_s)
+        cff2 = 0.5 / np.tanh(0.5*theta_s)
+        return ((1.0-theta_b)*cff1*np.sinh(theta_s*S) +
+                theta_b*(cff2*np.tanh(theta_s*(S+0.5))-0.5))
+
+    elif Vstretching == 2:
+        a, b = 1.0, 1.0
+        Csur = (1 - np.cosh(theta_s * S))/(np.cosh(theta_s) - 1)
+        Cbot = np.sinh(theta_b * (S+1)) / np.sinh(theta_b) - 1
+        mu = (S+1)**a * (1 + (a/b)*(1-(S+1)**b))
+        return mu*Csur + (1-mu)*Cbot
+
+    elif Vstretching == 4:
+        C = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
+        C = (np.exp(theta_b * C) - 1) / (1 - np.exp(-theta_b))
+        return C
+
+    else:
+        raise ValueError("Unknown Vstretching")
+
+def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
+    """Return depth of rho-points in s-levels
+
+    *H* : arraylike
+      Bottom depths [meter, positive]
+
+    *Hc* : scalar
+       Critical depth
+
+    *cs_r* : 1D array
+       s-level stretching curve
+
+    *stagger* : [ 'rho' | 'w' ]
+
+    *Vtransform* : [ 1 | 2 ]
+       defines the transform used, defaults 1 = Song-Haidvogel
+
+    Returns an array with ndim = H.ndim + 1 and
+    shape = cs_r.shape + H.shape with the depths of the
+    mid-points in the s-levels.
+
+    Typical usage::
+
+    >>> fid = Dataset(roms_file)
+    >>> H = fid.variables['h'][:,:]
+    >>> C = fid.variables['Cs_r'][:]
+    >>> Hc = fid.variables['hc'].getValue()
+    >>> z_rho = sdepth(H, Hc, C)
+
+    """
+    H = np.asarray(H)
+    Hshape = H.shape      # Save the shape of H
+    H = H.ravel()         # and make H 1D for easy shape maniplation
+    C = np.asarray(C)
+    N = len(C)
+    outshape = (N,) + Hshape       # Shape of output
+    if stagger == 'rho':
+        S = -1.0 + (0.5+np.arange(N))/N    # Unstretched coordinates
+    elif stagger == 'w':
+        S = np.linspace(-1.0, 0.0, N)
+    else:
+        raise ValueError("stagger must be 'rho' or 'w'")
+
+    if Vtransform == 1:         # Default transform by Song and Haidvogel
+        A = Hc * (S - C)[:, None]
+        B = np.outer(C, H)
+        return (A + B).reshape(outshape)
+
+    elif Vtransform == 2:       # New transform by Shchepetkin
+        N = Hc*S[:, None] + np.outer(C, H)
+        D = (1.0 + Hc/H)
+        return (N/D).reshape(outshape)
+
+    else:
+        raise ValueError("Unknown Vtransform")
+
+
+def Z2S(z_w, X, Y, Z):
+    """
+    Find s-level and coefficients for vertical interpolation
+
+    input: X, Y, Z is 3D position, Z positive
+
+    Returns K and A where:
+
+    K is a 2D integer array such that
+       -H  <= z_w[K] <= -Z < z_w[K+1] <= 0
+
+    A is a 2D float array such that
+        -Z = A*z_rho[K] + (1-A)*z_rho[K+1]
+
+    """
+
+    kmax = z_w.shape[0]-1          # Number of vertical
+    jmax, imax = z_w.shape[1:]     # Number of horizontal cells
+
+    # Find rho-based horizontal grid cell
+    # i.e. closest rho-point
+    I = np.around(X).astype('int')
+    J = np.around(Y).astype('int')
+
+    K = np.sum(z_w[:, J, I] < -Z, axis=0) - 1
+    K = K.clip(0, kmax-1)
+
+    A = (z_w[K+1, J, I] + Z) / (z_w[K+1, J, I] - z_w[K, J, I])
+    A = A.clip(0, 1)
+
+    return K, A
