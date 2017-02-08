@@ -15,7 +15,7 @@ import logging
 import numpy as np
 from netCDF4 import Dataset
 
-from ladim.sample_roms import s_stretch, sdepth
+# from ladim.sample_roms import s_stretch, sdepth
 # from roppy import s_stretch, sdepth
 # from roppy.depth import sdepth, zslice, s_stretch
 # from roppy.sample import sample2D, bilin_inv
@@ -43,13 +43,6 @@ class Grid:
     Note: Can not (yet) be initialized from a standard grd-file,
     use initial, history or average file or supply extra vertical
     information by Vinfo or Vfile.
-
-    Typical usage::
-
-    >>> fid = Dataset(roms_file)
-    >>> grd = SGrid(fid)
-
-    More arguments::
 
     >>> fid = Dataset(roms_file)
     >>> Vinfo = {'N': 32, 'hc': 10, 'theta_s': 0.8, 'theta_b': 0.4}
@@ -136,6 +129,7 @@ class Grid:
         self.z_w = sdepth(self.H, self.hc, self.Cs_w,
                           stagger='w', Vtransform=self.Vtransform)
 
+        # Land masks at u- and v-points
         M = self.M
         Mu = np.zeros((self.jmax, self.imax+1), dtype=int)
         Mu[:, 1:-1] = M[:, :-1] * M[:, 1:]
@@ -194,10 +188,11 @@ class Grid:
         return self.M[J, I] > 0
 
 # ---------------------------------------------
-#      More low-level functions
+#      Low-level vertical functions
 #      more or less from the roppy package
 #      https://github.com/bjornaa/roppy
 # ----------------------------------------------
+
 
 def s_stretch(N, theta_s, theta_b, stagger='rho', Vstretching=1):
     """Compute a s-level stretching array
@@ -241,6 +236,7 @@ def s_stretch(N, theta_s, theta_b, stagger='rho', Vstretching=1):
 
     else:
         raise ValueError("Unknown Vstretching")
+
 
 def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     """Return depth of rho-points in s-levels
@@ -298,8 +294,12 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     else:
         raise ValueError("Unknown Vtransform")
 
+# ------------------------
+#   Sampling routines
+# ------------------------
 
-def Z2S(z_w, X, Y, Z):
+
+def z2s(z_w, X, Y, Z):
     """
     Find s-level and coefficients for vertical interpolation
 
@@ -330,3 +330,54 @@ def Z2S(z_w, X, Y, Z):
     A = A.clip(0, 1)
 
     return K, A
+
+
+def sample3D(F, X, Y, K, A, method='bilinear'):
+    """
+    Sample a 3D field on the (sub)grid
+
+    F = 3D field
+    S = depth structure matrix
+    X, Y = 1D arrays of horizontal grid coordinates
+    Z = 1D arryay of depth [m, positive downwards]
+
+    Everything in rho-points
+
+    F.shape = S.shape = (kmax, jmax, imax)
+    S.shape = (kmax, jmax, imax)
+    X.shape = Y.shape = Z.shape = (pmax,)
+
+    # Interpolation = 'bilinear' for trilinear Interpolation
+    # = 'nearest' for value in 3D grid cell
+
+    """
+
+    if method == 'bilinear':
+        # Find rho-point as lower left corner
+        I = X.astype('int')
+        J = Y.astype('int')
+        P = X - I
+        Q = Y - J
+        W000 = (1-P)*(1-Q)*(1-A)
+        W010 = (1-P)*Q*(1-A)
+        W100 = P*(1-Q)*(1-A)
+        W110 = P*Q*(1-A)
+        W001 = (1-P)*(1-Q)*A
+        W011 = (1-P)*Q*A
+        W101 = P*(1-Q)*A
+        W111 = P*Q*A
+
+        return (W000*F[K, J, I] + W010*F[K, J+1, I] +
+                W100*F[K, J, I+1] + W110*F[K, J+1, I+1] +
+                W001*F[K-1, J, I] + W011*F[K-1, J+1, I] +
+                W101*F[K-1, J, I+1] + W111*F[K-1, J+1, I+1])
+
+    else:   # method == 'nearest'
+        I = X.round().astype('int')
+        J = Y.round().astype('int')
+        return F[K, J, I]
+
+
+def sample3DUV(U, V, X, Y, K, A, method='bilinear'):
+    return (sample3D(U, X-0.5, Y, K, A, method=method),
+            sample3D(V, X, Y-0.5, K, A, method=method))

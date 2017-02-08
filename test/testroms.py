@@ -23,6 +23,6 @@ print("X = ", X)
 print("Y = ", Y)
 print("Z = ", Z)
 
-K, A = Z2S(z_rho, X, Y, Z)
+K, A = z2s(z_rho, X, Y, Z)
 
 print(sample3D_(z_rho, X, Y, K, A))

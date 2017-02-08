@@ -53,7 +53,7 @@ def sample3D(F, X, Y, K, A):
             W101*F[K-1, J, I+1] + W111*F[K-1, J+1, I+1])
 
 # def sample3D(F, X, Y, Z):
-#    K, A = Z2S(z_rho, X, Y, Z)
+#    K, A = z2s(z_rho, X, Y, Z)
 #    F0 = sample3D_(F, X, Y, K, A)
 
 
@@ -205,7 +205,7 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
 
 # Returnere I, J, p, q også??
 # Disse fort å finne uansett
-def Z2S(z_rho, X, Y, Z):
+def z2s(z_rho, X, Y, Z):
     """
     Find s-levels K and A such that
     i)  -Z < z_rho[0],

@@ -10,7 +10,7 @@
 import unittest
 import numpy as np
 
-from ladim.grid import sdepth, s_stretch, Z2S
+from ladim.grid import sdepth, s_stretch, z2s
 
 # ------------------------------------
 
@@ -167,7 +167,7 @@ class test_Vstretching4(unittest.TestCase):
         self.assertEqual(len(C), N+1)
 
 
-class test_Z2S(unittest.TestCase):
+class test_z2s(unittest.TestCase):
 
     def test_correct(self):
         # Set-up
@@ -184,35 +184,35 @@ class test_Z2S(unittest.TestCase):
 
         # at surface
         Z = 0.0
-        K, A = Z2S(z_w, 0.5, 0.5, Z)
+        K, A = z2s(z_w, 0.5, 0.5, Z)
         assert(z_w[K] <= -Z <= z_w[K+1])
         assert(0 <= A <= 1)
         assert(abs(A*z_w[K] + (1-A)*z_w[K+1] + Z) < 1.e-5)
 
         # near surface
         Z = 0.1
-        K, A = Z2S(z_w, 0.5, 0.5, Z)
+        K, A = z2s(z_w, 0.5, 0.5, Z)
         assert(z_w[K] <= -Z <= z_w[K+1])
         assert(0 <= A <= 1)
         assert(abs(A*z_w[K] + (1-A)*z_w[K+1] + Z) < 1.e-5)
 
         # mid water
         Z = 50
-        K, A = Z2S(z_w, 0.5, 0.5, Z)
+        K, A = z2s(z_w, 0.5, 0.5, Z)
         assert(z_w[K] <= -Z <= z_w[K+1])
         assert(0 <= A <= 1)
         assert(abs(A*z_w[K] + (1-A)*z_w[K+1] + Z) < 1.e-5)
 
         # near bottom
         Z = H[0, 0] - 0.1
-        K, A = Z2S(z_w, 0.5, 0.5, Z)
+        K, A = z2s(z_w, 0.5, 0.5, Z)
         assert(z_w[K] <= -Z <= z_w[K+1])
         assert(0 <= A <= 1)
         assert(abs(A*z_w[K] + (1-A)*z_w[K+1] + Z) < 1.e-5)
 
         # at bottom
         Z = H[0, 0]
-        K, A = Z2S(z_w, 0.5, 0.5, Z)
+        K, A = z2s(z_w, 0.5, 0.5, Z)
         assert(z_w[K] <= -Z <= z_w[K+1])
         assert(0 <= A <= 1)
         assert(abs(A*z_w[K] + (1-A)*z_w[K+1] + Z) < 1.e-5)

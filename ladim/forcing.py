@@ -6,7 +6,7 @@ import logging
 import numpy as np
 from netCDF4 import Dataset, MFDataset, num2date
 # from ladim.grid import Grid
-from ladim.sample_roms import Z2S, sample3DUV, sample3D
+from ladim.grid import z2s, sample3DUV, sample3D
 
 
 class ROMS_forcing:
@@ -181,22 +181,23 @@ class ROMS_forcing:
 
         self._nc.close()
 
-    def sample_velocity(self, X, Y, Z, tstep=0):
+    def sample_velocity(self, X, Y, Z, tstep=0, method='bilinear'):
 
         i0 = self._grid.i0
         j0 = self._grid.j0
-        K, A = Z2S(self._grid.z_r, X-i0, Y-j0, Z)
+        K, A = z2s(self._grid.z_r, X-i0, Y-j0, Z)
         if tstep < 0.001:
-            return sample3DUV(self.U, self.V, X-i0, Y-j0, K, A)
+            return sample3DUV(self.U, self.V,
+                              X-i0, Y-j0, K, A, method=method)
         else:
             return sample3DUV(self.U+tstep*self.dU, self.V+tstep*self.dV,
-                              X-i0, Y-j0, K, A)
+                              X-i0, Y-j0, K, A, method=method)
 
     # Simplify to grid cell
     def sample_field(self, X, Y, Z, name):
         # should not be necessary to repeat
         i0 = self._grid.i0
         j0 = self._grid.j0
-        K, A = Z2S(self._grid.z_r, X-i0, Y-j0, Z)
+        K, A = z2s(self._grid.z_r, X-i0, Y-j0, Z)
         F = self[name]
-        return sample3D(F, X-i0, Y-j0, K, A)
+        return sample3D(F, X-i0, Y-j0, K, A, method='nearest')
