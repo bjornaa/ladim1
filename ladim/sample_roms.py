@@ -1,103 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-
-
-def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
-    """Return depth of rho-points in s-levels
-
-    *H* : arraylike
-      Bottom depths [meter, positive]
-
-    *Hc* : scalar
-       Critical depth
-
-    *cs_r* : 1D array
-       s-level stretching curve
-
-    *stagger* : [ 'rho' | 'w' ]
-
-    *Vtransform* : [ 1 | 2 ]
-       defines the transform used, defaults 1 = Song-Haidvogel
-
-    Returns an array with ndim = H.ndim + 1 and
-    shape = cs_r.shape + H.shape with the depths of the
-    mid-points in the s-levels.
-
-    Typical usage::
-
-    >>> fid = Dataset(roms_file)
-    >>> H = fid.variables['h'][:,:]
-    >>> C = fid.variables['Cs_r'][:]
-    >>> Hc = fid.variables['hc'].getValue()
-    >>> z_rho = sdepth(H, Hc, C)
-
-    """
-    H = np.asarray(H)
-    Hshape = H.shape      # Save the shape of H
-    H = H.ravel()         # and make H 1D for easy shape maniplation
-    C = np.asarray(C)
-    N = len(C)
-    outshape = (N,) + Hshape       # Shape of output
-    if stagger == 'rho':
-        S = -1.0 + (0.5+np.arange(N))/N    # Unstretched coordinates
-    elif stagger == 'w':
-        S = np.linspace(-1.0, 0.0, N)
-    else:
-        raise ValueError("stagger must be 'rho' or 'w'")
-
-    if Vtransform == 1:         # Default transform by Song and Haidvogel
-        A = Hc * (S - C)[:, None]
-        B = np.outer(C, H)
-        return (A + B).reshape(outshape)
-
-    elif Vtransform == 2:       # New transform by Shchepetkin
-        N = Hc*S[:, None] + np.outer(C, H)
-        D = (1.0 + Hc/H)
-        return (N/D).reshape(outshape)
-
-    else:
-        raise ValueError("Unknown Vtransform")
-
 # -----------------------------
 
-
-# Returnere I, J, p, q også??
-# Disse fort å finne uansett
-def Z2S(z_rho, X, Y, Z):
-    """
-    Find s-levels K and A such that
-    i)  -Z < z_rho[0],
-             K=1,   A=1
-    ii) z_rho[k-1] <= -Z < z_rho[k], k = 1, ..., kmax-1
-             K=k,   A=(z_rho[k] + Z)/(z_rho[k]-z_rho[k-1])
-    iii) z_rho[kmax-1] <= -Z,
-             K=kmax-1, A=0
-
-    Find integer array K and real array A s.th.
-    z_rho[0] < -Z <= z_rho[kmax-1]:
-       -Z = A*z_rho[K-1] + (1-A)*z_rho[K]
-    extend boundary values:
-       -Z <= z_rho[0] : K = 1, A = 1
-       -Z > z_rho[kmax-1] : K = kmax-1, A = 0
-
-    """
-
-    kmax, jmax, imax = z_rho.shape
-
-    # Find rho-based horizontal grid cell
-    # i.e. closest rho-point
-    I = np.around(X).astype('int')
-    J = np.around(Y).astype('int')
-
-    # Find integer array K such that
-    #   z_rho[K[p]-1, J[p], I[p]] < -Z[p] <= z_rho[K[p], J[p], I[p]]
-    K = np.sum(z_rho[:, J, I] < -Z, axis=0)
-    K = K.clip(1, kmax-1)
-    A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K-1, J, I])
-    A = A.clip(0, 1)
-
-    return K, A
 
 
 # --------
@@ -194,3 +99,143 @@ def sample3DUV(U, V, X, Y, K, A):
 #     W01 = (1-P)*Q
 #     W10 = P*(1-Q)
 #     W11 = P*Q
+
+def s_stretch(N, theta_s, theta_b, stagger='rho', Vstretching=1):
+    """Compute a s-level stretching array
+
+    *N* : Number of vertical levels
+
+    *theta_s* : Surface stretching factor
+
+    *theta_b* : Bottom stretching factor
+
+    *stagger* : "rho"|"w"
+
+    *Vstretching* : 1|2|4
+
+    """
+
+    if stagger == 'rho':
+        S = -1.0 + (0.5+np.arange(N))/N
+    elif stagger == "w":
+        S = np.linspace(-1.0, 0.0, N+1)
+    else:
+        raise ValueError("stagger must be 'rho' or 'w'")
+
+    if Vstretching == 1:
+        cff1 = 1.0 / np.sinh(theta_s)
+        cff2 = 0.5 / np.tanh(0.5*theta_s)
+        return ((1.0-theta_b)*cff1*np.sinh(theta_s*S)
+                + theta_b*(cff2*np.tanh(theta_s*(S+0.5))-0.5))
+
+    elif Vstretching == 2:
+        a, b = 1.0, 1.0
+        Csur = (1 - np.cosh(theta_s * S))/(np.cosh(theta_s) - 1)
+        Cbot = np.sinh(theta_b * (S+1)) / np.sinh(theta_b) - 1
+        mu = (S+1)**a * (1 + (a/b)*(1-(S+1)**b))
+        return mu*Csur + (1-mu)*Cbot
+
+    elif Vstretching == 4:
+        C = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
+        C = (np.exp(theta_b * C) - 1) / (1 - np.exp(-theta_b))
+        return C
+
+    else:
+        raise ValueError("Unknown Vstretching")
+
+
+
+
+def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
+    """Return depth of rho-points in s-levels
+
+    *H* : arraylike
+      Bottom depths [meter, positive]
+
+    *Hc* : scalar
+       Critical depth
+
+    *cs_r* : 1D array
+       s-level stretching curve
+
+    *stagger* : [ 'rho' | 'w' ]
+
+    *Vtransform* : [ 1 | 2 ]
+       defines the transform used, defaults 1 = Song-Haidvogel
+
+    Returns an array with ndim = H.ndim + 1 and
+    shape = cs_r.shape + H.shape with the depths of the
+    mid-points in the s-levels.
+
+    Typical usage::
+
+    >>> fid = Dataset(roms_file)
+    >>> H = fid.variables['h'][:,:]
+    >>> C = fid.variables['Cs_r'][:]
+    >>> Hc = fid.variables['hc'].getValue()
+    >>> z_rho = sdepth(H, Hc, C)
+
+    """
+    H = np.asarray(H)
+    Hshape = H.shape      # Save the shape of H
+    H = H.ravel()         # and make H 1D for easy shape maniplation
+    C = np.asarray(C)
+    N = len(C)
+    outshape = (N,) + Hshape       # Shape of output
+    if stagger == 'rho':
+        S = -1.0 + (0.5+np.arange(N))/N    # Unstretched coordinates
+    elif stagger == 'w':
+        S = np.linspace(-1.0, 0.0, N)
+    else:
+        raise ValueError("stagger must be 'rho' or 'w'")
+
+    if Vtransform == 1:         # Default transform by Song and Haidvogel
+        A = Hc * (S - C)[:, None]
+        B = np.outer(C, H)
+        return (A + B).reshape(outshape)
+
+    elif Vtransform == 2:       # New transform by Shchepetkin
+        N = Hc*S[:, None] + np.outer(C, H)
+        D = (1.0 + Hc/H)
+        return (N/D).reshape(outshape)
+
+    else:
+        raise ValueError("Unknown Vtransform")
+
+
+# Returnere I, J, p, q også??
+# Disse fort å finne uansett
+def Z2S(z_rho, X, Y, Z):
+    """
+    Find s-levels K and A such that
+    i)  -Z < z_rho[0],
+             K=1,   A=1
+    ii) z_rho[k-1] <= -Z < z_rho[k], k = 1, ..., kmax-1
+             K=k,   A=(z_rho[k] + Z)/(z_rho[k]-z_rho[k-1])
+    iii) z_rho[kmax-1] <= -Z,
+             K=kmax-1, A=0
+
+    Find integer array K and real array A s.th.
+    z_rho[0] < -Z <= z_rho[kmax-1]:
+       -Z = A*z_rho[K-1] + (1-A)*z_rho[K]
+    extend boundary values:
+       -Z <= z_rho[0] : K = 1, A = 1
+       -Z > z_rho[kmax-1] : K = kmax-1, A = 0
+
+    """
+
+    kmax, jmax, imax = z_rho.shape
+
+    # Find rho-based horizontal grid cell
+    # i.e. closest rho-point
+    I = np.around(X).astype('int')
+    J = np.around(Y).astype('int')
+
+    # Find integer array K such that
+    #   z_rho[K[p]-1, J[p], I[p]] < -Z[p] <= z_rho[K[p], J[p], I[p]]
+    K = np.sum(z_rho[:, J, I] < -Z, axis=0)
+    K = K.clip(1, kmax-1)
+    A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K-1, J, I])
+    A = A.clip(0, 1)
+
+    return K, A

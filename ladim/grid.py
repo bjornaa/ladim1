@@ -15,7 +15,8 @@ import logging
 import numpy as np
 from netCDF4 import Dataset
 
-from roppy import s_stretch, sdepth
+from ladim.sample_roms import s_stretch, sdepth
+# from roppy import s_stretch, sdepth
 # from roppy.depth import sdepth, zslice, s_stretch
 # from roppy.sample import sample2D, bilin_inv
 # import ladim.sample_roms as sample_roms
@@ -174,7 +175,6 @@ class Grid:
         return (sample2D(self.lon, X-self.i0, Y-self.j0),
                 sample2D(self.lat, X-self.i0, Y-self.j0))
 
-    # Feil ?, skal være pluss
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
         return ((self.i0-0.5 <= X) & (X <= self.i1-0.5) &
