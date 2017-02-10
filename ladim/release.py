@@ -229,35 +229,3 @@ def duplicate(A, M):
     return S
 
 # --------------------------------
-
-if __name__ == "__main__":
-
-    # Improvements, fjern fil - bruk inline string
-
-    # from datetime import datetime
-
-    # Make a minimal config object
-    class Container(object):
-        pass
-    config = Container()
-    config.start_time = np.datetime64('2015-03-31 12')
-    # config.reference_time = config.start_time
-    config.stop_time = np.datetime64('2015-04-04')
-    config.dt = 3600
-    config.particle_release_file = '../models/lakselus/release.in'
-    config.release_format = ['mult', 'release_time',
-                             'X', 'Y', 'Z',
-                             'farmid', 'super']
-    config.release_dtype = dict(mult=int, release_time=np.datetime64,
-                                X=float, Y=float, Z=float,
-                                farmid=int, super=float)
-    config.particle_variables = ['release_time', 'farmid']
-
-    release = ParticleReleaser(config)
-    # release = p.release()
-
-    for step in range(10):
-        print('step = ', step)
-        if step in release.steps:
-            V = next(release)
-            print(V)

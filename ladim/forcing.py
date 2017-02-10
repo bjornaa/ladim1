@@ -51,12 +51,17 @@ class ROMS_forcing:
                 self.scaled['V'] = True
                 self.scale_factor['V'] = self.scale_factor['U']
                 self.add_offset['V'] = self.add_offset['U']
+            else:
+                self.scaled['U'] = False
+                self.scaled['V'] = False
 
             for key in self.ibm_forcing:
                 if hasattr(nc.variables[key], 'scale_factor'):
                     self.scaled[key] = True
                     self.scale_factor[key] = nc.variables[key].scale_factor
                     self.add_offset[key] = nc.variables[key].add_offset
+                else:
+                    self.scaled[key] = False
 
         # ---------------------------
         # Overview of all the files
@@ -129,13 +134,26 @@ class ROMS_forcing:
         # to get Runge-Kutta going
         # --------------
         # Last step < 0
-        prestep = max([step for step in steps if step < 0])
-        print(prestep)
+        #
+        V = [step for step in steps if step < 0]
+        if V:
+            prestep = max(V)
+        elif steps[0] == 0:
+            prestep = 0
+        else:
+            # No forcing at start, should alreadu be
+            raise SystemExit(3)
+
         self.U, self.V = self._read_velocity(prestep)
-        # Read zero step (assumes 0 is a forcing step)
-        self.Unew, self.Vnew = self._read_velocity(0)
-        self.dU = (self.U - self.Unew) / prestep
-        self.dV = (self.V - self.Vnew) / prestep
+        stepdiff = self.stepdiff[steps.index(prestep)]
+        nextstep = prestep + stepdiff
+        self.Unew, self.Vnew = self._read_velocity(nextstep)
+        self.dU = (self.Unew - self.U) / stepdiff
+        self.dV = (self.Vnew - self.V) / stepdiff
+        if prestep == 0:
+            # Hold back to be in phase
+            self.U = self.Unew
+            self.V = self.Vnew
 
         # Do more elegant
         for name in self.ibm_forcing:

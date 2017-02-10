@@ -17,7 +17,7 @@ is available::
 
   ftp://ftp.imr.no/bjorn/ladim-data/ocean_avg_0014.nc.gz
 
-Gunzip and store it in ``ladim/input directory``-
+Gunzip and store it in ``examples/data``-
 
 
 Source code

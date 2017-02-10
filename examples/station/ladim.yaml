@@ -67,7 +67,7 @@ numerics:
     # Advection method: options =
     #        EF = Euler-Forward,
     #        RK2, RK4 = Runge-Kutta 2nd or 4th order
-    advection: RK4
+    advection: RK2
     # Horizontal diffusion coefficient [m2.s-1]
     #         zero = no diffusion
     diffusion: 10.0

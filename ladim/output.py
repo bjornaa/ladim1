@@ -29,8 +29,8 @@ class OutPut:
         nc = Dataset(config.output_file, mode='w',
                      format="NETCDF3_CLASSIC")
         # --- Dimensions
-        nc.createDimension('particle_instance', None)  # unlimited
         nc.createDimension('particle', config.total_particle_count)
+        nc.createDimension('particle_instance', None)  # unlimited
         # Sett output-period i config (bruk naturlig enhet)
         # regne om til antall tidsteg og få inn under
         print("NUM_OUTPUT = ", config.num_output)
@@ -96,14 +96,3 @@ class OutPut:
     def write_particle_variables(self, partini):
         for name, value in partini.particle_variables.items():
             self.nc.variables[name][:] = value
-
-
-if __name__ == '__main__':
-
-    import configuration
-
-    config_file = '../ladim.yaml'
-    config = ladim_config.read_config(config_file)
-    config.output_file = '../output/a.nc'
-    config.total_particle_count = 100
-    out = OutPut(config)

@@ -32,7 +32,7 @@ W4 = np.where(C > 2, W4c, W4)
 # Estimate root of G (here 4*G)
 
 coeff = [-1, 2, -4, 4]
-print np.roots(coeff)[-1]
+print(np.roots(coeff)[-1])
 
 
 

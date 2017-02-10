@@ -1,8 +1,18 @@
+# ------------------------------------
+# trackpart.py
+# Part of the LADIM Model
+#
+# Bjørn Ådllandsvik, <bjorn@imr.no>
+# Institute of Marine Research
+#
+# Licenced under the MIT license
+# ------------------------------------
 
 import numpy as np
 
 
 class TrackPart:
+    """The physical particle tracking kernel"""
 
     def __init__(self, config):
         self.dt = config.dt
@@ -16,6 +26,7 @@ class TrackPart:
             self.D = config.diffusion_coefficient  # [m2.s-1]
 
     def move_particles(self, grid, forcing, state):
+        """Move the particles"""
 
         X, Y = state.X, state.Y
         self.pm, self.pn = grid.sample_metric(X, Y)
@@ -39,7 +50,7 @@ class TrackPart:
 
         # --- Move the particles
 
-        # New position, untested
+        # New position, if OK
         X1 = X + U * self.pm * dt
         Y1 = Y + V * self.pn * dt
 
@@ -50,8 +61,7 @@ class TrackPart:
         # I = True
         X[I] = X1[I]
         Y[I] = Y1[I]
-        # X, Y = X1, Y1
-        # Må ha blitt laget en kopi et sted
+
         state.X = X
         state.Y = Y
 
@@ -65,8 +75,6 @@ class TrackPart:
         U, V = forcing.sample_velocity(X, Y, Z)
 
         return U, V
-        # X += U * pm * dt
-        # Y += V * pm * dt
 
     def RK2(self, grid, forcing, state):
         """Runge-Kutta second order = Heun scheme"""
@@ -83,7 +91,7 @@ class TrackPart:
         return U, V
 
     def RK4(self, grid, forcing, state):
-        """Runge-Kutta fourth order"""
+        """Runge-Kutta fourth order advection"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
         dt = self.dt
@@ -103,8 +111,6 @@ class TrackPart:
 
         U4, V4 = forcing.sample_velocity(X3, Y3, Z, tstep=1.0)
 
-        # X += (U1 + 2*U2 + 2*U3 + U4) * pm * dt / 6.0
-        # Y += (V1 + 2*V2 + 2*V3 + V4) * pn * dt / 6.0
         U = (U1 + 2*U2 + 2*U3 + U4) / 6.0
         V = (V1 + 2*V2 + 2*V3 + V4) / 6.0
 
