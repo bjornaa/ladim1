@@ -79,6 +79,8 @@ class Grid:
         self.i0, self.i1, self.j0, self.j1 = limits
         self.imax = self.i1 - self.i0
         self.jmax = self.j1 - self.j0
+        print('Grid : imax, jmax, size = ',
+              self.imax, self.jmax, self.imax*self.jmax)
 
         # Slices
         #   rho-points
@@ -351,6 +353,8 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
     # = 'nearest' for value in 3D grid cell
 
     """
+
+    # print('sample3D: method =', method)
 
     if method == 'bilinear':
         # Find rho-point as lower left corner

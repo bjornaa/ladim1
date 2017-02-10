@@ -59,7 +59,7 @@ class Configure:
         logger.info('Configuration: Time Stepping')
         # Read time step and convert to seconds
         dt = np.timedelta64(*tuple(conf['numerics']['dt']))
-        self.dt = dt.astype('m8[s]').astype('int')
+        self.dt = int(dt.astype('m8[s]').astype('int'))
         self.simulation_time = np.timedelta64(
             self.stop_time - self.start_time, 's').astype('int')
         self.numsteps = self.simulation_time // self.dt

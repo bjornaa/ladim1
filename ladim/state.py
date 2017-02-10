@@ -12,6 +12,8 @@ class State:
     def __init__(self, config):
 
         self.timestep = 0
+        self.timestamp = config.start_time
+        self.dt = np.timedelta64(config.dt, 's')
         self.position_variables = ['X', 'Y', 'Z']
         self.ibm_variables = config.ibm_variables
         self.instance_variables = self.position_variables + self.ibm_variables
@@ -64,6 +66,7 @@ class State:
 
     def update(self, grid, forcing):
         self.timestep += 1
+        self.timestamp += self.dt
         self.track.move_particles(grid, forcing, self)
         if self.ibm:
             self.ibm.update_ibm(grid, self, forcing)

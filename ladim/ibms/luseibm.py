@@ -33,7 +33,7 @@ class IBM:
 
         # Light at depth
         lon, lat = grid.lonlat(state.X, state.Y)
-        light0 = light.surface_light(forcing.time, lon, lat)
+        light0 = light.surface_light(state.timestamp, lon, lat)
         Eb = light0 * np.exp(-self.k*state.Z)
 
         # Swimming velocity
