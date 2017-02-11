@@ -78,8 +78,6 @@ for i in range(numsteps+1):
 
     # Save to file
     if i % config.output_period == 0:
-        print("Output: i = ", i, num2date(i*dt,
-              'seconds since %s' % str(config.start_time)))
         out.write(state)
 
     # --- Update the model state ---

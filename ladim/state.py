@@ -1,5 +1,6 @@
 # Classes for Particle and State variables
 
+import logging
 import importlib
 from ladim.trackpart import TrackPart
 import numpy as np
@@ -12,8 +13,10 @@ class State:
 
     def __init__(self, config):
 
+        logging.info("Initializing the model state")
+
         self.timestep = 0
-        self.timestamp = config.start_time
+        self.timestamp = config.start_time.astype('datetime64[s]')
         self.dt = np.timedelta64(config.dt, 's')
         self.position_variables = ['X', 'Y', 'Z']
         self.ibm_variables = config.ibm_variables
@@ -67,7 +70,7 @@ class State:
 
     def update(self, grid, forcing):
         self.timestep += 1
-        self.timestamp += self.dt
+        self.timestamp += np.timedelta64(self.dt, 's')
         self.track.move_particles(grid, forcing, self)
         if self.ibm:
             self.ibm.update_ibm(grid, self, forcing)

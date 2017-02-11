@@ -17,7 +17,8 @@ class ROMS_forcing:
 
     def __init__(self, config, grid):
 
-        loglevel = logging.INFO
+        logging.basicConfig(level=logging.INFO)
+        logging.info("Initiating forcing")
 
         self._grid = grid  # Get the grid object, make private?
 
@@ -184,6 +185,7 @@ class ROMS_forcing:
         # fieldnr = self._fieldnr
         # self.time += self.dt  # et tidsteg for tidlig ??
         # print('forcing-update: tid = ', self.time)
+        logging.debug("Updating forcing, time step = {}".format(t))
         if t in self.steps:  # No time interpolation
             self.U = self.Unew
             self.V = self.Vnew
@@ -211,12 +213,13 @@ class ROMS_forcing:
     # --------------
 
     def _read_velocity(self, n):
-        """Read fields at time frame = n"""
+        """Read fields at time step = n"""
         # Need a switch for reading W
         # T = self._nc.variables['ocean_time'][n]  # Read new fields
 
         # Handle file opening/closing
         # Always read velocity before other fields
+        logging.info('Reading velocity for time step = {}'.format(n))
         first = True
         if first:   # Open file initiallt
             self._nc = Dataset(self._files[self.file_idx[n]])
