@@ -1,11 +1,15 @@
 import time
-import itertools
-import matplotlib; matplotlib.use('TkAgg')
+# import itertools
+# import matplotlib; matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+from matplotlib import animation
 from netCDF4 import Dataset
 import roppy
 import roppy.mpl_util
 from postladim.particlefile import ParticleFile
+
+
+# PROBLEM, timestring is not updated
 
 # ---------------
 # User settings
@@ -25,36 +29,17 @@ j0, j1 = 60, 140
 
 # Slight overkill to use roppy, could be more stand alone
 f0 = Dataset(grid_file)
-g = roppy.SGrid(f0, subgrid=(i0, i1, j0, j1))
-
+g = roppy.SGrid(f0, subgrid=(i0+1, i1, j0+1, j1))
 
 # particle_file
 pf = ParticleFile(particle_file)
-
-Ntimes = pf.num_times
-
-
-def animate():
-    # for t in range(1, Ntimes):
-    for t in itertools.count():
-        t = (t + 1) % Ntimes
-        if t == 0:
-            time.sleep(0.5)
-        X, Y = pf.position(t)
-        timestring = pf.time(t)
-        h[0].set_xdata(X)
-        h[0].set_ydata(Y)
-        ax.set_title(timestring)
-        fig.canvas.draw()
-
-# Create a figure
+num_times = pf.num_times
 
 fig = plt.figure(figsize=(12, 10))
-ax = fig.add_subplot(1, 1, 1)
-
+ax = plt.axes(xlim=(i0+1, i1-1), ylim=(j0+1, j1-1), aspect='equal')
 # Make background map
 cmap = plt.get_cmap('Blues')
-h = ax.contourf(g.X, g.Y, g.h, cmap=cmap, alpha=0.3)
+ax.contourf(g.X, g.Y, g.h, cmap=cmap, alpha=0.3)
 roppy.mpl_util.landmask(g, (0.6, 0.8, 0.0))
 ax.contour(g.X, g.Y, g.lat_rho, levels=range(57, 64),
            colors='black', linestyles=':')
@@ -64,15 +49,37 @@ ax.contour(g.X, g.Y, g.lon_rho, levels=range(-4, 10, 2),
 
 # Plot initial particle distribution
 X, Y = pf.position(0)
-timestring = pf.time(0)
+# timestring = pf.time(0)
 # noinspection PyRedeclaration
-h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
-ax.set_title(timestring)
 
-# Do the animation
-fig.canvas.manager.window.after(100, animate)
+h, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+h1 = ax.set_title(pf.time(0))
+
 
 # Show the results
-plt.axis('image')
-plt.axis((i0+1, i1-1, j0+1, j1-1))
+# plt.axis('image')
+# plt.axis((i0+1, i1-1, j0+1, j1-1))
+
+
+# initialization function: plot the background of each frame
+def init():
+    # h.set_data(X, Y)
+    return h, h1
+
+
+def animate(t):
+    i = t % num_times
+    if i == 0:
+        time.sleep(0.5)
+    X, Y = pf.position(i)
+    h.set_data(X, Y)
+    h1.set_text(pf.time(i))
+    return h, h1
+
+# Can have more general argument for frames
+# call the animator.  blit=True means only re-draw the parts that have changed.
+anim = animation.FuncAnimation(fig, animate, init_func=init,
+                               frames=2000, interval=20, blit=True)
+
+
 plt.show()
