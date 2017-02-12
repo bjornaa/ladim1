@@ -52,7 +52,7 @@ import numpy as np
 class ParticleReleaser:
     """Particle Release Class"""
 
-    def __init__(self, config, loglevel=logging.INFO):
+    def __init__(self, config):
 
         # release_type = config.release_type
 

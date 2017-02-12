@@ -13,6 +13,7 @@ import logging
 import numpy as np
 import yaml
 
+
 class Configure:
 
     def __init__(self, config_file, loglevel=logging.WARNING):
@@ -92,7 +93,6 @@ class Configure:
             self.ibm_module = conf['ibm']['ibm_module']
             logging.info('Configuration: IBM')
             logging.info('    {:15s}: {}'.format('ibm_module',
-
                                                  self.ibm_module))
         # Skille på om ikke gitt, eller om navnet er feil
         except KeyError:

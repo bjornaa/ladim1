@@ -1,7 +1,9 @@
 # Classes for Particle and State variables
 
-import logging
+import sys
+import os
 import importlib
+import logging
 from ladim.trackpart import TrackPart
 import numpy as np
 
@@ -21,8 +23,6 @@ class State:
         self.position_variables = ['X', 'Y', 'Z']
         self.ibm_variables = config.ibm_variables
         self.instance_variables = self.position_variables + self.ibm_variables
-        # print("self.instance_variables")
-        # print(self.instance_variables)
 
         self.pid = np.array([], dtype=int)
         for name in self.instance_variables:
@@ -36,11 +36,12 @@ class State:
         self.dt = config.dt
 
         if config.ibm_module:
-            ibm_module = importlib.import_module(
-                'ladim.ibms.' + config.ibm_module)
-            # Initiate IBM object
+            # Import the module
+            logging.info("Initalizing the IBM")
+            sys.path.insert(0, os.getcwd())
+            ibm_module = importlib.import_module(config.ibm_module)
+            # Initiate the IBM object
             self.ibm = ibm_module.IBM(config)
-
         else:
             self.ibm = None
 
@@ -72,5 +73,17 @@ class State:
         self.timestep += 1
         self.timestamp += np.timedelta64(self.dt, 's')
         self.track.move_particles(grid, forcing, self)
+
+        # From physics all particles are alive
+        self.alive = np.ones(len(self), dtype='bool')
+
+        # Update the IBM
         if self.ibm:
             self.ibm.update_ibm(grid, self, forcing)
+
+        # Compactify by removing dead particles
+        # Compactify
+        # Could have a switch to avoid this if no deaths
+        self.pid = self.pid[self.alive]
+        for key in self.instance_variables:
+            self[key] = self[key][self.alive]
