@@ -10,12 +10,12 @@ from postladim.particlefile import ParticleFile
 # ---------------
 
 # Files
-particle_file = 'streak.nc'
-grid_file = '../data/ocean_avg_0014.nc'
+particle_file = 'out.nc'
+grid_file = '/scratch/Data/NK800/file_0000.nc'
 
 # Subgrid definition
-i0, i1 = 100, 130
-j0, j1 = 90, 115
+i0, i1 = 200, 750
+j0, j1 = 300, 900
 
 # ----------------
 
