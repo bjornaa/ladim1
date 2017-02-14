@@ -47,11 +47,15 @@ class ROMS_forcing:
 
             if hasattr(nc.variables['u'], 'scale_factor'):
                 self.scaled['U'] = True
-                self.scale_factor['U'] = nc.variables['u'].scale_factor
-                self.add_offset['U'] = nc.variables['u'].add_offset
+                self.scale_factor['U'] = np.float32(
+                    nc.variables['u'].scale_factor)
+                self.add_offset['U'] = np.float32(
+                    nc.variables['u'].add_offset)
                 self.scaled['V'] = True
-                self.scale_factor['V'] = self.scale_factor['U']
-                self.add_offset['V'] = self.add_offset['U']
+                self.scale_factor['V'] = np.float32(
+                    self.scale_factor['U'])
+                self.add_offset['V'] = np.float32(
+                    self.add_offset['U'])
             else:
                 self.scaled['U'] = False
                 self.scaled['V'] = False
@@ -59,8 +63,10 @@ class ROMS_forcing:
             for key in self.ibm_forcing:
                 if hasattr(nc.variables[key], 'scale_factor'):
                     self.scaled[key] = True
-                    self.scale_factor[key] = nc.variables[key].scale_factor
-                    self.add_offset[key] = nc.variables[key].add_offset
+                    self.scale_factor[key] = np.float32(
+                        nc.variables[key].scale_factor)
+                    self.add_offset[key] = np.float32(
+                        nc.variables[key].add_offset)
                 else:
                     self.scaled[key] = False
 
@@ -242,12 +248,9 @@ class ROMS_forcing:
             V = self.add_offset['U'] + self.scale_factor['U']*V
 
         # If necessary put U,V = zero on land and land boundaries
-        U = self._grid.Mu * U
-        V = self._grid.Mv * V
-
-        # if True:
-        #    print("Reading ROMS input, input time = ",
-        #          num2date(self._timevar[n], self._time_units))
+        # Stay as float32
+        np.multiply(U, self._grid.Mu, out=U)
+        np.multiply(V, self._grid.Mv, out=V)
         return U, V
 
     def _read_field(self, name, n):
