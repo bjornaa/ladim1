@@ -1,5 +1,5 @@
-LADIM implementation
-====================
+LADIM Components
+================
 
 This chapter describes briefly the present implementation
 of LADIM. The code is modular and flexible with classes
@@ -13,6 +13,12 @@ The code may be developed towards base classes, where alternatives
 can inherit from a common base class. Presently, alternatives must
 be written separately.
 
+.. figure:: ladim-system.jpg
+   :width: 500
+
+   The LADIM "eco"-system; the connections between the
+   components.
+
 .. toctree::
    :maxdepth: 2
 
@@ -21,6 +27,6 @@ be written separately.
    release_class.rst
    forcing.rst
    state.rst
-   trackpart.rst
+   tracker.rst
    IBM_class.rst
    output_class.rst

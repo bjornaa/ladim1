@@ -15,7 +15,7 @@ time_control:
     # Start and stop of simulation
     # use an alias &t0 if used again
     start_time: &time0 2015-04-01 00:00:00
-    stop_time:  2015-04-06 00:00:00
+    stop_time:  2015-04-01 12:00:00
     # Reference time for netcdf output
     # by default set to start_time
     # can be overridden explicitly
@@ -30,7 +30,7 @@ files:
 grid:
     # Format = [i0, i1, j0, j1]
     # subgrid: [350, 400, 510, 550]
-    subgrid: [200, 750, 300, 900]
+    # subgrid: [200, 750, 300, 900]
 
 # Samle IBM-variablene her
 ibm:

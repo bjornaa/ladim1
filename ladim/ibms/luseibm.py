@@ -51,6 +51,6 @@ class IBM:
 
         # Update vertical position, using reflextive boundary condition
         state.Z += W * self.dt
-        # Reflective boundary condition at surface
-        I = state.Z < 0
-        state.Z[I] = - state.Z[I]
+        
+        # Mark particles older than 200 degree days as dead
+        state.alive = state.age < 200

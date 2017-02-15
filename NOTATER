@@ -1,0 +1,191 @@
+Tidtaking med LADIM
+-------------------
+
+2017-02-09
+----------
+
+Standard run, lakselusmodell
+2 anlegg, 3 partikler pr time per anlegg 12 timer
+2015-04-01 00 + 12 timer simulering
+Totalt 72 partikler, 540 instanser
+Hele området: 2600 x 900 = 2340000 grid celler
+
+htop oppgir litt under 25-30% minne eller 8-10 GB
+
+NB: Noe galt med release timestamps
+
+ladim  175,52s user 41.6 system 99% cpu
+
+Skalerer opp # partikler
+mult = 30,  720 partikler totalt
+ladim  172.68s user 104.11s system 99%
+
+mult = 300, 7200 totalt
+ladim  173.35s user 99.08s system 99%
+
+mult = 3000, 72 000 totalt
+ladim  179.22s user 94.86s system 99%
+
+mult = 30000, 720 000 totalt
+ladim  257.77s user 109.71s system 99%
+
+mult = 300000, 7 200 000 totalt
+1022.99s user 366.41s system 99%
+
+mult = 3 000 000, 72 000 000 totalt
+8785.41s user 2132.91 system 94% cpu
+(til tider over 90% av minne)
+
+# ---- Størrelse på grid ----
+
+standard:  2600 x 900 = 2340000
+175,52s user 41.6 system 99% cpu
+
+fjerdedel: 1300 x 450 = 585000
+
+ladim:  53.75s user 10.13s system 99%
+31% og 24%
+
+hundre-del: 260 x 90 = 23400
+
+ladim: 4.03s user, 0.16s system
+2.2% og 0.3%
+(med mult = 3000,
+ladim  11.84s user 0.20s, 6.6% og 0.2%)
+
+# ----------------------------
+# Profilerer
+# ----------------------------
+
+python -m cProfile -o ladim.prof /opt/anaconda/bin/ladim
+
+i ipython:
+  import pstats
+  p = pstats.Stats('ladim.prof')
+  p.strip_dirs().sort_stats('cumulative').print_stats(12)
+
+Med standard kjøring gir dette:
+
+Thu Feb  9 14:01:22 2017    ladim.prof
+
+         238391 function calls (235195 primitive calls) in 217.353 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1324 to 12 due to restriction <12>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    152/1    0.003    0.000  217.353  217.353 {built-in method builtins.exec}
+        1    0.003    0.003  217.353  217.353 ladim:3(<module>)
+       73   21.022    0.288  168.399    2.307 forcing.py:98(update)
+       13   21.718    1.671   65.746    5.057 forcing.py:146(_read_velocity)
+       26   16.500    0.635   60.337    2.321 forcing.py:165(_read_field)
+      177   45.844    0.259   52.642    0.297 core.py:956(__call__)
+       73    0.001    0.000   37.474    0.513 state.py:65(update)
+       73    0.003    0.000   37.393    0.512 trackpart.py:18(move_particles)
+       73    0.001    0.000   37.381    0.512 trackpart.py:71(RK2)
+      146   37.350    0.256   37.379    0.256 forcing.py:184(sample_velocity)
+      146   13.916    0.095   30.954    0.212 core.py:4011(__iadd__)
+       52    0.062    0.001   27.896    0.536 core.py:3905(__add__)
+
+77% til forcing
+  30% til read_velocity
+  28% til read_field
+  17% til sample hastighet
+
+
+Med mult = 3000
+===============
+
+        238391 function calls (235195 primitive calls) in 226.261 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1324 to 12 due to restriction <12>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    152/1    0.003    0.000  226.261  226.261 {built-in method builtins.exec}
+        1    0.004    0.004  226.261  226.261 ladim:3(<module>)
+       73   21.080    0.289  169.244    2.318 forcing.py:98(update)
+       13   21.699    1.669   66.010    5.078 forcing.py:146(_read_velocity)
+       26   16.677    0.641   60.751    2.337 forcing.py:165(_read_field)
+      177   46.082    0.260   52.891    0.299 core.py:956(__call__)
+       73    0.001    0.000   41.807    0.573 state.py:65(update)
+       73    0.049    0.001   39.826    0.546 trackpart.py:18(move_particles)
+       73    0.021    0.000   39.456    0.540 trackpart.py:71(RK2)
+      146   37.457    0.257   39.402    0.270 forcing.py:184(sample_velocity)
+      146   13.976    0.096   31.097    0.213 core.py:4011(__iadd__)
+       52    0.062    0.001   27.936    0.537 core.py:3905(__add__)
+
+75% forcing
+  29% read_velocity
+  27% read_field
+  17% sample_velocity
+
+2017-02-10
+==========
+
+Skrevet om forcing-delen.
+Bruker ikke auto-maskand scale og MFDataset
+
+Standardrun:
+105.82s user 27.99s system 99%
+
+62% og 68%
+
+mult=3000
+114.46s user 28.09s system 99%
+64% og 30%
+
+Forcing nå dobbel så rask, står nå for 58% (av kortere tid)
+Sample velocity tar samme tid.
+
+Prøver å sample hastighet i nærmeste celle.
+Dette har (overraskende) liten betydning for ytelsen.
+
+2017-02-13
+==========
+
+111.69s user 81.71s system 99 (mult=3000)
+
+Prøvde float32
+(ved scale_factor og add_offset + float32 som state-variable)
+97.04s user 24.70s system 99
+
+Funker ikke helt, må sjekke om konsekvent float32
+
+
+2017-02-15
+==========
+
+32-bit file reading, 3000 partikler -> 91 s (ned fra 226)
+
+ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+ 152/1    0.003    0.000   90.820   90.820 {built-in method builtins.exec}
+     1    0.003    0.003   90.820   90.820 ladim:3(<module>)
+    73   18.406    0.252   54.004    0.740 forcing.py:187(update)
+    73    0.028    0.000   24.233    0.332 state.py:72(update)
+    14   23.372    1.669   23.377    1.670 forcing.py:221(_read_velocity)
+    73    0.049    0.001   22.371    0.306 trackpart.py:28(move_particles)
+    73    0.018    0.000   22.006    0.301 trackpart.py:79(RK2)
+   146   20.914    0.143   21.954    0.150 forcing.py:279(sample_velocity)
+    28   18.662    0.666   18.667    0.667 forcing.py:256(_read_field)
+     1    0.796    0.796    7.289    7.289 forcing.py:18(__init__)
+    13    3.643    0.280    3.651    0.281 output.py:85(write)
+    73    0.101    0.001    1.832    0.025 luseibm.py:25(update_ibm)
+
+_read_velocity:  25.6%
+sample_velocity: 23.0%
+_read_field:     20.5%
+
+output bruker: 4.0% av tiden
+
+Hva bruker forcing.update tid på i tillegg kallene over? 20% av tiden
+dt = 600 sek, dvs. 5 vanlige oppdatering U += dU
+hver sjette leser feltene (1 read_vel + 2 read_field)
+       1.6 + 2*0.7 = 3 sek. dette gir gjennomsnitt 0.5 s /kall
+       update bruker 0.74 i gjennomsnitt
+
+Det var tidsinterpolasjonen: skru den av reduserer fra 18.4 til 0.2 s.
+Unødvendig for salt/temp? Endres ikke så fort, OK for lakselus.
+Ha bryter for det. Alternativ: kan dette speedes opp?
+
+Kutter ut tidsinterpolasjon for salt/temp, speeder opp 10s = 11%

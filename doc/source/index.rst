@@ -13,7 +13,7 @@ Contents:
 
    intro.rst
    manual.rst
-   modules.rst
+   components.rst
 
 
 

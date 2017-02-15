@@ -1,5 +1,5 @@
 # ------------------------------------
-# trackpart.py
+# tracker.py
 # Part of the LADIM Model
 #
 # Bjørn Ådllandsvik, <bjorn@imr.no>
@@ -11,7 +11,7 @@
 import numpy as np
 
 
-class TrackPart:
+class Tracker:
     """The physical particle tracking kernel"""
 
     def __init__(self, config):

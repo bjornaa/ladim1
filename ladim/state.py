@@ -4,7 +4,7 @@ import sys
 import os
 import importlib
 import logging
-from ladim.trackpart import TrackPart
+from ladim.tracker import Tracker
 import numpy as np
 
 # ------------------------
@@ -28,11 +28,7 @@ class State:
         for name in self.instance_variables:
             setattr(self, name, np.array([], dtype=float))
 
-        # Skal disse være her??, trenger ikke lagres,
-        # oppdatere output etter hver release.
-        # self.particle_variables = ['release_time', 'farmid']
-
-        self.track = TrackPart(config)
+        self.track = Tracker(config)
         self.dt = config.dt
 
         if config.ibm_module:
@@ -55,7 +51,7 @@ class State:
         return len(getattr(self, 'X'))
 
     def append(self, new):
-        """Append to the state"""
+        """Append new particles to the model state"""
         nnew = len(new['pid'])
         self.pid = np.concatenate((self.pid, new['pid']))
         for name in self.instance_variables:
@@ -63,13 +59,10 @@ class State:
                 self[name] = np.concatenate((self[name], new[name]))
             else:   # Initialize to zero
                 self[name] = np.concatenate((self[name], np.zeros(nnew)))
-        # Only store new particle variable values
-        # (trenger kanskje ikke lagres her i det hele tatt,
-        #   gå rett til output)
-        # for name in self.particle_variables:
-        #    self[name] = new[name]
 
     def update(self, grid, forcing):
+        """Update the model state to the next timestep"""
+
         self.timestep += 1
         self.timestamp += np.timedelta64(self.dt, 's')
         self.track.move_particles(grid, forcing, self)
@@ -81,8 +74,16 @@ class State:
         if self.ibm:
             self.ibm.update_ibm(grid, self, forcing)
 
+        # Surface/bottom boundary conditions
+        #     Reflective  at surface
+        I = self.Z < 0
+        self.Z[I] = - self.Z[I]
+        #     Keep just above bottom
+        H = grid.sample_depth(self.X, self.Y)
+        I = self.Z > H
+        self.Z[I] = 0.99*H[I]
+
         # Compactify by removing dead particles
-        # Compactify
         # Could have a switch to avoid this if no deaths
         self.pid = self.pid[self.alive]
         for key in self.instance_variables:

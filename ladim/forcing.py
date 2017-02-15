@@ -5,7 +5,6 @@ import glob
 import logging
 import numpy as np
 from netCDF4 import Dataset, num2date
-# from ladim.grid import Grid
 from ladim.grid import z2s, sample3DUV, sample3D
 
 
@@ -165,32 +164,24 @@ class ROMS_forcing:
         # Do more elegant
         for name in self.ibm_forcing:
             print(self.ibm_forcing)
-            # print("XXX", name)
-            # print(name+'old')
             self[name] = self._read_field(name, prestep)
             self[name+'new'] = self._read_field(name, 0)
             self['d'+name] = (self[name] - self[name+'new']) / prestep
 
-        # print step[fieldnr], " < ", 0, " <= ", step[fieldnr+1]
-
-        # Variables needed by update
-        # timevar = timevar
-        # self._step = step
-        # self._fieldnr = fieldnr
         self.steps = steps
         self._files = files
-        # stepdiff[i] = steps[i+1] - step[i]
-        # self.last_field = -1  #
 
     # ==============================================
 
+    # Turned off time interpolation of scalar fields
+    # TODO: Implement a switch for turning it on again if wanted
     def update(self, t):
         """Update the fields to time step t"""
-        # dt = self.dt
-        # steps = self.steps
-        # fieldnr = self._fieldnr
-        # self.time += self.dt  # et tidsteg for tidlig ??
-        # print('forcing-update: tid = ', self.time)
+
+        # Read from config
+        interpolate_velocity_in_time = True
+        interpolate_ibm_forcing_in_time = False
+
         logging.debug("Updating forcing, time step = {}".format(t))
         if t in self.steps:  # No time interpolation
             self.U = self.Unew
@@ -204,17 +195,21 @@ class ROMS_forcing:
                 self.Unew, self.Vnew = self._read_velocity(nextstep)
                 for name in self.ibm_forcing:
                     self[name+'new'] = self._read_field(name, nextstep)
-                # Kan slås sammen med testen øverst
-                self.dU = (self.Unew - self.U) / stepdiff
-                self.dV = (self.Vnew - self.V) / stepdiff
-                for name in self.ibm_forcing:
-                    self['d'+name] = (self[name+'new'] - self[name]) / stepdiff
+                if interpolate_velocity_in_time:
+                    self.dU = (self.Unew - self.U) / stepdiff
+                    self.dV = (self.Vnew - self.V) / stepdiff
+                if interpolate_ibm_forcing_in_time:
+                    for name in self.ibm_forcing:
+                        self['d'+name] = (
+                            (self[name+'new'] - self[name])/stepdiff)
 
-            self.U += self.dU
-            self.V += self.dV
-            # May suppose changes slowly, use value until new?
-            for name in self.ibm_forcing:
-                self[name] += self['d'+name]
+            # "Ordinary" time step (including self.steps+1)
+            if interpolate_velocity_in_time:
+                self.U += self.dU
+                self.V += self.dV
+            if interpolate_ibm_forcing_in_time:
+                for name in self.ibm_forcing:
+                    self[name] += self['d'+name]
 
     # --------------
 
@@ -243,9 +238,12 @@ class ROMS_forcing:
         U = self._nc.variables['u'][frame, :, self._grid.Ju, self._grid.Iu]
         V = self._nc.variables['v'][frame, :, self._grid.Jv, self._grid.Iv]
         # Scale if needed
+        # Assume offset = 0 for velocity
         if self.scaled['U']:
-            U = self.add_offset['U'] + self.scale_factor['U']*U
-            V = self.add_offset['U'] + self.scale_factor['U']*V
+            U = self.scale_factor['U']*U
+            V = self.scale_factor['U']*V
+            # U = self.add_offset['U'] + self.scale_factor['U']*U
+            # V = self.add_offset['U'] + self.scale_factor['U']*V
 
         # If necessary put U,V = zero on land and land boundaries
         # Stay as float32
@@ -255,7 +253,7 @@ class ROMS_forcing:
 
     def _read_field(self, name, n):
         """Read a 3D field"""
-        print("IBM-forcing:", name)
+        # print("IBM-forcing:", name)
         frame = self.frame_idx[n]
         F = self._nc.variables[name][frame, :, self._grid.J, self._grid.I]
         if self.scaled[name]:

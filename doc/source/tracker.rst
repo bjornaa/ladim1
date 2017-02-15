@@ -1,5 +1,5 @@
-TrackPart
-=========
+Tracker
+=======
 
 This is the physical particle tracking module for horizontal movement.
 Vertical movement (except staying between bottom and surface) is the
@@ -13,4 +13,4 @@ There are no public attributes
 One public method:
 
  - move_particles(grid, forcing, state): advect and diffuse the particles
-   horizontally, check for particles out-of-area or on land.
+   horizontally, check for landing or particles out-of-area.
