@@ -77,43 +77,49 @@ These properties can be used to extract the individual trajectories, if needed.
 Example CDL
 -----------
 
-Ta mer fullstendig eksempel, med super og age
 ::
 
   netcdf out {
   dimensions:
-	  particle_instance = UNLIMITED ; // (450 currently)
-	  particle = 240 ;
-	  time = 9 ;
+	    particle = 72000 ;
+	    particle_instance = UNLIMITED ; // (540000 currently)
+	    time = 13 ;
+
   variables:
-	  double time(time) ;
-		  time:long_name = "time" ;
-		  time:standard_name = "time" ;
-		  time:units = "seconds since 2015-03-31 13:00:00" ;
-	  int particle_count(time) ;
-		  particle_count:long_name = "number of particles in a given timestep" ;
-		  particle_count:ragged_row_count = "particle count at nth timestep" ;
-	  double release_time(particle) ;
-		  release_time:units = "seconds since 2015-03-31 13:00:00" ;
-		  release_time:long_name = "particle release time" ;
-	  int pid(particle_instance) ;
-		  pid:long_name = "particle identifier" ;
-	  float X(particle_instance) ;
-		  X:long_name = "particle X-coordinate" ;
-	  float Y(particle_instance) ;
-		  Y:long_name = "particle Y-coordinate" ;
-	  float Z(particle_instance) ;
-		  Z:long_name = "particle depth" ;
-		  Z:positive = "down" ;
-		  Z:units = "m" ;
-		  Z:standard_name = "depth_below_surface" ;
+	    double time(time) ;
+		      time:long_name = "time" ;
+		      time:standard_name = "time" ;
+		      time:units = "seconds since 2015-04-01T00:00:00.000000" ;
+	    long particle_count(time) ;
+		      particle_count:long_name = "number of particles in a given timestep" ;
+		      particle_count:ragged_row_count = "particle count at nth timestep" ;
+	    double release_time(particle) ;
+		      release_time:units = "seconds since 2015-04-01T00:00:00.000000" ;
+		      release_time:long_name = "particle release time" ;
+	    long farmid(particle) ;
+		      farmid:long_name = "fish farm location number" ;
+	    long pid(particle_instance) ;
+		      pid:long_name = "particle identifier" ;
+	    float X(particle_instance) ;
+		      X:long_name = "particle X-coordinate" ;
+	    float Y(particle_instance) ;
+		      Y:long_name = "particle Y-coordinate" ;
+	    float Z(particle_instance) ;
+		      Z:standard_name = "depth_below_surface" ;
+		      Z:positive = "down" ;
+		      Z:units = "m" ;
+		      Z:long_name = "particle depth" ;
+	    float super(particle_instance) ;
+		      super:long_name = "number of individuals in instance" ;
+	    float age(particle_instance) ;
+		      age:standard_name = "integral_of_sea_water_temperature_wrt_time" ;
+		      age:units = "Celcius days" ;
+		      age:long_name = "particle age in degree-days" ;
 
   // global attributes:
-		:Conventions = "CF-1.5" ;
-		:institution = "Institute of Marine Research" ;
-		:source = "Lagrangian Advection and DIffusion Model, python version" ;
-		:history = "Created by pyladim" ;
-		:date = "2017-01-24" ;
+	  	:Conventions = "CF-1.5" ;
+		  :institution = "Institute of Marine Research" ;
+		  :source = "Lagrangian Advection and DIffusion Model, python version" ;
+		  :history = "Created by pyladim" ;
+		  :date = "2017-02-15" ;
   }
-
-

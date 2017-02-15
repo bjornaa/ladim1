@@ -8,5 +8,6 @@ User Manual
   configuration
   release
   output
+  postprocessing
 
 How to use LADIM.

@@ -7,7 +7,7 @@ class ParticleFile(object):
 
     Attributes:
       nc - The underlying netCDF4 Dataset
-      ntimes - Number of time frames in the file
+      num_times - Number of time frames in the file
       variables - List of instance variables
       particle_variables - List of particle variables
 
@@ -53,13 +53,24 @@ class ParticleFile(object):
         count = self._count[n]
         return self.nc.variables[name][start:start+count]
 
-    def __getitem__(self, name, n):
-        if name in self.variables:
+    # Med dette virker pf['temp', 3]
+    # Ønsker også pf['temp'] (hva er den)
+    # og pf['temp', 3, 10] = pf['temp', 3][10]
+    def __getitem__(self, v):
+        print(v)
+        name, *val = v
+        print(name, val)
+        if len(val) == 1:
+            return self._get_variable(name, val)
+        if len(val) == 2:
+            return self.get_variables(name, val[0])[val[1]]
+
+        # if name in self.variables:
             # n = time frame
-            return self._get_variable(name, n)
-        elif name in self.particle_variables:
+        #    return self._get_variable(name, time)
+        # elif name in self.particle_variables:
             # n = pid
-            return self.nc.variables[name][n]
+        #    return self.nc.variables[name][n]
 
     # Alternativ: gi en default verdi om ikke aktiv
     #    Evt. raise exception
