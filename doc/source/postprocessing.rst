@@ -11,7 +11,7 @@ by the following lines::
   ...
   pf = ParticleFile('ladim-output.nc')
 
-It has the following attributes:
+It has the following **attributes**:
 
 nc
   The underlying netCDF4 Dataset
@@ -22,7 +22,7 @@ variables
 particle_variables
   List of particle variables
 
-And methods:
+And **methods**:
 
 time(n)
   Timestamp (yyyy-mm-hh hh:mm:ss) of the n-th time frame
@@ -31,5 +31,18 @@ particle_count(n)
 position(n)
   Position (X and Y) of particle-distibution at n-th time time
 
-Det under er feil
-variables(name, n) - Value of the variable at time frame
+**Item notation** with pf as a ParticleFile instance:
+
+- name = instance variable
+
+  - pf[name, time_idx] returns values at time frame time_idx
+
+  - pf[name, time_idx, i] shorthand for pf[name, time_idx][i]
+
+- name = particle variable
+
+  - pf[name] returns all values
+
+  - pf[name, pid] is shorthand for pf[name][pid]
+
+For example: pf.position(4) returns the tuple (pf['X', 4], pf['Y', 4])

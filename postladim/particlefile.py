@@ -53,17 +53,35 @@ class ParticleFile(object):
         count = self._count[n]
         return self.nc.variables[name][start:start+count]
 
-    # Med dette virker pf['temp', 3]
-    # Ønsker også pf['temp'] (hva er den)
-    # og pf['temp', 3, 10] = pf['temp', 3][10]
+    # name = instance variable
+    #   pf[name, time_idx] returns values at time frame time_idx
+    #   pf[name, time_idx, i] shorthand for pf[name, time_idx][i]
+    # name = particle variable
+    #   pf[name] returns all values
+    #   pf[name, pid] is shorthand for pf[name][pid]
     def __getitem__(self, v):
-        print(v)
-        name, *val = v
-        print(name, val)
-        if len(val) == 1:
-            return self._get_variable(name, val)
-        if len(val) == 2:
-            return self.get_variables(name, val[0])[val[1]]
+        nargs = len(v)
+        if isinstance(v, str):
+            name = v
+            nargs = 1
+        else:
+            name = v[0]
+        if name in self.variables:
+            if nargs == 2:
+                return self._get_variable(name, v[1])
+            elif nargs == 3:
+                return self._get_variable(name, v[1])[v[2]]
+            else:
+                raise KeyError('Must have 2 or 3 indices')
+        elif name in self.particle_variables:
+            if nargs == 1:
+                return self.nc.variables[name][:]
+            elif nargs == 2:
+                return self.nc.variables[name][v[1]]
+            else:
+                raise KeyError('Must have 1 or 2 indices')
+        else:
+            raise KeyError(name)
 
         # if name in self.variables:
             # n = time frame
