@@ -1,7 +1,5 @@
-Grid module
-===========
-
-[document module or class?]
+:mod:grid --- The ladim grid module
+===================================
 
 The grid module defines the coordinate system and provide methods for
 interfacing the grid.
@@ -30,20 +28,27 @@ Vertical coordinate system
 The vertical coordinate system is simply the depth in meters, with positive
 values downwards.
 
-Grid class
-----------
+:class:`grid`
+-------------
 
-The grid is defined by a class having the following public attributes and methods.
+The grid is defined by a class having the following public **attributes**.
 
-- imax, jmax Number of grid cells in X and Y direction (needed outside?)
-- H: the bathymetry [meters]
-- M: sea mask (= 1 at sea, = 0 at land)
+``imax``, ``jmax``
+    Number of grid cells in X and Y direction (needed outside?)
+``H``
+    The bathymetry [meters]
+``M``
+    Sea mask (= 1 at sea, = 0 at land)
 
-A set of methods, taking positional arrays X, Y as input
+And a set of **methods**, taking positional arrays ``X``, ``Y`` as input
 
-- sample_metric(X, Y):  returns :math:`Delta x` and  :math:`Delta y`
- at the positions
-- sample_depth(X, Y):  returns the depth at the positions
-- lonlat(X, Y): returns lon/lat of positions [degrees]
-- ingrid(X, Y): returns True for positions inside the grid
-- atsea(X, Y): returns True for positions at sea (not on land)
+``sample_metric(X, Y)``
+    returns :math:`\Delta x` and  :math:`\Delta y` at the positions
+``sample_depth(X, Y)``
+    returns the depth at the positions
+``lonlat(X, Y)``
+    returns lon/lat of positions [degrees]
+``ingrid(X, Y)``
+    returns True for positions inside the grid
+``atsea(X, Y)``
+    returns True for positions at sea (not on land)

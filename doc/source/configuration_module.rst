@@ -7,7 +7,7 @@ and flexibility in the sequence of keywords, missing or extra keyweord,
 
 The Configuration class has no public methods, so it is basically
 a dictionary. It supports both dictionary and attribute type access,
-that is config['dt'] is equivalent to config.dt.
+that is ``config['dt']`` is equivalent to ``config.dt``.
 This is useful for IBM_variables, where the variable names are flexible.
 
 Mandatory attributes
@@ -16,11 +16,11 @@ Mandatory attributes
  - reference_time: for output "time-units since reference_time"
 
  - grid_file
- - input_file  # rename to forcing_file
+ - forcing_file
  - particle_release_file
  - output_file
 
- - Grid class   # presntly only ROMS type
+ - Grid class   # presently only ROMS type
  - attributes for Grid class, ROMS: subgrid and Vinfo
 
  - ibm_variables
