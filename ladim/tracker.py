@@ -29,7 +29,8 @@ class Tracker:
         """Move the particles"""
 
         X, Y = state.X, state.Y
-        self.pm, self.pn = grid.sample_metric(X, Y)
+        dx, dy = grid.sample_metric(X, Y)
+        self.dx, self.dy = dx, dy
         dt = self.dt
         self.num_particles = len(X)
 
@@ -51,8 +52,8 @@ class Tracker:
         # --- Move the particles
 
         # New position, if OK
-        X1 = X + U * self.pm * dt
-        Y1 = Y + V * self.pn * dt
+        X1 = X + U * dt / dx
+        Y1 = Y + V * dt / dy
 
         # Land, boundary treatment. Do not move the particles
         # Consider a sequence of different actions
@@ -81,11 +82,10 @@ class Tracker:
 
         X, Y, Z = state['X'], state['Y'], state['Z']
         dt = self.dt
-        pm, pn = grid.sample_metric(X, Y)
 
         U, V = forcing.sample_velocity(X, Y, Z)
-        X1 = X + 0.5 * U * pm * dt
-        Y1 = Y + 0.5 * V * pn * dt
+        X1 = X + 0.5 * U * dt / self.dx
+        Y1 = Y + 0.5 * V * dt / self.dy
 
         U, V = forcing.sample_velocity(X1, Y1, Z, tstep=0.5)
         return U, V
@@ -95,19 +95,19 @@ class Tracker:
 
         X, Y, Z = state['X'], state['Y'], state['Z']
         dt = self.dt
-        pm, pn = grid.sample_metric(X, Y)
+        dx, dy = self.dx, self.dy
 
         U1, V1 = forcing.sample_velocity(X, Y, Z, tstep=0.0)
-        X1 = X + 0.5 * U1 * pm * dt
-        Y1 = Y + 0.5 * V1 * pn * dt
+        X1 = X + 0.5 * U1 * dt / dx
+        Y1 = Y + 0.5 * V1 * dt / dy
 
         U2, V2 = forcing.sample_velocity(X1, Y1, Z, tstep=0.5)
-        X2 = X + 0.5 * U2 * pm * dt
-        Y2 = Y + 0.5 * V2 * pn * dt
+        X2 = X + 0.5 * U2 * dt / dx
+        Y2 = Y + 0.5 * V2 * dt / dy
 
         U3, V3 = forcing.sample_velocity(X2, Y2, Z, tstep=0.5)
-        X3 = X + U3 * pm * dt
-        Y3 = Y + V3 * pn * dt
+        X3 = X + U3 * dt / dx
+        Y3 = Y + V3 * dt / dy
 
         U4, V4 = forcing.sample_velocity(X3, Y3, Z, tstep=1.0)
 

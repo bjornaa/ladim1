@@ -121,8 +121,8 @@ class Grid:
         self.M = ncid.variables['mask_rho'][self.J, self.I].astype(int)
         # self.Mu = ncid.variables['mask_u'][self.Ju, self.Iu]
         # self.Mv = ncid.variables['mask_v'][self.Jv, self.Iv]
-        self.pm = ncid.variables['pm'][self.J, self.I]
-        self.pn = ncid.variables['pn'][self.J, self.I]
+        self.dx = 1./ncid.variables['pm'][self.J, self.I]
+        self.dy = 1./ncid.variables['pn'][self.J, self.I]
         self.lon = ncid.variables['lon_rho'][self.J, self.I]
         self.lat = ncid.variables['lat_rho'][self.J, self.I]
 
@@ -157,7 +157,7 @@ class Grid:
         J = Y.round().astype(int) - self.j0
 
         # Metric is conform for PolarStereographic
-        A = self.pm[J, I]
+        A = self.dx[J, I]
         return A, A
 
     def sample_depth(self, X, Y):
