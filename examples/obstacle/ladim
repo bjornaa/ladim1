@@ -4,8 +4,7 @@ import sys
 # from netCDF4 import num2date
 
 from ladim.configuration import Configure
-from ladim.gridforce_ROMS import Grid, Forcing
-from ladim.forcing import ROMS_forcing
+from gridforce_analytic import Grid, Forcing
 from ladim.release import ParticleReleaser
 from ladim.state import State
 from ladim.output import OutPut
@@ -14,6 +13,7 @@ from ladim.output import OutPut
 # Initiate the model
 # ==================
 
+
 # --- Configuration ---
 if len(sys.argv) > 1:   # configuration file from command line
     config_file = sys.argv[1]
@@ -21,13 +21,12 @@ else:
     config_file = 'ladim.yaml'
 config = Configure(config_file)
 
-
 # numsteps = config.numsteps
 # dt = config.dt
 
 # --- Initiate the grid and the forcing ---
-grid = Grid(config)
-forcing = Forcing(config, grid)
+grid = Grid()
+forcing = Forcing()
 
 # --- Initiate particle releaser ---
 releaser = ParticleReleaser(config)

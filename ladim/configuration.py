@@ -78,7 +78,7 @@ class Configure:
                      self.numsteps))
 
         # --- Grid ---
-        logging.info('Configuration: Grid')
+        logging.info('Configuration: gridforce')
         try:
             self.subgrid = conf['grid']['subgrid']
         except (KeyError, TypeError):
