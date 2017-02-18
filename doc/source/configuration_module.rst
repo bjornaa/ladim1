@@ -1,44 +1,74 @@
-Configuration class
-===================
+:mod:`configuration` --- LADIM Configuration
+============================================
 
-LADIM's configuration system uses the pyyaml package to read the
+.. module:: configuration
+   :synopsis: LADIM configuration
+
+LADIM's configuration system uses the :mod:`pyyaml` package to read the
 configuration file. This allows comments, nested keywords,
 and flexibility in the sequence of keywords, missing or extra keyweord,
 
 The Configuration class has no public methods, so it is basically
 a dictionary. It supports both dictionary and attribute type access,
 that is ``config['dt']`` is equivalent to ``config.dt``.
-This is useful for IBM_variables, where the variable names are flexible.
+This is useful for IBM variables, where the variable names are flexible.
 
-Mandatory attributes
- - start_time
- - stop_time
- - reference_time: for output "time-units since reference_time"
+.. class:: Configure()
 
- - grid_file
- - forcing_file
- - particle_release_file
- - output_file
+   Mandatory attributes
 
- - Grid class   # presently only ROMS type
- - attributes for Grid class, ROMS: subgrid and Vinfo
+   .. attribute:: start_time
+   .. attribute:: stop_time
+   .. attribute:: reference_time
 
- - ibm_variables
- - IBM class
- - attributes for IBM class
+      for output "time-units since reference_time"
 
- - release_format:  Format for a release line
- - release_dtype:  The type of the entries in the release line
- - particle_variables: The particle variables in the release
-      [name is too general]
+   .. attribute:: grid_file
+   .. attribute:: forcing_file
+   .. attribute:: particle_release_file
+   .. attribute:: output_file
 
- - velocity:  mapping specifying velocity names
- - ibm_forcing:  mapping specifying ibm input names
+   .. attribute:: Grid class
 
- - output_period
- - output_variables
+   attributes for Grid class, ROMS: subgrid and Vinfo
 
- - dt
- - advection: EF, RK2 or RK4
- - diffusion: Logical switch for horizontal diffusion
- - diffusion_coefficient: only needed if diffusion = True
+   .. attribute:: ibm_variables
+   .. attribute:: IBM class
+
+   attributes for IBM class
+
+   .. attribute:: release_format
+
+      Format for a release line
+
+   .. attribute:: release_dtype
+
+      The types of the entries in the release line
+
+   .. attribute:: particle_variables:
+
+      The particle variables in the release  [name is too general]
+
+   .. attribute:: velocity
+
+      Mapping specifying velocity names
+
+   .. attribute:: ibm_forcing
+
+      Mapping specifying ibm input names
+
+   .. attribute:: output_period
+   .. attribute:: output_variables
+
+   .. attribute:: dt
+   .. attribute:: advection
+
+      EF, RK2 or RK4
+
+   .. attribute:: diffusion
+
+      Logical switch for horizontal diffusion
+
+   .. attribute:: diffusion_coefficient
+
+      Only needed if diffusion = True

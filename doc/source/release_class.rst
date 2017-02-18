@@ -1,19 +1,30 @@
-Release module
-==============
+:mod:`release` --- Particle release
+===================================
 
-During initialization, this class has the responsibility to
+.. module:: release
+   :synopsis: Release of new particles
+
+During initialization, the :class:`ParticleRelease` class has the responsibility to
 warn about any mismatches in timing between the simulation
 and particle release.
 
 The total number of particles that will be involved in the
 simulation is computed up-front and exported to the configuration
 as config.total_particle_count.
+[Do something better]
 
-Public attributes are: [need only one of these]
+.. class:: ParticleRelease(config)
 
-  - release_steps: List of time steps with particle release.
-  - release_times: Timestrings of particle release times
+   Public attributes are: [need only one of these]
 
-It is implemented as an iterator. The __next__ method,
+  .. attribute:: release_steps
+
+     List of time steps with particle release.
+
+  .. attribute:: release_times
+
+     Timestrings of particle release times
+
+It is implemented as an iterator. The :meth:`__next__` method,
 returns a dictionary of release information to be used by
 the State class' append method.

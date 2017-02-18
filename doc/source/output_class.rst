@@ -1,20 +1,28 @@
-Output module
-=============
+:mod:`output` --- NetCDF output of particle distributions
+=========================================================
 
-The output Class is responsible for the NetCDF output from the
-simulation. It is used sequentually, saving the selected part of
-the state at regular intervals.
+.. module:: output_file
+   :synopsis: NetCDF output of particle distributions
 
-Initially it defines the NetCDF output file.
+The :class:`OutPut` class is responsible for the NetCDF output from the
+simulation. Initially it defines the NetCDF output file. It is used
+sequentually, saving the selected part of the state at regular intervals.
 
-It has two methods:
+.. class:: OutPut(config)
 
-  - write(state): Writes the selected state variables to file
-  - write_particle_variables(release): Writes particle variables
+   The class has two methods:
 
-Here particle variables are things like, release time, release position,
-that does not change with time.
+   .. method:: write(state)
 
-Note that the pid is by definition a particle variable, but it is
-used as a state variable to identify the particle of an instance.
+      Saves the selected state variables.
+
+   .. method:: write_particle_variables(release)
+
+      Writes the selected particle variables.
+
+Here particle variables are things like, ``release time``,
+``release position``, that belongs to a particle and does not change with time.
+
+Note that the ``pid`` is by definition a particle variable, but it is
+used as an instance variable to identify the particle of an instance.
 It works as the index of the particle variables.

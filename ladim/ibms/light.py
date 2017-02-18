@@ -81,6 +81,7 @@ def surface_light(dtime, lon, lat):
 
     return slight
 
+
 if __name__ == '__main__':
 
     dtime = np.datetime64('2014-06-23 12')

@@ -10,7 +10,6 @@ The fundamental data structure is the same, so cripts should be easy to modify.
 The change is done to follow the CF-standard
 as far as possible, and to increase flexibility.
 
-
 For particle tracking the CF-standard defines a format for
 "Indexed ragged array representation of trajectories". This is not suitable
 for our purpose since we are more interested in the geographical distribution

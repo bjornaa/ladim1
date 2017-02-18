@@ -1,11 +1,11 @@
-LADIM Components
-================
+LADIM Modules
+=============
 
 This chapter describes briefly the present implementation
 of LADIM. The code is modular and flexible with classes
 that can be modified or replaced for different purposes.
 
-The descriptions tries the requierements of the classes
+The descriptions tries the requirements of the classes
 from the rest of the system, hopefully being helpful for
 developing alternative classes for use systems.
 
@@ -17,15 +17,14 @@ be written separately.
    :width: 500
 
    The LADIM "eco"-system; the connections between the
-   components.
+   modules.
 
 .. toctree::
    :maxdepth: 2
 
    configuration_module.rst
-   grid.rst
+   gridforce.rst
    release_class.rst
-   forcing.rst
    state.rst
    tracker.rst
    IBM_class.rst

@@ -28,7 +28,7 @@ class IBM:
         state.super *= self.mortality_factor
 
         # Age in degree-days
-        temp = forcing.sample_field(state.X, state.Y, state.Z, 'temp')
+        temp = forcing.field(state.X, state.Y, state.Z, 'temp')
         state.age += temp * state.dt / 86400
 
         # Light at depth
@@ -41,7 +41,7 @@ class IBM:
         # Upwards if light enough (decreasing depth)
         W[Eb >= 0.01] = - self.swim_vel
         # Downwards if salinity < 20
-        salt = forcing.sample_field(state.X, state.Y, state.Z, 'salt')
+        salt = forcing.field(state.X, state.Y, state.Z, 'salt')
         W[salt < 20] = self.swim_vel
 
         # Random diffusion velocity
@@ -51,6 +51,6 @@ class IBM:
 
         # Update vertical position, using reflextive boundary condition
         state.Z += W * self.dt
-        
+
         # Mark particles older than 200 degree days as dead
         state.alive = state.age < 200
