@@ -8,6 +8,7 @@ User Manual
   configuration
   release
   output
+  workflow
   postprocessing
 
 How to use LADIM.

@@ -1,3 +1,7 @@
+.. _installation:
+
+.. index:: installation
+
 Installation
 ============
 
@@ -10,7 +14,7 @@ If it is installed you will get the reply::
   ERROR - Configuration file ladim.yaml not found
 
 If it is not installed, or the system version is old, you can
-make a private install under your oser.
+make a private install under your user.
 
 TODO: Implement version information as ``ladim --version``
 

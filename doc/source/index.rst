@@ -17,7 +17,7 @@ LADIM documentation
 
    intro.rst
    manual.rst
-   components.rst
+   modules.rst
 
 
 

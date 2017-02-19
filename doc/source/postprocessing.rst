@@ -11,25 +11,38 @@ by the following lines::
   ...
   pf = ParticleFile('ladim-output.nc')
 
-It has the following **attributes**:
 
-nc
-  The underlying netCDF4 Dataset
-num_times
-  Number of time frames in the file
-variables
-  List of instance variables
-particle_variables
-  List of particle variables
+.. class:: ParticleFile(particle_file)
 
-And **methods**:
+   It has the following **attributes**:
 
-time(n)
-  Timestamp (yyyy-mm-hh hh:mm:ss) of the n-th time frame
-particle_count(n)
-  Number of particles at n-th time frame
-position(n)
-  Position (X and Y) of particle-distibution at n-th time time
+  .. attribute:: nc
+
+     The underlying netCDF4 Dataset.
+
+  .. attribute:: num_times
+
+     Number of time frames in the file.
+
+  .. attribute:: variables
+
+     List of instance variables.
+
+  .. attribute:: particle_variables
+
+     List of particle variables.
+
+  .. method:: time(n)
+
+     Timestamp (yyyy-mm-hh hh:mm:ss) of the n-th time frame.
+
+  .. method:: particle_count(n)
+
+     Number of particles at n-th time frame.
+
+  .. method:: position(n)
+
+     Position (X and Y) of particle-distibution at n-th time time.
 
 **Item notation** with pf as a ParticleFile instance:
 

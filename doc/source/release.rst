@@ -47,3 +47,7 @@ Alternatively a better format might be developed.
 
 For time the point is that the clock part should not be interpreted as
 the X-coordinate. An alternative would be to use a comma-separated format (csv)
+
+.. seealso::
+  Module :mod:`release`
+    Documentation of the :mod:`release` module

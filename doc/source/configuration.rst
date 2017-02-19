@@ -29,7 +29,9 @@ Main configuration may just state which IBM module to use,
 and the name of the IBM configuration file.
 
 
-
+.. seealso::
+  Module :mod:`configuration`
+    Documentation of the :mod:`configuration` module
 
 An example configuration file
 -----------------------------

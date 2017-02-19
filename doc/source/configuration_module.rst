@@ -1,3 +1,5 @@
+.. configuration:
+
 :mod:`configuration` --- LADIM Configuration
 ============================================
 

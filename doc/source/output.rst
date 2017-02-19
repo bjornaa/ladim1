@@ -52,6 +52,10 @@ In MATLAB the code is::
   count = particle_count(n+1)
   X = ncread(particle_file, 'X', start, count)
 
+.. seealso::
+
+  Module :mod:`output`
+    Documentation of the :mod:`output` module.
 
 Particle identifier
 -------------------

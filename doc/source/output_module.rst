@@ -1,7 +1,7 @@
 :mod:`output` --- NetCDF output of particle distributions
 =========================================================
 
-.. module:: output_file
+.. module:: output
    :synopsis: NetCDF output of particle distributions
 
 The :class:`OutPut` class is responsible for the NetCDF output from the

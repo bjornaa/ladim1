@@ -185,7 +185,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'ladim.tex', u'LADIM Documentation',
-   u'Bjørn Ådlandsvik', 'manual'),
+   r'Bjørn Ådlandsvik\\Institute of Marine Research', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

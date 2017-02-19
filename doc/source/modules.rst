@@ -24,8 +24,8 @@ be written separately.
 
    configuration_module.rst
    gridforce.rst
-   release_class.rst
+   release_module.rst
    state.rst
    tracker.rst
-   IBM_class.rst
-   output_class.rst
+   IBM_module.rst
+   output_module.rst
