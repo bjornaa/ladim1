@@ -73,7 +73,7 @@ class Tracker:
         # dt = self.dt
         # pm, pn = grid.sample_metric(X, Y)
 
-        U, V = forcing.sample_velocity(X, Y, Z)
+        U, V = forcing.velocity(X, Y, Z)
 
         return U, V
 
@@ -83,11 +83,11 @@ class Tracker:
         X, Y, Z = state['X'], state['Y'], state['Z']
         dt = self.dt
 
-        U, V = forcing.sample_velocity(X, Y, Z)
+        U, V = forcing.velocity(X, Y, Z)
         X1 = X + 0.5 * U * dt / self.dx
         Y1 = Y + 0.5 * V * dt / self.dy
 
-        U, V = forcing.sample_velocity(X1, Y1, Z, tstep=0.5)
+        U, V = forcing.velocity(X1, Y1, Z, tstep=0.5)
         return U, V
 
     def RK4(self, grid, forcing, state):
@@ -97,19 +97,19 @@ class Tracker:
         dt = self.dt
         dx, dy = self.dx, self.dy
 
-        U1, V1 = forcing.sample_velocity(X, Y, Z, tstep=0.0)
+        U1, V1 = forcing.velocity(X, Y, Z, tstep=0.0)
         X1 = X + 0.5 * U1 * dt / dx
         Y1 = Y + 0.5 * V1 * dt / dy
 
-        U2, V2 = forcing.sample_velocity(X1, Y1, Z, tstep=0.5)
+        U2, V2 = forcing.velocity(X1, Y1, Z, tstep=0.5)
         X2 = X + 0.5 * U2 * dt / dx
         Y2 = Y + 0.5 * V2 * dt / dy
 
-        U3, V3 = forcing.sample_velocity(X2, Y2, Z, tstep=0.5)
+        U3, V3 = forcing.velocity(X2, Y2, Z, tstep=0.5)
         X3 = X + U3 * dt / dx
         Y3 = Y + V3 * dt / dy
 
-        U4, V4 = forcing.sample_velocity(X3, Y3, Z, tstep=1.0)
+        U4, V4 = forcing.velocity(X3, Y3, Z, tstep=1.0)
 
         U = (U1 + 2*U2 + 2*U3 + U4) / 6.0
         V = (V1 + 2*V2 + 2*V3 + V4) / 6.0

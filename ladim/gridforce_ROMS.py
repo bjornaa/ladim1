@@ -448,7 +448,7 @@ class Forcing:
         self._nc.close()
 
     # def sample_velocity(self, X, Y, Z, tstep=0, method='bilinear'):
-    def sample_velocity(self, X, Y, Z, tstep=0, method='nearest'):
+    def velocity(self, X, Y, Z, tstep=0, method='nearest'):
 
         i0 = self._grid.i0
         j0 = self._grid.j0
@@ -461,7 +461,7 @@ class Forcing:
                               X-i0, Y-j0, K, A, method=method)
 
     # Simplify to grid cell
-    def sample_field(self, X, Y, Z, name):
+    def field(self, X, Y, Z, name):
         # should not be necessary to repeat
         i0 = self._grid.i0
         j0 = self._grid.j0
