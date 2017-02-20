@@ -85,8 +85,8 @@ class OutPut:
     def write(self, state):
         """Write the model state to NetCDF"""
 
-        logging.info("Writing: timestep, timestamp = {} {}".
-                     format(state.timestep, state.timestamp))
+        logging.debug("Writing: timestep, timestamp = {} {}".
+                      format(state.timestep, state.timestamp))
         t = self.outcount
         pcount = len(state)
         pstart = self.instance_count
