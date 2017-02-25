@@ -14,8 +14,8 @@ particle_file = 'station.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 100, 135
-j0, j1 = 80, 105
+i0, i1 = 100, 125
+j0, j1 = 84, 108
 
 # ----------------
 
@@ -57,18 +57,26 @@ plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 
 # Plot initial particle distribution
 X, Y = pf.position(0)
-particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+Z = pf['Z', 0]
+# particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+particle_dist = ax.scatter(X, Y, c=Z, cmap=plt.get_cmap('plasma_r'))
 # title = ax.set_title(pf.time(0))
-timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15,
+cb = plt.colorbar(particle_dist)
+cb.ax.invert_yaxis()
+cb.set_label('Depth', fontsize=14)
+
+
+timestamp = ax.text(0.01, 0.96, pf.time(0), fontsize=15,
                     transform=ax.transAxes)
 
 
 # Update function
 def animate(t):
     X, Y = pf.position(t)
-    particle_dist.set_data(X, Y)
+    particle_dist.set_offsets(np.vstack((X, Y)).T)
     timestamp.set_text(pf.time(t))
     return particle_dist, timestamp
+
 
 # Do the animation
 anim = FuncAnimation(fig, animate, frames=num_times, interval=20,
