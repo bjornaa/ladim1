@@ -25,7 +25,7 @@ files:
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: []
+    # ibm_variables: []
 
 particle_release:
     variables: [mult, release_time, X, Y, Z]
@@ -35,10 +35,13 @@ particle_release:
     farmid: int
     particle_variables: [release_time]
 
-forcing:
+gridforce:
+    # Gridforce module
+    module: ladim.gridforce.ROMS
+
     # mapping: model name -> name in input file
-    velocity: {U: u, V: v}
-    ibm_forcing: {}
+    # velocity: {U: u, V: v}
+    # ibm_forcing: {}
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d

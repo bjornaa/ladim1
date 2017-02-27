@@ -9,7 +9,7 @@ import numpy as np
 
 class Grid:
 
-    def __init__(self):
+    def __init__(self, config):
         km = 1000           # abbrev
         self.L = 100*km     # Length of channel [m]
         self.W = 50*km      # Width of channel [m]
@@ -51,7 +51,7 @@ class Grid:
 
 class Forcing:
 
-    def __init__(self, grid):
+    def __init__(self, config, grid):
         denom = ((grid.II-grid.X0)**2 + grid.JJ**2)**2 + 0.00001
         self.U = grid.U0 - grid.U0*grid.R**2*(
              (grid.II-grid.X0)**2 - grid.JJ**2) / denom

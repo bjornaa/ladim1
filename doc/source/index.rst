@@ -18,14 +18,14 @@ LADIM documentation
    intro.rst
    manual.rst
    modules.rst
+   implementation.rst
 
 
+.. only: html
 
+  Indices and tables
+  ==================
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+  * :ref:`genindex`
+  * :ref:`modindex`
+  * :ref:`search`

@@ -4,8 +4,7 @@ import sys
 # from netCDF4 import num2date
 
 from ladim.configuration import Configure
-from ladim.gridforce_ROMS import Grid, Forcing
-from ladim.forcing import ROMS_forcing
+from ladim.gridforce import Grid, Forcing
 from ladim.release import ParticleReleaser
 from ladim.state import State
 from ladim.output import OutPut

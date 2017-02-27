@@ -33,11 +33,9 @@ particle_release:
     farmid: int
     particle_variables: [release_time]
 
-forcing:
-    # mapping: model name -> name in input file
-    velocity: {U: u, V: v}
-    ibm_forcing: {}
-
+gridforce:
+    module: ladim.gridforce.ROMS
+  
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]

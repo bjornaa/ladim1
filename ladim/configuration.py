@@ -79,6 +79,8 @@ class Configure:
 
         # --- Grid ---
         logging.info('Configuration: gridforce')
+        self.gridforce_module = conf['gridforce']['module']
+        logging.info('    {:15s}: {}'.format('module', self.gridforce_module))
         try:
             self.subgrid = conf['grid']['subgrid']
         except (KeyError, TypeError):
@@ -87,6 +89,15 @@ class Configure:
         self.Vinfo = {}
         logging.info('    {:15s}: {}'.format('vertical information',
                                              self.Vinfo))
+
+        # --- Forcing ---
+        # self.velocity = conf['gridforce']['velocity']
+        # logging.info('    {:15s}: {}'.format('velocity', self.velocity))
+        try:
+            self.ibm_forcing = conf['gridforce']['ibm_forcing']
+        except (KeyError, TypeError):
+            self.ibm_forcing = []
+        logging.info('    {:15s}: {}'.format('ibm_forcing', self.ibm_forcing))
 
         # --- IBM ---
         try:
@@ -132,12 +143,6 @@ class Configure:
             self.ibm_variables = []
         logging.info('    ibm_variables: {}'.format(self.ibm_variables))
 
-        # --- Forcing ---
-        logging.info('Configuration: Forcing')
-        self.velocity = conf['forcing']['velocity']
-        logging.info('    {:15s}: {}'.format('velocity', self.velocity))
-        self.ibm_forcing = conf['forcing']['ibm_forcing']
-        logging.info('    {:15s}: {}'.format('ibm_forcing', self.ibm_forcing))
 
         # --- Output control ---
         logging.info('Configuration: Output Control')
@@ -199,6 +204,7 @@ class Configure:
 
     def __getitem__(self, key):
         return getattr(self, key)
+
 
 # # -------------
 # # Simple test

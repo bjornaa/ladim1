@@ -1,0 +1,6 @@
+LADIM implementation
+====================
+
+.. toctree::
+
+   variables
