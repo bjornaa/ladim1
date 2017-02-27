@@ -26,16 +26,14 @@ state:
     ibm_variables: []
 
 particle_release:
-    variables: [mult, release_time, X, Y, Z]
+    variables: [release_time, X, Y, Z]
     # Converters (if not float)
-    mult: int
     release_time: time
-    farmid: int
     particle_variables: [release_time]
 
 gridforce:
     module: ladim.gridforce.ROMS
-  
+
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]

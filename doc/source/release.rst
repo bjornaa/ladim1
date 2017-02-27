@@ -5,34 +5,38 @@ Particle release is controlled by a release file.
 This is a text file with one row per release location
 per time. The name of the release file is defined in the configuration file.
 
-The line has the following format with whitespace as delimiter::
+The format of the line is specified in the configuration by the
+list ``release_format``.
+Possible alternative, use a header line in the release file.
 
-   mult release_time X Y Z + any additional fields
+The line has the following mandatory fields:
 
-mult
-  the number of particles released in the event.
 release_time
-   should have the format yyyy-mm-ddThh:mm:ss.
+   Should have the format yyyy-mm-ddThh:mm:ss.
    The time format follows the `ISO 8601 standard <https://xkcd.com/1179>`_.
    The second and minutes can be dropped, but the `T` is essential.
    An alternative format, dropping the `T` is "yyyy-mm-dd hh:mm:ss"
    with double quotes.
 X
-  grid X-coordinate of the release position
+  Grid X-coordinate of the release position
 Y
-  grid Y-coordinate of the release position
+  Grid Y-coordinate of the release position
 Z
-  release depth in meters (positive downwards)
+  Release depth in meters (positive downwards)
+
+In addition the field ``mult`` is reveserved. If present should give the number
+of times the line should be repeated, for release of several particles at the
+same time and position. If ``mult`` is omitted, a default value of 1, single
+particle, is used.
 
 The additional variables should be specified in the configuration file.
 Unspecified data in the row is ignored (check)
 
 Example::
 
-  1 1989-05-24T12  68.117  94.989    5.0
+  3 1989-05-24T12  68.117  94.989    5.0
 
 Ta lakselus-eksempel med flere felt.
-
 
 Additional fields such as the number of superindividuals,
 an identifier for the release location, .... must be defined

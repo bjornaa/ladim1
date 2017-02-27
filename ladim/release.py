@@ -58,23 +58,28 @@ class ParticleReleaser:
 
         # På nytt, men lager dict av arrayer/lister
         V = dict()
+        print(config.release_format)
         for key in config.release_format:
             V[key] = []
+        if 'mult' not in config.release_format:
+            V['mult'] = []
 
         # --- Read the particle release file ---
 
         with open(config.particle_release_file) as f:
             for line in f:
                 w = line.split()
-                # Handle time format in two words, yyyy-mm-dd hh:mm:ss
-                if len(w) == len(config.release_format) + 1:
-                    w[1] = 'T'.join(w[1:3])
-                    w.pop(2)
                 for i, key in enumerate(config.release_format):
                     V[key].append(config.release_dtype[key](w[i]))
+                # If not mult present, mult = 1
+                if 'mult' not in config.release_format:
+                    V['mult'].append(1)
 
         for key in config.release_format:
             V[key] = np.array(V[key])
+        # Gjør dette mer elegant, definer en liste med mult i tillegg
+        if 'mult' not in config.release_format:
+            V['mult'] = np.array(V['mult'])
 
         # --- Fill in if continuous release ---
 
@@ -89,6 +94,9 @@ class ParticleReleaser:
                 W[key] = []
                 if key != 'release_time':
                     B[key] = []
+            if 'mult' not in config.release_format:
+                W['mult'] = []
+                B['mult'] = []
             count = 0  # Number of times to repeat
             utimes = np.unique(V['release_time'])
             for t in cont_times:
@@ -98,16 +106,21 @@ class ParticleReleaser:
                     for key in config.release_format:
                         if key != 'release_time':
                             B[key] = list(V[key][I])
+                    if 'mult' not in config.release_format:
+                        B['mult'] = list(V['mult'][I])
                 W['release_time'].extend(count*[t])
 
                 for key in config.release_format:
                     if key != 'release_time':
                         W[key].extend(B[key])
+                if 'mult' not in config.release_format:
+                    W['mult'].extend(B['mult'])
 
             for key in config.release_format:
                 W[key] = np.array(W[key])
             V = W
 
+        V['mult'] = np.asarray(V['mult'])
         self.release_data = V
         self.times = V['release_time']
 
@@ -144,7 +157,7 @@ class ParticleReleaser:
         rel_time = rel_time.astype('m8[s]').astype('int')  # Convert to seconds
         self.unique_steps = rel_time // config.dt
 
-        config.total_particle_count = self.release_data['mult'].sum()
+        config.total_particle_count = sum(self.release_data['mult'])
         logging.info('Total number of particles in simulation: {}'.
                      format(config.total_particle_count))
 
