@@ -60,6 +60,5 @@ particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 plt.xticks([])
 plt.yticks([])
 
-
 plt.savefig('logo.png', dpi=200, bbox_inches='tight')
 plt.show()

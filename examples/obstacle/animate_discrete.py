@@ -1,38 +1,37 @@
+# import itertools
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from postladim.particlefile import ParticleFile
+from gridforce_discrete import Grid
 
-# Files
+# Input file
 particle_file = 'obstacle.nc'
 
-imax, jmax = 100, 50
-km = 1000
-L = imax*km
-R = 0.32
-X0 = 0.5*imax
+# Get the grid information
+grid = Grid()
 
-# Cell centers and boundaries
-# Xcell = np.arange(0, imax+1)
-# Ycell = np.arange(1, jmax)
-# Xb = np.arange(0.5, i1)
-# Yb = np.arange(j0-0.5, j1)
-
-# particle_file
+# Open the particle_file
 pf = ParticleFile(particle_file)
 num_times = pf.num_times
 
 # Set up the plot area
 fig = plt.figure(figsize=(12, 8))
-ax = plt.axes(xlim=(0, imax), ylim=(0, jmax), aspect='equal')
+ax = plt.axes(xlim=(0, grid.imax), ylim=(0, grid.jmax), aspect='equal')
 
-# Plot the semicircular obstacle
-circle = plt.Circle((X0, 0), R*jmax, color='g')
-ax.add_artist(circle)
+# Landmask
+Xb = np.arange(-0.5, grid.imax)
+Yb = np.arange(-0.5, grid.jmax)
+constmap = plt.matplotlib.colors.ListedColormap([0.2, 0.6, 0.4])
+M = np.ma.masked_where(grid.M > 0, grid.M)
+plt.pcolormesh(Xb, Yb, M, cmap=constmap)
+# Draw the cirular boundary
+T = np.linspace(0, np.pi)
+plt.plot(grid.X0 + grid.R*np.cos(T), grid.R*np.sin(T), color='black', )
 
 # Plot initial particle distribution
 X, Y = pf.position(0)
 particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0.5, lw=0.5)
-# title = ax.set_title(pf.time(0))
 time0 = pf.time(0)   # Save start-time
 timestr = "00:00"
 timestamp = ax.text(0.02, 0.93, timestr, fontsize=16,

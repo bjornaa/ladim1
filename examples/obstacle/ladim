@@ -4,7 +4,8 @@ import sys
 # from netCDF4 import num2date
 
 from ladim.configuration import Configure
-from gridforce_analytic import Grid, Forcing
+# from gridforce_analytic import Grid, Forcing
+from gridforce_discrete import Grid, Forcing
 from ladim.release import ParticleReleaser
 from ladim.state import State
 from ladim.output import OutPut
@@ -26,7 +27,7 @@ config = Configure(config_file)
 
 # --- Initiate the grid and the forcing ---
 grid = Grid()
-forcing = Forcing()
+forcing = Forcing(grid)
 
 # --- Initiate particle releaser ---
 releaser = ParticleReleaser(config)
