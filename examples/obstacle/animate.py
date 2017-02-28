@@ -1,21 +1,18 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from postladim.particlefile import ParticleFile
+from gridforce_analytic import Grid
 
-# Files
+# Particle file
 particle_file = 'obstacle.nc'
 
-imax, jmax = 100, 50
-km = 1000
-L = imax*km
-R = 0.32
-X0 = 0.5*imax
+# Get the grid information
+grid = Grid(None)
 
-# Cell centers and boundaries
-# Xcell = np.arange(0, imax+1)
-# Ycell = np.arange(1, jmax)
-# Xb = np.arange(0.5, i1)
-# Yb = np.arange(j0-0.5, j1)
+imax, jmax = grid.imax, grid.jmax
+# L = grid.L
+R = grid.R
+X0 = grid.X0
 
 # particle_file
 pf = ParticleFile(particle_file)
@@ -26,7 +23,7 @@ fig = plt.figure(figsize=(12, 8))
 ax = plt.axes(xlim=(0, imax), ylim=(0, jmax), aspect='equal')
 
 # Plot the semicircular obstacle
-circle = plt.Circle((X0, 0), R*jmax, color='g')
+circle = plt.Circle((X0, 0), R, color='g')
 ax.add_artist(circle)
 
 # Plot initial particle distribution

@@ -15,8 +15,8 @@ class Grid:
         self.W = 50*km      # Width of channel [m]
         self.dx = 1*km      # Grid spacing along channel [m]
         self.dy = 1*km      # Grid spacing cross channel [m]
-        X0 = 0.5*self.L          # Center location of peninsular obstacle [m]
-        R = 0.32*self.W          # Radius of peninsular obstacle [m]
+        X0 = 0.5*self.L     # Center location of peninsular obstacle [m]
+        R = 0.32*self.W     # Radius of peninsular obstacle [m]
         self.H = 100        # Depth of channel [m]
         self.U0 = 1         # Undisturbed along-channel velocity [m/s]
 

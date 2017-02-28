@@ -36,7 +36,8 @@ particle_release:
     particle_variables: [release_time]
 
 gridforce:
-    module: gridforce_discrete
+    module: gridforce_analytic
+    #module: gridforce_discrete
     # mapping: model name -> name in input file
     # velocity: {U: u, V: v}
     # ibm_forcing: {}

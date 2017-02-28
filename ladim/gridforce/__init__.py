@@ -54,8 +54,8 @@ class Forcing:
         gridforce_module = importlib.import_module(config.gridforce_module)
         self.forcing = gridforce_module.Forcing(config, grid.grid)
         # self.steps = self.forcing.steps
-        self.U = self.forcing.U
-        self.V = self.forcing.V
+        # self.U = self.forcing.U
+        # self.V = self.forcing.V
 
     def update(self, t):
         return self.forcing.update(t)

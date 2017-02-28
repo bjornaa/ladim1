@@ -15,7 +15,6 @@ import yaml
 
 
 class Configure:
-
     def __init__(self, config_file, loglevel=logging.WARNING):
 
         # --- Read the configuration file ---
@@ -73,9 +72,9 @@ class Configure:
         self.numsteps = self.simulation_time // self.dt
         logging.info('    {:15s}: {} seconds'.format('dt', self.dt))
         logging.info('    {:15s}: {} hours'.format('simulation time',
-                     self.simulation_time // 3600))
+                                                   self.simulation_time // 3600))
         logging.info('    {:15s}: {}'.format('number of time steps',
-                     self.numsteps))
+                                             self.numsteps))
 
         # --- Grid ---
         logging.info('Configuration: gridforce')
@@ -122,7 +121,7 @@ class Configure:
             self.release_frequency = np.timedelta64(
                 *tuple(prelease['release_frequency']))
             logging.info('        {:11s}: {}'.format(
-                        'release_frequency', str(self.release_frequency)))
+                'release_frequency', str(self.release_frequency)))
         self.release_format = conf['particle_release']['variables']
         self.release_dtype = dict()
         # Map from str to converter
@@ -143,14 +142,13 @@ class Configure:
             self.ibm_variables = []
         logging.info('    ibm_variables: {}'.format(self.ibm_variables))
 
-
         # --- Output control ---
         logging.info('Configuration: Output Control')
         outper = np.timedelta64(*tuple(conf['output_variables']['outper']))
         outper = outper.astype('m8[s]').astype('int') // self['dt']
         self.output_period = outper
         logging.info('    {:15s}: {} timesteps'.format(
-                    'output_period', self.output_period))
+            'output_period', self.output_period))
         self.num_output = 1 + self.numsteps // self.output_period
         logging.info('    {:15s}: {}'.format('numsteps', self.numsteps))
         self.output_particle = conf['output_variables']['particle']
@@ -165,14 +163,14 @@ class Configure:
             self.nc_attributes[name] = conf['output_variables'][name]
         logging.info('    particle variables')
         for name in self.output_particle:
-            logging.info(8*' ' + name)
+            logging.info(8 * ' ' + name)
             for item in self.nc_attributes[name].items():
-                logging.info(12*' ' + '{:11s}: {:s}'.format(*item))
+                logging.info(12 * ' ' + '{:11s}: {:s}'.format(*item))
         logging.info('    particle instance variables')
         for name in self.output_instance:
-            logging.info(8*' ' + name)
+            logging.info(8 * ' ' + name)
             for item in self.nc_attributes[name].items():
-                logging.info(12*' ' + '{:11s}: {:s}'.format(*item))
+                logging.info(12 * ' ' + '{:11s}: {:s}'.format(*item))
 
         # --- Numerics ---
         # dt belongs here, but is already read
@@ -190,8 +188,8 @@ class Configure:
             self.diffusion = True
             self.diffusion_coefficient = diffusion
             logging.info('    {:15s}: {}'.format(
-                        'diffusion coefficient',
-                        self.diffusion_coefficient))
+                'diffusion coefficient',
+                self.diffusion_coefficient))
         else:
             self.diffusion = False
             logging.info('    no diffusion')
