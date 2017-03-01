@@ -13,7 +13,6 @@ class Grid:
     def __init__(self, config):
         # Allow gridforce module in current directory
         sys.path.insert(0, os.getcwd())
-        print(sys.path)
         # Import correct gridforce_module
         gridforce_module = importlib.import_module(config.gridforce_module)
         self.grid = gridforce_module.Grid(config)
@@ -47,12 +46,12 @@ class Grid:
 
 class Forcing:
 
-    def __init__(self, config, grid):
+    def __init__(self, config, grid, **args):
         # Allow gridforce module in current directory
         sys.path.insert(0, os.getcwd())
         # Import correct gridforce_module
         gridforce_module = importlib.import_module(config.gridforce_module)
-        self.forcing = gridforce_module.Forcing(config, grid.grid)
+        self.forcing = gridforce_module.Forcing(config, grid.grid, **args)
         # self.steps = self.forcing.steps
         # self.U = self.forcing.U
         # self.V = self.forcing.V
@@ -64,7 +63,7 @@ class Forcing:
         return self.forcing.velocity(X, Y, Z, tstep=tstep)
 
     def field(self, X, Y, Z, name):
-        return self.field(X, Y, Z, name)
+        return self.forcing.field(X, Y, Z, name)
 
     def close(self):
         return self.forcing.close()

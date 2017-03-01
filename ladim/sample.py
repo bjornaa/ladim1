@@ -162,7 +162,7 @@ def sample2D(F, X, Y, mask=None, undef_value=0.0, outside_value=None):
     # scalar is True if both X and Y are scalars
     scalar = np.isscalar(Z)
 
-    if np.rank(F) != 2:
+    if np.ndim(F) != 2:
         raise ValueError("F must be 2D")
     if mask is not None:
         if mask.shape != F.shape:

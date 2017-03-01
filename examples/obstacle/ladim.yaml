@@ -28,11 +28,9 @@ state:
     ibm_variables: []
 
 particle_release:
-    variables: [mult, release_time, X, Y, Z]
+    variables: [release_time, X, Y, Z]
     # Converters (if not float)
-    mult: int
     release_time: time
-    farmid: int
     particle_variables: [release_time]
 
 gridforce:

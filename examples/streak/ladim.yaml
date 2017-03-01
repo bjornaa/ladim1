@@ -29,11 +29,9 @@ particle_release:
     # type = continuous or discrete [default]
     release_type: 'continuous'
     release_frequency: [1, h]
-    variables: [mult, release_time, X, Y, Z]
+    variables: [release_time, X, Y, Z]
     # Data type [int, float, time], default = float
-    mult: int
     release_time: time
-    farmid: int
     particle_variables: [release_time]
 
 gridforce:

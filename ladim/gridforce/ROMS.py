@@ -1,5 +1,5 @@
 """
-Grid class for LADIM, simplified from roppy
+Grid and Forcing for LADIM for the Regional Ocean Model System (ROMS)
 
 """
 
@@ -7,7 +7,7 @@ Grid class for LADIM, simplified from roppy
 # Bjørn Ådlandsvik, <bjorn@imr.no>
 # Institute of Marine Research
 # Bergen, Norway
-# 2010-09-30
+# 2017-03-01
 # -----------------------------------
 
 # import sys
@@ -19,30 +19,23 @@ from netCDF4 import Dataset, num2date
 from ladim.sample import sample2D
 
 
-# Make this a ROMS_grid class
-# Inherit from a more general grid class
 class Grid:
 
     """Simple ROMS grid object
 
-    Simple, minimal ROMS 3D grid object, for keeping important
-    information together.
-
-    Note: Can not (yet) be initialized from a standard grd-file,
-    use initial, history or average file or supply extra vertical
-    information by Vinfo or Vfile.
-
-    >>> fid = Dataset(roms_file)
-    >>> Vinfo = {'N': 32, 'hc': 10, 'theta_s': 0.8, 'theta_b': 0.4}
-    >>> grd = SGrid(fid, subgrid=(100, 121, 60, 161), Vinfo=Vinfo)
+    Possible grid arguments:
+      subgrid = [i0, i1, j0, j1]
+        Ordinary python style, start points included, not end points
+        Each of the elements can be replaced with None, for no limitation
+      Vinfo: dictionary with N, hc, theta_s and theta_b
 
     """
 
     # Lagrer en del unødige attributter
 
     def __init__(self, config):
-        # def __init__(self, grid_file, subgrid=[], Vinfo=None, Vfile=None):
 
+        logging.info("Initalizing ROMS-type grid object")
         try:
             ncid = Dataset(config.grid_file)
         except OSError:
@@ -55,8 +48,8 @@ class Grid:
         # Here, imax, jmax refers to whole grid
         jmax, imax = ncid.variables['h'].shape
         whole_grid = [1, imax-1, 1, jmax-1]
-        if config.subgrid:
-            limits = list(config.subgrid)
+        if 'subgrid' in config.grid_args:
+            limits = list(config.grid_args['subgrid'])
         else:
             limits = whole_grid
         # Allow None if no imposed limitation
@@ -67,8 +60,8 @@ class Grid:
         self.i0, self.i1, self.j0, self.j1 = limits
         self.imax = self.i1 - self.i0
         self.jmax = self.j1 - self.j0
-        print('Grid : imax, jmax, size = ',
-              self.imax, self.jmax, self.imax*self.jmax)
+        # print('Grid : imax, jmax, size = ',
+        #      self.imax, self.jmax, self.imax*self.jmax)
 
         # Slices
         #   rho-points
@@ -82,8 +75,8 @@ class Grid:
 
         # Vertical grid
 
-        if config.Vinfo:
-            Vinfo = config.Vinfo
+        if 'Vinfo' in config.grid_args:
+            Vinfo = config.grid_args['Vinfo']
             self.N = Vinfo['N']
             self.hc = Vinfo['hc']
             self.Vstretching = Vinfo.get('Vstretching', 1)
@@ -201,7 +194,7 @@ class Forcing:
         files = glob.glob(config.input_file)
         numfiles = len(files)
         if numfiles == 0:
-            print("No input file:", config.input_file)
+            logging.error("No input file: {}".format(config.input_file))
             raise SystemExit(3)
         logging.info('Number of forcing files = {}'.format(numfiles))
 
@@ -337,7 +330,6 @@ class Forcing:
 
         # Do more elegant
         for name in self.ibm_forcing:
-            print(self.ibm_forcing)
             self[name] = self._read_field(name, prestep)
             self[name+'new'] = self._read_field(name, 0)
             self['d'+name] = (self[name] - self[name+'new']) / prestep

@@ -42,6 +42,7 @@ out.write_particle_variables(releaser)
 # Main time loop
 # ==============
 
+print("============ starting time loop")
 for step in range(config.numsteps+1):
 
     # --- Update forcing ---

@@ -71,23 +71,22 @@ class Configure:
             self.stop_time - self.start_time, 's').astype('int')
         self.numsteps = self.simulation_time // self.dt
         logging.info('    {:15s}: {} seconds'.format('dt', self.dt))
-        logging.info('    {:15s}: {} hours'.format('simulation time',
-                                                   self.simulation_time // 3600))
-        logging.info('    {:15s}: {}'.format('number of time steps',
-                                             self.numsteps))
+        logging.info('    {:15s}: {} hours'.
+                     format('simulation time', self.simulation_time // 3600))
+        logging.info('    {:15s}: {}'.
+                     format('number of time steps', self.numsteps))
 
         # --- Grid ---
         logging.info('Configuration: gridforce')
         self.gridforce_module = conf['gridforce']['module']
         logging.info('    {:15s}: {}'.format('module', self.gridforce_module))
+        # Grid arguments
         try:
-            self.subgrid = conf['grid']['subgrid']
-        except (KeyError, TypeError):
-            self.subgrid = []
-        logging.info('    {:15s}: {}'.format('subgrid', self.subgrid))
+            self.grid_args = conf['gridforce']['grid']
+        except KeyError:
+            self.grid_args = {}
+        logging.info('    {:15s}: {}'.format('grid arguments', self.grid_args))
         self.Vinfo = {}
-        logging.info('    {:15s}: {}'.format('vertical information',
-                                             self.Vinfo))
 
         # --- Forcing ---
         # self.velocity = conf['gridforce']['velocity']

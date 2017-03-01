@@ -58,7 +58,7 @@ class ParticleReleaser:
 
         # På nytt, men lager dict av arrayer/lister
         V = dict()
-        print(config.release_format)
+        # print(config.release_format)
         for key in config.release_format:
             V[key] = []
         if 'mult' not in config.release_format:
@@ -190,7 +190,7 @@ class ParticleReleaser:
             timestep = self.unique_steps[self._release_index]
         except IndexError:
             raise StopIteration
-        logging.info('release: timestep, time = {}, {}'.
+        logging.info('timestep, time = {}, {}'.
                      format(timestep, self.times[self._release_index]))
         # print(type(timestep))
         self._release_index += 1
