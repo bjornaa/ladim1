@@ -19,7 +19,6 @@ class Grid:
         self.jmax = W / self.dy
         self.X0 = X0 / self.dx
         self.R = R / self.dy
-        print("R", self.R)
 
     def sample_metric(self, X, Y):
         return self.dx + np.zeros_like(X), self.dy + np.zeros_like(Y)
