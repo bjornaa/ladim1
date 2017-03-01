@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import numpy as np
-from netCDF4 import Dataset, num2date
+from netCDF4 import Dataset
 
 
 class ParticleFile(object):
@@ -84,10 +84,22 @@ class ParticleFile(object):
         else:
             raise KeyError(name)
 
+
 # Can't use netcdf4-pythons num2date, returns wrong type
 def num2date(value, units):
-    units = units.replace('T', ' ')
+    """Return datetime from netCDF time
+
+    value: numerical value
+    units: "seconds since reference_time"
+    Returns: datetime.datetime object
+
+    Example: value = 3600, units = "seconds since 2017-03-01 15:20:00"
+    Returns datetime.datetime(2017, 3, 1, 16, 20)
+
+    """
+    units = units.replace('T', ' ')   # Handle "T" between date and clock
     w = units.split()
+    units = w[0]
     date = w[-2]
     clock = w[-1]
     y, m, d = [int(v) for v in date.split('-')]
