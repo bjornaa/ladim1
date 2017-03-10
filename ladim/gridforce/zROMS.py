@@ -425,7 +425,7 @@ class Forcing:
 
         i0 = self._grid.i0
         j0 = self._grid.j0
-        K, A = (self._grid.z_r, X-i0, Y-j0, Z)
+        K, A = vert_level(self._grid.z_levels, X-i0, Y-j0, Z)
         if tstep < 0.001:
             return sample3DUV(self.U, self.V,
                               X-i0, Y-j0, K, A, method=method)
@@ -556,7 +556,7 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
 # TODO: Unify with s-routune
 
 
-def vert_level(z_level, Z):
+def vert_level(z_level, X, Y, Z):
     """
     Find vertical level and coefficients for vertical interpolation
 
@@ -578,7 +578,7 @@ def vert_level(z_level, Z):
     # K = K.clip(0, kmax-1)
     K = np.searchsorted(z_level, Z) - 1
 
-    A = (z_level(K+1) - Z) / (z_level(K+1) - z_level(K))
+    A = (z_level[K+1] - Z) / (z_level[K+1] - z_level[K])
 
     A = A.clip(0, 1)
 

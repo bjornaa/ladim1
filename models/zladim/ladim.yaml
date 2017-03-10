@@ -36,7 +36,7 @@ gridforce:
     ibm_forcing: {temp: temp, salt: salt}
     # grid arguments
     grid:
-        subgrid: [200, 750, 300, 900]
+        subgrid: [1, 2600, 1, 900]
 
 # Samle IBM-variablene her
 ibm:

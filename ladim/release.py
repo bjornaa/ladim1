@@ -30,7 +30,7 @@
 
 # For restart, no problem: t
 
-# Sequence:
+
 # date clock mult X Y Z [particle_variables] [state_variables]
 # date must have format yyyy-mm-dd
 # clock can have hh:mm:ss, hh:mm or simply 0-23 for hour only
@@ -87,6 +87,8 @@ class ParticleReleaser:
             time0 = V['release_time'][0]
             cont_times = np.arange(
                 time0, config.stop_time, config.release_frequency)
+            print("cont_times", len(cont_times))
+            print(time0, config.stop_time, config.release_frequency)
 
             B = dict()     # Block to repeat
             W = dict()
@@ -156,6 +158,11 @@ class ParticleReleaser:
         rel_time = self.unique_times - config.start_time
         rel_time = rel_time.astype('m8[s]').astype('int')  # Convert to seconds
         self.unique_steps = rel_time // config.dt
+
+        print(len(self.unique_steps))
+        print("Num unique steps", self.unique_steps)
+        print(len(self.release_data))
+        print(len(self.release_data['mult']))
 
         config.total_particle_count = sum(self.release_data['mult'])
         logging.info('Total number of particles in simulation: {}'.

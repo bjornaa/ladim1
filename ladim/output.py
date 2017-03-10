@@ -103,5 +103,7 @@ class OutPut:
         self.instance_count += pcount
 
     def write_particle_variables(self, partini):
+        print("particle_variables")
         for name, value in partini.particle_variables.items():
+            print(name, len(self.nc.variables[name]))
             self.nc.variables[name][:] = value

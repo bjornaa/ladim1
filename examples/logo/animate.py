@@ -72,7 +72,9 @@ def animate(t):
 
 
 # Do the animation
-anim = FuncAnimation(fig, animate, frames=num_times, interval=20,
+anim = FuncAnimation(fig, animate, frames=num_times, interval=2,
                      repeat=True, repeat_delay=500, blit=True)
+
+anim.save('logo.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 
 plt.show()
