@@ -38,4 +38,4 @@ Z = 5
 
 with open('logo.rls', mode='w') as f:
     for (x, y) in zip(X, Y):
-        f.write('1989-05-24T12 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
+        f.write('1 1989-05-24T12 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
