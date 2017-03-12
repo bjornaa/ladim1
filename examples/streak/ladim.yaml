@@ -28,7 +28,7 @@ state:
 particle_release:
     # type = continuous or discrete [default]
     release_type: 'continuous'
-    release_frequency: [1, h]
+    release_frequency: [1800, s]
     variables: [release_time, X, Y, Z]
     # Data type [int, float, time], default = float
     release_time: time

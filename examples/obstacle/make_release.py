@@ -12,6 +12,6 @@ Z = 5
 f = open('obstacle.rls', mode='w')
 
 for (x, y) in zip(X, Y):
-    f.write('0001-01-01 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
+    f.write('1 0001-01-01 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
 
 f.close()
