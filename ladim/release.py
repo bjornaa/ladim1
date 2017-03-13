@@ -197,8 +197,9 @@ class ParticleReleaser:
             timestep = self.unique_steps[self._release_index]
         except IndexError:
             raise StopIteration
+        print(self._release_index)
         logging.info('timestep, time = {}, {}'.
-                     format(timestep, self.times[self._release_index]))
+                     format(timestep, self.unique_times[self._release_index]))
         # print(type(timestep))
         self._release_index += 1
 
