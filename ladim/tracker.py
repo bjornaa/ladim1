@@ -55,6 +55,12 @@ class Tracker:
         X1 = X + U * dt / dx
         Y1 = Y + V * dt / dy
 
+
+        # Do not move particles out of the grid
+        I = ~grid.ingrid(X1, Y1)
+        X1[I] = X[I]
+        Y1[I] = Y[I]
+
         # Land, boundary treatment. Do not move the particles
         # Consider a sequence of different actions
         # I = (grid.ingrid(X1, Y1)) & (grid.atsea(X1, Y1))
