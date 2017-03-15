@@ -68,13 +68,6 @@ class ParticleReleaser:
         logging.info("Total particle count = {}".format(
             self.total_particle_count))
 
-        rel_time = self.times - config.start_time
-        rel_time = rel_time.astype('m8[s]').astype('int')  # Convert to seconds
-        self.steps = rel_time // config.dt
-
-        # Export total particle count
-        config.total_particle_count = self.total_particle_count
-
         # Reset the counters after the particle count
         self._index = 0    # Index of next release
         self._file_index = 0      # Index of next data from release file
