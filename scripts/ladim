@@ -35,8 +35,8 @@ releaser = ParticleReleaser(config)
 state = State(config)
 
 # --- Initiate the output ---
-out = OutPut(config)
-out.write_particle_variables(releaser)
+out = OutPut(config, releaser)
+# out.write_particle_variables(releaser)
 
 # ==============
 # Main time loop
@@ -50,7 +50,7 @@ for step in range(config.numsteps+1):
 
     # --- Particle release ---
     # TODO: Find better name than unique_steps
-    if step in releaser.unique_steps:
+    if step in releaser.steps:
         V = next(releaser)
         state.append(V)
 

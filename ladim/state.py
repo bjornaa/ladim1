@@ -22,11 +22,19 @@ class State:
         self.dt = np.timedelta64(config.dt, 's')
         self.position_variables = ['X', 'Y', 'Z']
         self.ibm_variables = config.ibm_variables
-        self.instance_variables = self.position_variables + self.ibm_variables
+        self.particle_variables = config.particle_variables
+        self.instance_variables = (
+            self.position_variables +
+            [var for var in self.ibm_variables
+             if var not in self.particle_variables])
 
         self.pid = np.array([], dtype=int)
         for name in self.instance_variables:
             setattr(self, name, np.array([], dtype=float))
+
+        for name in self.particle_variables:
+            setattr(self, name,
+                    np.array([], dtype=config.release_dtype[name]))
 
         self.track = Tracker(config)
         self.dt = config.dt
@@ -40,6 +48,9 @@ class State:
             self.ibm = ibm_module.IBM(config)
         else:
             self.ibm = None
+
+        # self.num_particles = len(self.X)
+        self.nnew = 0
 
     def __getitem__(self, name):
         return getattr(self, name)
@@ -59,6 +70,7 @@ class State:
                 self[name] = np.concatenate((self[name], new[name]))
             else:   # Initialize to zero
                 self[name] = np.concatenate((self[name], np.zeros(nnew)))
+        self.nnew = nnew
 
     def update(self, grid, forcing):
         """Update the model state to the next timestep"""

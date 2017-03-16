@@ -58,13 +58,20 @@ class ParticleReleaser:
         self._B = [x[1] for x in A.groupby('release_time')]
 
         # Compute total number of particles in the simulation
-        # by a dry run of the particle releases
+        # and read the particle variables
         self._index = 0            # Index of next release
         self._file_index = 0       # Index of next data from release file
         self._particle_count = 0   # Particle counter
+        pvars = dict()
+        for name in config.particle_variables:
+            pvars[name] = np.array([], dtype=config.release_dtype[name])
+            # setattr(self, name, np.array([], dtype=config.release_dtype))
         for t in self.times:
-            next(self)
+            V = next(self)
+            for name in config.particle_variables:
+                pvars[name] = np.concatenate((pvars[name], V[name]))
         self.total_particle_count = self._particle_count
+        self.particle_variables = pvars
         logging.info("Total particle count = {}".format(
             self.total_particle_count))
 
