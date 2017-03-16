@@ -57,19 +57,28 @@ class ParticleReleaser:
         # Make dataframes for each timeframe
         self._B = [x[1] for x in A.groupby('release_time')]
 
-        # Compute total number of particles in the simulation
-        # and read the particle variables
+        # Read the particle variables
         self._index = 0            # Index of next release
         self._file_index = 0       # Index of next data from release file
         self._particle_count = 0   # Particle counter
         pvars = dict()
         for name in config.particle_variables:
-            pvars[name] = np.array([], dtype=config.release_dtype[name])
-            # setattr(self, name, np.array([], dtype=config.release_dtype))
+            dtype = config.release_dtype[name]
+            if dtype == np.datetime64:
+                dtype = np.float64
+            pvars[name] = np.array([], dtype=dtype)
+
         for t in self.times:
             V = next(self)
             for name in config.particle_variables:
-                pvars[name] = np.concatenate((pvars[name], V[name]))
+                dtype = config.release_dtype[name]
+                if dtype == np.datetime64:
+                    rtimes = V[name] - config.reference_time
+                    rtimes = rtimes.astype('timedelta64[s]').astype(np.float64)
+                    pvars[name] = np.concatenate((pvars[name], rtimes))
+                else:
+                    pvars[name] = np.concatenate((pvars[name], V[name]))
+
         self.total_particle_count = self._particle_count
         self.particle_variables = pvars
         logging.info("Total particle count = {}".format(
