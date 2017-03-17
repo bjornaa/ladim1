@@ -10,12 +10,12 @@ from postladim.particlefile import ParticleFile
 # ---------------
 
 # Files
-particle_file = 'logo.nc'
-grid_file = '../data/ocean_avg_0014.nc'
+particle_file = 'out.nc'
+grid_file = '/scratch/Data/NK800/file_0000.nc'
 
 # Subgrid definition
-i0, i1 = 58, 150
-j0, j1 = 60, 140
+i0, i1 = 340, 440
+j0, j1 = 490, 560
 
 # ----------------
 
@@ -74,8 +74,5 @@ def animate(t):
 # Do the animation
 anim = FuncAnimation(fig, animate, frames=num_times, interval=20,
                      repeat=True, repeat_delay=500, blit=True)
-
-# Save the animation as a video file
-# anim.save("logo.mp4")
 
 plt.show()

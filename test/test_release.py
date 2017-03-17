@@ -34,7 +34,7 @@ def test_discrete():
     # Make a release file
     A = ['2 2015-04-01 100',
          '1 2015-04-01T00 111',
-         '3 2015-04-03 12 200']
+         '3 "2015-04-03 12" 200']
     with open('test.rst', mode='w') as f:
         for a in A:
             f.write(a + '\n')
@@ -43,21 +43,20 @@ def test_discrete():
     release = ParticleReleaser(config)
     os.remove('test.rst')
 
-    assert(len(release.times) == 3)
-    assert(len(release.unique_times) == 2)
-    assert(config.total_particle_count == 6)
+    assert(len(release.times) == 2)
+    assert(release.total_particle_count == 6)
 
     # First release
     S = next(release)
-    assert(S['pid'] == [0, 1, 2])
+    assert(np.all(S['pid'] == [0, 1, 2]))
     assert(S['release_time'][0] == np.datetime64('2015-04-01'))
-    assert(S['X'] == [100, 100, 111])
+    assert(np.all(S['X'] == [100, 100, 111]))
 
     # Second release
     S = next(release)
-    assert(S['pid'] == [3, 4, 5])
+    assert(np.all(S['pid'] == [3, 4, 5]))
     assert(S['release_time'][0] == np.datetime64('2015-04-03T12:00:00'))
-    assert(S['X'] == [200, 200, 200])
+    assert(np.all(S['X'] == [200, 200, 200]))
 
     # No more releases
     with pytest.raises(StopIteration):
@@ -82,8 +81,8 @@ def test_continuous():
 
     # Make a release file
     A = ['2 2015-04-01 100',
-         '1 2015-04-01 111',
-         '3 2015-04-01 12 200']
+         '1 2015-04-01T00 111',
+         '3 "2015-04-01 12" 200']
     with open('test.rst', mode='w') as f:
         for a in A:
             f.write(a + '\n')
@@ -93,31 +92,28 @@ def test_continuous():
     # Clean out the release file
     os.remove('test.rst')
 
+    print(release.times)
+
     # Check some overall sizes
-    assert(len(release.times) == 8)
-    assert(len(release.unique_times) == 6)
+    assert(len(release.times) == 6)
     assert(config.total_particle_count == 18)
 
     # --- Check the releases
-    # First entry
-    S = next(release)
-    assert(S['pid'] == [0, 1, 2])
-    assert(S['release_time'][0] == np.datetime64('2015-04-01'))
-    assert(S['X'] == [100, 100, 111])
-
-    # Second entry
-    S = next(release)
-    assert(S['pid'] == [3, 4, 5])
-    assert(S['release_time'][0] == np.datetime64('2015-04-01 06'))
-    assert(S['X'] == [100, 100, 111])
+    # Entries 1-2
+    for t in range(2):
+        S = next(release)
+        assert(np.all(S['pid'] == [3*t, 1+3*t, 2+3*t]))
+        assert(S['release_time'][0] ==
+               np.datetime64('2015-04-01T00') + t*config.release_frequency)
+        assert(np.all(S['X'] == [100, 100, 111]))
 
     # Entries 3-6
-    for t in range(4):
+    for t in range(2, 6):
         S = next(release)
-    assert(S['pid'] == [6+3*t, 7+3*t, 8+3*t])
-    assert(S['release_time'][0] ==
-           np.datetime64('2015-04-01T12:00:00') + t*config.release_frequency)
-    assert(S['X'] == [200, 200, 200])
+        assert(np.all(S['pid'] == [3*t, 1+3*t, 2+3*t]))
+        assert(S['release_time'][0] ==
+               np.datetime64('2015-04-01') + t*config.release_frequency)
+        assert(np.all(S['X'] == [200, 200, 200]))
 
     # No more releases
     with pytest.raises(StopIteration):

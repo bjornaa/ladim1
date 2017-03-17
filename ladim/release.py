@@ -97,7 +97,7 @@ class ParticleReleaser:
         self._particle_count = 0
 
     def __next__(self):
-        """Release particles at time = dtime"""
+        """Perform the next particle release"""
 
         # This should not happen
         if self._index >= len(self.times):
@@ -106,10 +106,10 @@ class ParticleReleaser:
         rel_time = self.times[self._index]
         file_time = self._file_times[self._file_index]
 
-        # print("rel vs file", rel_time, file_time)
         if rel_time < file_time:
             # Use previous file release data
             V = self.V
+            V.release_time = rel_time
         else:
             # rel_time >= file_time, get new release data
             V = self._B[self._file_index]
@@ -135,4 +135,4 @@ class ParticleReleaser:
         self._index += 1
         self._particle_count += len(V)
 
-        return(V)
+        return V

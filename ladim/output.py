@@ -80,10 +80,8 @@ class OutPut:
 
         logging.debug("Netcdf output file defined")
 
-        #### Håndter tid bedre
+        # Save particle variables
         for name in config.output_particle:
-            print(name)
-            print(nc.variables)
             nc.variables[name][:] = release.particle_variables[name][:]
 
         return nc
