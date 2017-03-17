@@ -14,11 +14,11 @@ from netCDF4 import Dataset
 # Gjør til en iterator
 class OutPut:
 
-    def __init__(self, config):
+    def __init__(self, config, release):
 
         logging.info('Initializing output')
 
-        self.nc = self._define_netcdf(config)
+        self.nc = self._define_netcdf(config, release)
         self.instance_variables = config['output_instance']
         self.instance_count = 0
         self.outcount = 0    # No output yet
@@ -27,14 +27,14 @@ class OutPut:
     def close(self):
         self.nc.close()
 
-    def _define_netcdf(self, config):
+    def _define_netcdf(self, config, release):
         """Define a NetCDF output file"""
 
         logging.debug("Defining netCDF file")
         nc = Dataset(config.output_file, mode='w',
                      format="NETCDF3_CLASSIC")
         # --- Dimensions
-        nc.createDimension('particle', config.total_particle_count)
+        nc.createDimension('particle', release.total_particle_count)
         nc.createDimension('particle_instance', None)  # unlimited
         # Sett output-period i config (bruk naturlig enhet)
         # regne om til antall tidsteg og få inn under
@@ -80,6 +80,10 @@ class OutPut:
 
         logging.debug("Netcdf output file defined")
 
+        # Save particle variables
+        for name in config.output_particle:
+            nc.variables[name][:] = release.particle_variables[name][:]
+
         return nc
 
     def write(self, state):
@@ -102,6 +106,7 @@ class OutPut:
         self.outcount += 1
         self.instance_count += pcount
 
-    def write_particle_variables(self, partini):
-        for name, value in partini.particle_variables.items():
-            self.nc.variables[name][:] = value
+    # def write_particle_variables(self, partini):
+    #     for name, value in partini.particle_variables.items():
+    #     for name, value in state.particle_variables.items():
+    #         self.nc.variables[name][] = value
