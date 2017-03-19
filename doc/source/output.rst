@@ -34,7 +34,7 @@ stranding, or becoming inactive for biological reasons. The particle_instance
 dimension is therefore the single unlimited dimension.
 
 The indirect indexing is given by the variable ``particle_count(time)``.
-The particle distribution at timestep ``n`` (counting from inital time n=0) can be
+The particle distribution at timestep ``n`` (counting from initial time n=0) can be
 retrieved by the following python code::
 
   nc = Dataset(particle_file)
@@ -122,7 +122,7 @@ Example CDL
   // global attributes:
 	  	:Conventions = "CF-1.5" ;
 		  :institution = "Institute of Marine Research" ;
-		  :source = "Lagrangian Advection and DIffusion Model, python version" ;
+		  :source = "Lagrangian Advection and Diffusion Model, python version" ;
 		  :history = "Created by pyladim" ;
 		  :date = "2017-02-15" ;
   }

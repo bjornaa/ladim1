@@ -8,7 +8,7 @@
 
 LADIM's configuration system uses the :mod:`pyyaml` package to read the
 configuration file. This allows comments, nested keywords,
-and flexibility in the sequence of keywords, missing or extra keyweord,
+and flexibility in the sequence of keywords, missing or extra keyword,
 
 The Configuration class has no public methods, so it is basically
 a dictionary. It supports both dictionary and attribute type access,

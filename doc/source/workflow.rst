@@ -2,7 +2,7 @@ Workflow
 ========
 
 This chapter describes various possible workflows with LADIM, from simple usage
-to developing. Some terminologi may be useful. An *installed* LADIM, has been
+to developing. Some terminology may be useful. An *installed* LADIM, has been
 installed by ``python setup.py install`` in the LADIM root directory, either
 *system-wide* by sudo or personal by using the ``--prefix``-option,
 see :ref:`installation`. This is typical a working *stable* version in a

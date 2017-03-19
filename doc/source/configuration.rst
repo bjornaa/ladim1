@@ -5,7 +5,7 @@ LADIM configuration
 
 The LADIM model is highly configurable using a separate configuration file.
 The goal is that a user should not have to touch the code, every necessary
-aspect should be customable by the configuration file.
+aspect should be customizable by the configuration file.
 
 The name of the configuration file is given as a command line argument to the
 main ladim script. If the name is missing, a default name of :file:`ladim.yaml` is

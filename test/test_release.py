@@ -96,7 +96,7 @@ def test_continuous():
 
     # Check some overall sizes
     assert(len(release.times) == 6)
-    assert(config.total_particle_count == 18)
+    assert(release.total_particle_count == 18)
 
     # --- Check the releases
     # Entries 1-2
@@ -108,13 +108,11 @@ def test_continuous():
         assert(np.all(S['X'] == [100, 100, 111]))
 
     # Entries 3-6
-    for t in range(2, 6):
-        S = next(release)
+    t = 2
+    for S in release:
+        # S = next(release)
         assert(np.all(S['pid'] == [3*t, 1+3*t, 2+3*t]))
         assert(S['release_time'][0] ==
                np.datetime64('2015-04-01') + t*config.release_frequency)
         assert(np.all(S['X'] == [200, 200, 200]))
-
-    # No more releases
-    with pytest.raises(StopIteration):
-        S = next(release)
+        t += 1

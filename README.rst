@@ -2,7 +2,7 @@ LADIM aka LADIM3 aka pyladim
 ============================
 
 This is a developing new version of the Lagrangian Advection and DIffusion
-Model. It is an off-line particle tracking code. Precently  using results from
+Model. It is an off-line particle tracking code. Presently  using results from
 the ocean model `ROMS <http://www.myroms.org/>`_ as input.
 
 Try out pyladim
@@ -29,3 +29,4 @@ The code is open source using the MIT License. It is available from
   Bjørn Ådlandsvik <bjorn@imr.no>
   Institute of Marine Research
   Bergen, Norway
+

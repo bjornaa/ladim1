@@ -1,7 +1,7 @@
 # from netCDF4 import Dataset, num2date
 from particlefile import ParticleFile
 
-pf = ParticleFile('../output/pyladim_out.nc')     # Particle output file
+# pf = ParticleFile('../output/pyladim_out.nc')     # Particle output file
 pf = ParticleFile('../output/streak.nc')     # Particle output file
 
 t = 112

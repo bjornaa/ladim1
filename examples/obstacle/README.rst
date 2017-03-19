@@ -9,7 +9,7 @@ This example is a recommended testcase in::
   physical-biological interactions during fih early life,
   ICES Cooperative Research Report, 295
 
-The module ``gridforce_analytic`` returns the analytical valuee of the current
+The module ``gridforce_analytic`` returns the analytical value of the current
 at the particle positions. The alternative module ``gridforce_discrete``
 discretize the current to a 1 km grid and samples the grid for current and sea
 mask.

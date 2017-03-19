@@ -41,7 +41,7 @@ class State:
 
         if config.ibm_module:
             # Import the module
-            logging.info("Initalizing the IBM")
+            logging.info("Initializing the IBM")
             sys.path.insert(0, os.getcwd())
             ibm_module = importlib.import_module(config.ibm_module)
             # Initiate the IBM object

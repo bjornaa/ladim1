@@ -23,7 +23,7 @@ class ParticleReleaser:
 
     def __init__(self, config):
 
-        logging.info('Initalizing the particle releaser')
+        logging.info('Initializing the particle releaser')
 
         # Read the particle release file
         A = pd.read_table(config.particle_release_file,
@@ -89,12 +89,15 @@ class ParticleReleaser:
         self.steps = rel_time // config.dt
 
         # Export total particle count
-        config.total_particle_count = self.total_particle_count
+        # config.total_particle_count = self.total_particle_count
 
         # Reset the counters after the particle count
         self._index = 0    # Index of next release
         self._file_index = 0      # Index of next data from release file
         self._particle_count = 0
+
+    def __iter__(self):
+        return self
 
     def __next__(self):
         """Perform the next particle release"""

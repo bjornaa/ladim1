@@ -6,7 +6,7 @@
 
 The :class:`OutPut` class is responsible for the NetCDF output from the
 simulation. Initially it defines the NetCDF output file. It is used
-sequentually, saving the selected part of the state at regular intervals.
+sequentially, saving the selected part of the state at regular intervals.
 
 .. class:: OutPut(config)
 

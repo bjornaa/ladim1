@@ -79,7 +79,7 @@ def sample2DV(F, X, Y):
 
 
 def sample2D_masked(F, M, X, Y):
-    """Bilinar sample of a 2D field
+    """Bilienar sample of a 2D field
 
     F = 2D array, M = mask (=1 on sea, = 0 on land)
     X, Y = position in grid coordinates, scalars or compatible arrays

@@ -2,7 +2,7 @@
 # tracker.py
 # Part of the LADIM Model
 #
-# Bjørn Ådllandsvik, <bjorn@imr.no>
+# Bjørn Ådlandsvik, <bjorn@imr.no>
 # Institute of Marine Research
 #
 # Licenced under the MIT license

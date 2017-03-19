@@ -54,7 +54,7 @@ Some particle variables, for instance location number, has no influence on the
 dynamics and are simply written to output for extra information. Other particle
 variables may store initial information, like release time or release position,
 and has no further influence. Other particle variables may influence the
-dynamics throughout  the simulation. Examples are diameter or sinking velovity
+dynamics throughout  the simulation. Examples are diameter or sinking velocity
 of non-organic sediment particles. The last category are counted as
 IBM-variables.
 

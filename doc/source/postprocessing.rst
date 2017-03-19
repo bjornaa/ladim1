@@ -2,7 +2,7 @@ Post processing
 ===============
 
 LADIM comes with a simple python package postladim that can be used
-for visulisation and analysis of LADIM output.
+for visualisation and analysis of LADIM output.
 
 The basic class is postladim.particlefile.ParticleFile it is initiated
 by the following lines::
@@ -42,7 +42,7 @@ by the following lines::
 
   .. method:: position(n)
 
-     Position (X and Y) of particle-distibution at n-th time time.
+     Position (X and Y) of particle-distribution at n-th time time.
 
 **Item notation** with pf as a ParticleFile instance:
 

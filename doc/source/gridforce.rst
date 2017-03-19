@@ -21,7 +21,7 @@ ROMS for instance are suitable. The coordinates should have integer values at
 the grid cell centers. [Necessary, or a detail left to the implementation?]
 Particle release and movements is referred to this coordinate system.
 
-The grid spacing is given byhorizontal arrays of metric coefficients
+The grid spacing is given by horizontal arrays of metric coefficients
 :math:`\Delta x` and :math:`\Delta y`
 (sjekk at de brukes rett).
 

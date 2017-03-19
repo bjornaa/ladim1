@@ -14,12 +14,11 @@ The line has the following mandatory fields:
 
 release_time
 
-   Should have the format yyyy-mm-ddThh:mm:ss.
+   Should have the format yyyy-mm-ddThh:mm:ss or "yyyy-mm-dd hh:mm:ss".
    The time format follows the `ISO 8601 standard <https://xkcd.com/1179>`_.
    Time components can be dropped from the end with obvious defaults.
-   It is essential that the time is given as a **single string** without space,
-   thus the "T" is mandatory, unless the whole clock part is omitted, giving
-   particle release at midnight 00:00:00.
+   It is essential that the time is interpreted as a **single string**, either
+   by joining with a "T" or enclosing with double ticks.
 
 X
   Grid X-coordinate of the release position
@@ -28,8 +27,8 @@ Y
 Z
   Release depth in meters (positive downwards)
 
-In addition the field ``mult`` is reveserved. If present it gives the multiplicity
-of the line, for release of several particles at the
+In addition the field ``mult`` is reserved. If present it gives the
+multiplicity of the line, for release of several particles at the
 same time and position. If ``mult`` is omitted, a default value of 1, single
 particle, is used.
 
@@ -50,11 +49,11 @@ Remarks:
 
 For continuous release, every hour for instance, the file can be large.
 A 42 days simulation with 1000 sources gives approximately 1 million rows.
-It is recommended to use preprossing scripts to make these files.
+It is recommended to use preprocessing scripts to make these files.
 Alternatively a better format might be developed.
 
 For time the point is that the clock part should not be interpreted as
-the X-coordinate. An alternative would be to use a comma-separated format (csv)
+the X-coordinate. An alternative would be to use a comma-separated format (csv).
 
 .. seealso::
   Module :mod:`release`

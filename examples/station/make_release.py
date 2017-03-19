@@ -1,5 +1,5 @@
 # Make a particles.in file for a streak line
-# Continuos release from single source
+# Continuous release from single source
 
 from numpy import linspace
 
