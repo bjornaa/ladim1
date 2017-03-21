@@ -96,6 +96,9 @@ class ParticleReleaser:
         self._file_index = 0      # Index of next data from release file
         self._particle_count = 0
 
+    def __iter__(self):
+        return self
+
     def __next__(self):
         """Perform the next particle release"""
 
