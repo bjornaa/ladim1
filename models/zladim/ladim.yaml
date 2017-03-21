@@ -14,30 +14,29 @@
 time_control:
     # Start and stop of simulation
     # use an alias &t0 if used again
-    start_time: &time0 2015-04-01 00:00:00
-    stop_time:  2015-04-01 12:00:00
+    start_time: &time0 2017-01-29 00:00:00
+    stop_time:  2017-03-10 00:00:00
     # Reference time for netcdf output
     # by default set to start_time
     # can be overridden explicitly
     reference_time: *time0
 
 files:
-    grid_file  : /home/bjorn/Data/zroms/NorKyst-800m_ZDEPTHS_CGRID_his.2017030900.nc4
-    input_file : /home/bjorn/Data/zroms/NorKyst-800m_ZDEPTHS_CGRID_his.*.nc4
-
-    particle_release_file : salmon_lice.rls
-    output_file           : out.nc
+    grid_file: /data/model_data006/anneds/Lusedata/Gridfiler/norkyst_800m_grid_full.nc
+    input_file: /hexagon/vol1/bjorn/NorKyst-800m_ZDEPTHS_CGRID_his.*2017*.nc4
+    particle_release_file : lice_2017-01-29.rls
+    output_file           : /hexagon/vol1/bjorn_rhea/out.nc
 
 gridforce:
     # Format = [i0, i1, j0, j1]
     # subgrid: [350, 400, 510, 550]
     # mapping: model name -> name in input file
     # velocity: {U: u, V: v}
-    module: ladim.gridforce.ROMS
+    module: ladim.gridforce.zROMS
     ibm_forcing: {temp: temp, salt: salt}
     # grid arguments
     grid:
-        subgrid: [200, 750, 300, 900]
+        subgrid: [1, 2600, 1, 900]
 
 # Samle IBM-variablene her
 ibm:

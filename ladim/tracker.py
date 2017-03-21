@@ -2,7 +2,7 @@
 # tracker.py
 # Part of the LADIM Model
 #
-# Bjørn Ådlandsvik, <bjorn@imr.no>
+# Bjørn Ådllandsvik, <bjorn@imr.no>
 # Institute of Marine Research
 #
 # Licenced under the MIT license
@@ -55,8 +55,7 @@ class Tracker:
         X1 = X + U * dt / dx
         Y1 = Y + V * dt / dy
 
-
-        # Do not move particles out of the grid
+        # Do not move out of grid
         I = ~grid.ingrid(X1, Y1)
         X1[I] = X[I]
         Y1[I] = Y[I]
