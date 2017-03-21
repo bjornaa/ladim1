@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import numpy as np
 from netCDF4 import Dataset
 
+# TODO: Misses slice notation,
 
 class ParticleFile(object):
     """Reader class for LADIM output particle files
