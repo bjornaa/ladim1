@@ -6,13 +6,15 @@ from ladim.state import State
 class Container:
     pass
 
+
 config = Container()
 config.dt = 600
 config.start_time = np.datetime64('2017-02-10 20')
 config.ibm_variables = ['super', 'age']
+config.particle_variables = []
 config.advection = 'RK4'
 config.diffusion = False
-config.ibm_module = 'luseibm'
+config.ibm_module = 'ladim.ibms.luseibm'
 
 state = State(config)
 state.pid = np.array([0])

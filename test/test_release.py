@@ -24,7 +24,7 @@ def test_discrete():
     # config.reference_time = config.start_time
     config.stop_time = np.datetime64('2015-04-04')
     config.dt = 3600
-    config.particle_release_file = 'test.rst'
+    config.particle_release_file = 'release.rls'
     config.release_format = ['mult', 'release_time', 'X']
     config.release_dtype = dict(mult=int, release_time=np.datetime64,
                                 X=float)
@@ -35,13 +35,13 @@ def test_discrete():
     A = ['2 2015-04-01 100',
          '1 2015-04-01T00 111',
          '3 "2015-04-03 12" 200']
-    with open('test.rst', mode='w') as f:
+    with open('release.rls', mode='w') as f:
         for a in A:
             f.write(a + '\n')
 
     # Make the ParticleReleaser object
     release = ParticleReleaser(config)
-    os.remove('test.rst')
+    os.remove('release.rls')
 
     assert(len(release.times) == 2)
     assert(release.total_particle_count == 6)
@@ -71,7 +71,7 @@ def test_continuous():
     # config.reference_time = config.start_time
     config.stop_time = np.datetime64('2015-04-02 12')
     config.dt = 3600
-    config.particle_release_file = 'test.rst'
+    config.particle_release_file = 'release.rls'
     config.release_format = ['mult', 'release_time', 'X']
     config.release_dtype = dict(mult=int, release_time=np.datetime64,
                                 X=float)
@@ -83,20 +83,18 @@ def test_continuous():
     A = ['2 2015-04-01 100',
          '1 2015-04-01T00 111',
          '3 "2015-04-01 12" 200']
-    with open('test.rst', mode='w') as f:
+    with open('release.rls', mode='w') as f:
         for a in A:
             f.write(a + '\n')
 
     # Make the ParticleReleaser object
     release = ParticleReleaser(config)
     # Clean out the release file
-    os.remove('test.rst')
-
-    print(release.times)
+    os.remove('release.rls')
 
     # Check some overall sizes
     assert(len(release.times) == 6)
-    assert(release.total_particle_count == 18)
+    assert(config.total_particle_count == 18)
 
     # --- Check the releases
     # Entries 1-2
@@ -110,7 +108,6 @@ def test_continuous():
     # Entries 3-6
     t = 2
     for S in release:
-        # S = next(release)
         assert(np.all(S['pid'] == [3*t, 1+3*t, 2+3*t]))
         assert(S['release_time'][0] ==
                np.datetime64('2015-04-01') + t*config.release_frequency)
