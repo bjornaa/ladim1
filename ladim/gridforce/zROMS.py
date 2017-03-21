@@ -133,8 +133,10 @@ class Grid:
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
-        return ((self.i0-0.5 <= X) & (X <= self.i1-0.5) &
-                (self.j0-0.5 <= Y) & (Y <= self.j0-0.5))
+        # return ((self.i0-0.5 <= X) & (X <= self.i1-0.5) &
+        #         (self.j0-0.5 <= Y) & (Y <= self.j1-0.5))
+        return ((self.i0 < X) & (X < self.i1-1) &
+                (self.j0 < Y) & (Y < self.j1-1))
 
     def onland(self, X, Y):
         """Returns True for points on land"""
@@ -224,6 +226,7 @@ class Forcing:
         num_frames = []         # Available time frames in each file
         # change_times = []     # Times for change of file
         for fname in files:
+            print(fname)
             with Dataset(fname) as nc:
                 # new_times = nc.variables['ocean_time'][:]
                 new_times = nc.variables['time'][:]
@@ -258,8 +261,10 @@ class Forcing:
         # Make a list steps of the forcing time steps
         # --------------------------------------------
         steps = []     # Model time step of forcing
+        print("time_units = ", time_units)
         for t in times:
-            otime = np.datetime64(num2date(t, time_units))
+            # print(num2date(t, time_units), t)
+            otime = np.datetime64(str(num2date(t, time_units)))
             dtime = np.timedelta64(otime - start_time, 's').astype(int)
             steps.append(int(dtime / config.dt))
 

@@ -22,7 +22,8 @@ ddmin, ddmax = 50, 150
 
 # First/last day to consider 
 date0 = datetime.datetime(2017, 3, 1)
-date1 = datetime.datetime(2017, 3, 10)
+date1 = datetime.datetime(2017, 3, 11)
+# date1 = datetime.datetime(2017, 3, 1)
 
 
 # ----------------
@@ -35,7 +36,7 @@ M = f.variables['mask_rho'][:,:]
 lon = f.variables['lon_rho'][:,:]
 lat = f.variables['lat_rho'][:,:]
 f.close()
-
+ 
 jmax, imax = H.shape
 
 # ---------------------
@@ -53,6 +54,7 @@ for n in range(pf.num_times):
         continue
     if n0 < 0:   # First time
         n0 = n
+        n1 = n
     if pf.time(n) < date1:
         n1 = n
     
@@ -66,9 +68,12 @@ for n in range(n0, n1+1):
     S0 = pf['super', n]
     A = pf['age', n]
     I = (ddmin <= A) & (A < ddmax)
-    C0, Xb, Yb = np.histogram2d(Y0[I], X0[I], (jmax, imax), weights=S0[I], 
-                           range=[[-0.5,jmax-0.5], [-0.5,imax-0.5]])
+    C0, Yb, Xb = np.histogram2d(
+        Y0[I], X0[I], weights=S0[I],
+        bins=(jmax, imax),
+        range=[[-0.5,jmax-0.5], [-0.5,imax-0.5]])
     C += C0
+
 
 # pf.close()
 
