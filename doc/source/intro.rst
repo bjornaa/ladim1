@@ -1,7 +1,7 @@
 Introduction
 ============
 
-LADIM is the acronym of the Lagrangian Advection and DIffusion Model.
+LADiM is the acronym of the Lagrangian Advection and DIffusion Model.
 
 It is an offline ocean particle tracking model. Presently it takes
 input from the `ROMS <http://www.myroms.org>`_ ocean model.

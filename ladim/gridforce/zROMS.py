@@ -34,7 +34,7 @@ class Grid:
 
     def __init__(self, config):
 
-        logging.info("Initalizing ROMS-type grid object")
+        logging.info("Initializing zROMS grid object")
         try:
             ncid = Dataset(config.grid_file)
         except OSError:
@@ -111,7 +111,7 @@ class Grid:
     def sample_metric(self, X, Y):
         """Sample the metric coefficients
 
-        Changes slowly, so using neareast neighbour
+        Changes slowly, so using nearest neighbour
         """
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j0
@@ -300,7 +300,7 @@ class Forcing:
         elif steps[0] == 0:
             prestep = 0
         else:
-            # No forcing at start, should alreadu be
+            # No forcing at start, should already be
             raise SystemExit(3)
 
         self.U, self.V = self._read_velocity(prestep)
@@ -558,7 +558,7 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
 #   Sampling routines
 # ------------------------
 
-# TODO: Unify with s-routune
+# TODO: Unify with s-routine
 
 
 def vert_level(z_level, X, Y, Z):
@@ -597,7 +597,7 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
     F = 3D field
     S = depth structure matrix
     X, Y = 1D arrays of horizontal grid coordinates
-    Z = 1D arryay of depth [m, positive downwards]
+    Z = 1D array of depth [m, positive downwards]
 
     Everything in rho-points
 

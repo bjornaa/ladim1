@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 i = 23
 x = i - 0.5 + 0.3  
-#q = i + 0.5 - x     # 0.7
+# q = i + 0.5 - x     # 0.7
 
 
 

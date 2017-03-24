@@ -1,4 +1,4 @@
-# Continuos release,
+# Continuous release,
 # 1 particle per hour from 2 locations
 # Fixed depth at 5 m
 
@@ -14,9 +14,9 @@ for line in f0:
     x = float(w[1])
     y = float(w[2])
     z = 5
-    super = float(w[4])
+    super_ = float(w[4])
     timestamp = w[5]
     f1.write("{:d} {:s} {:f} {:f} {:f} {:d} {:f}\n".format(
-             mult, timestamp, x, y, z, farmid, super))
+             mult, timestamp, x, y, z, farmid, super_))
 
 f1.close()

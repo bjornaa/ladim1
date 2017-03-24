@@ -2,7 +2,7 @@
 # tracker.py
 # Part of the LADIM Model
 #
-# Bjørn Ådllandsvik, <bjorn@imr.no>
+# Bjørn Ådlandsvik, <bjorn@imr.no>
 # Institute of Marine Research
 #
 # Licenced under the MIT license
@@ -39,7 +39,7 @@ class Tracker:
 
         # --- Advection ---
         if self.advect:
-            Uadv, Vadv = self.advect(grid, forcing, state)
+            Uadv, Vadv = self.advect(forcing, state)
             U += Uadv
             V += Vadv
 
@@ -71,7 +71,7 @@ class Tracker:
         state.X = X
         state.Y = Y
 
-    def EF(self, grid, forcing, state):
+    def EF(self, forcing, state):
         """Euler-Forward advection"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
@@ -82,7 +82,7 @@ class Tracker:
 
         return U, V
 
-    def RK2(self, grid, forcing, state):
+    def RK2(self, forcing, state):
         """Runge-Kutta second order = Heun scheme"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
@@ -95,7 +95,7 @@ class Tracker:
         U, V = forcing.velocity(X1, Y1, Z, tstep=0.5)
         return U, V
 
-    def RK4(self, grid, forcing, state):
+    def RK4(self, forcing, state):
         """Runge-Kutta fourth order advection"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
