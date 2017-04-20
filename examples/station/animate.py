@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from netCDF4 import Dataset
-from postladim.particlefile import ParticleFile
+from postladim import ParticleFile
 
 # ---------------
 # User settings
@@ -57,7 +57,7 @@ plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 
 # Plot initial particle distribution
 X, Y = pf.position(0)
-Z = pf['Z', 0]
+Z = pf.variables['Z'][0]
 # particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 particle_dist = ax.scatter(X, Y, c=Z, cmap=plt.get_cmap('plasma_r'))
 # title = ax.set_title(pf.time(0))

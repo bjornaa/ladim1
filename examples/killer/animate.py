@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from netCDF4 import Dataset
-from postladim.particlefile import ParticleFile
+from postladim import ParticleFile
 
 # ---------------
 # User settings
@@ -69,6 +69,7 @@ def animate(t):
     particle_dist.set_data(X, Y)
     timestamp.set_text(pf.time(t))
     return particle_dist, timestamp
+
 
 # Do the animation
 anim = FuncAnimation(fig, animate, frames=num_times, interval=30,

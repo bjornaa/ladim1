@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from postladim.particlefile import ParticleFile
+from postladim import ParticleFile
 from gridforce_analytic import Grid
 
 # Particle file

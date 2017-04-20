@@ -4,7 +4,7 @@
 import datetime
 import numpy as np
 from netCDF4 import Dataset
-from postladim.particlefile import ParticleFile
+from postladim import ParticleFile
 # import gridmap
 
 # ----------------
@@ -20,7 +20,7 @@ output_file = "c2.nc"
 # Min, max day-degrees to consider
 ddmin, ddmax = 50, 150
 
-# First/last day to consider 
+# First/last day to consider
 date0 = datetime.datetime(2017, 3, 1)
 date1 = datetime.datetime(2017, 3, 11)
 # date1 = datetime.datetime(2017, 3, 1)
@@ -36,7 +36,7 @@ M = f.variables['mask_rho'][:,:]
 lon = f.variables['lon_rho'][:,:]
 lat = f.variables['lat_rho'][:,:]
 f.close()
- 
+
 jmax, imax = H.shape
 
 # ---------------------
@@ -46,7 +46,7 @@ jmax, imax = H.shape
 pf = ParticleFile(particle_file)
 
 # Find record numbers
-    
+
 n0 = -99
 # n1 = -99
 for n in range(pf.num_times):
@@ -57,7 +57,7 @@ for n in range(pf.num_times):
         n1 = n
     if pf.time(n) < date1:
         n1 = n
-    
+
 print("start: ", n0, pf.time(n0))
 print("stop : ", n1, pf.time(n1))
 

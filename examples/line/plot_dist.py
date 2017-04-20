@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import roppy.mpl_util
 from netCDF4 import Dataset
 
-from postladim.particlefile import ParticleFile
+from postladim import ParticleFile
 
 # ---------------
 # User settings
