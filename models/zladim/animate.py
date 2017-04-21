@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from netCDF4 import Dataset
-from postladim.particlefile import ParticleFile
+from postladim import ParticleFile
 
 # ---------------
 # User settings

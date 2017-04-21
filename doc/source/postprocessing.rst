@@ -4,10 +4,10 @@ Post processing
 LADIM comes with a simple python package postladim that can be used
 for visualisation and analysis of LADIM output.
 
-The basic class is postladim.particlefile.ParticleFile it is initiated
+The basic class is postladim.ParticleFile it is initiated
 by the following lines::
 
-  from postladim.particlefile import ParticleFile
+  from postladim import ParticleFile
   ...
   pf = ParticleFile('ladim-output.nc')
 
@@ -26,7 +26,11 @@ by the following lines::
 
   .. attribute:: variables
 
-     List of instance variables.
+     Dictionary of variables
+
+  .. attribute:: instance_variables
+
+     List of particle instance variables
 
   .. attribute:: particle_variables
 
@@ -43,19 +47,15 @@ by the following lines::
   .. method:: position(n)
 
      Position (X and Y) of particle-distribution at n-th time time.
+     pf.position(n) = (pf.variables['X'][n], pf.variables['Y'][n])
 
 **Item notation** with pf as a ParticleFile instance:
 
 - name = instance variable
 
-  - pf[name, time_idx] returns values at time frame time_idx
-
-  - pf[name, time_idx, i] shorthand for pf[name, time_idx][i]
+  - pf.variables[name][n] returns values at time frame n
 
 - name = particle variable
 
-  - pf[name] returns all values
+  - pf.variables[name][pid] returns the particle variable value
 
-  - pf[name, pid] is shorthand for pf[name][pid]
-
-For example: pf.position(4) returns the tuple (pf['X', 4], pf['Y', 4])

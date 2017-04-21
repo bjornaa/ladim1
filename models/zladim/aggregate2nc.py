@@ -4,7 +4,7 @@
 import datetime
 import numpy as np
 from netCDF4 import Dataset
-from postladim.particlefile import ParticleFile
+from postladim import ParticleFile
 # import gridmap
 
 # ----------------
@@ -20,7 +20,7 @@ output_file = "c.nc"
 # Min, max day-degrees to consider
 ddmin, ddmax = 50, 150
 
-# First/last day to consider 
+# First/last day to consider
 date0 = datetime.datetime(2017, 3, 1)
 date1 = datetime.datetime(2017, 3, 10)
 
@@ -45,7 +45,7 @@ jmax, imax = H.shape
 pf = ParticleFile(particle_file)
 
 # Find record numbers
-    
+
 n0 = -99
 # n1 = -99
 for n in range(pf.num_times):
@@ -55,7 +55,7 @@ for n in range(pf.num_times):
         n0 = n
     if pf.time(n) < date1:
         n1 = n
-    
+
 print("start: ", n0, pf.time(n0))
 print("stop : ", n1, pf.time(n1))
 
@@ -88,7 +88,7 @@ for n in range(n0, n1+1):
 # Uses histogram2d for computational speed
 
 print("Counting")
-C, Xb, Yb = np.histogram2d(Y, X, (jmax, imax), weights=S, 
+C, Xb, Yb = np.histogram2d(Y, X, (jmax, imax), weights=S,
                            range=[[-0.5,jmax-0.5], [-0.5,imax-0.5]])
 
 # Get average

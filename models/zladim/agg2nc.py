@@ -4,7 +4,8 @@
 import datetime
 import numpy as np
 from netCDF4 import Dataset
-from postladim.particlefile import ParticleFile
+
+from postladim import ParticleFile
 
 # import gridmap
 
@@ -21,7 +22,7 @@ output_file = "c2.nc"
 # Min, max day-degrees to consider
 ddmin, ddmax = 50, 150
 
-# First/last day to consider 
+# First/last day to consider
 date0 = datetime.datetime(2017, 3, 1)
 date1 = datetime.datetime(2017, 3, 11)
 # date1 = datetime.datetime(2017, 3, 1)

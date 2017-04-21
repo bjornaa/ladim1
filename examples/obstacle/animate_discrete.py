@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from postladim.particlefile import ParticleFile
+from postladim import ParticleFile
 from gridforce_discrete import Grid
 
 # Input file

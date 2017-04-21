@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta
+# from datetime import datetime, timedelta
 import numpy as np
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 
 # TODO: Misses slice notation,
+
 
 class ParticleFile(object):
     """Reader class for LADIM output particle files
@@ -15,8 +16,8 @@ class ParticleFile(object):
 
     Methods:
         time(n) - Time of the time frame
-        particle_count(n) - Number of particles at each time frame
-        position(n) - Position of time
+        particle_count(n) - Number of particles at the frame
+        position(n) - Positions of particles at the time frame
         variables(name, n) - Value of the variable at time frame
 
     """
@@ -86,27 +87,28 @@ class ParticleFile(object):
             raise KeyError(name)
 
 
-# Can't use netcdf4-pythons num2date, returns wrong type
-def num2date(value, units):
-    """Return datetime from netCDF time
+# # Can't use netcdf4-pythons num2date, returns wrong type
+# # 2017-04-19: No problem
+# def num2date(value, units):
+#     """Return datetime from netCDF time
 
-    value: numerical value
-    units: "seconds since reference_time"
-    Returns: datetime.datetime object
+#     value: numerical value
+#     units: "seconds since reference_time"
+#     Returns: datetime.datetime object''''''
 
-    Example: value = 3600, units = "seconds since 2017-03-01 15:20:00"
-    Returns datetime.datetime(2017, 3, 1, 16, 20)
+#     Example: value = 3600, units = "seconds since 2017-03-01 15:20:00"
+#     Returns datetime.datetime(2017, 3, 1, 16, 20)
 
-    """
-    units = units.replace('T', ' ')   # Handle "T" between date and clock
-    w = units.split()
-    units = w[0]
-    date = w[-2]
-    clock = w[-1]
-    y, m, d = [int(v) for v in date.split('-')]
-    wclock = clock.split(':')
-    h, mi = int(wclock[0]), int(wclock[1])
-    s = float(wclock[2])
-    s = int(round(s))  # Round to nearest second
-    time0 = datetime(y, m, d, h, mi, s)
-    return time0 + timedelta(seconds=value)
+#     """
+#     units = units.replace('T', ' ')   # Handle "T" between date and clock
+#     w = units.split()
+#     units = w[0]
+#     date = w[-2]
+#     clock = w[-1]
+#     y, m, d = [int(v) for v in date.split('-')]
+#     wclock = clock.split(':')
+#     h, mi = int(wclock[0]), int(wclock[1])
+#     s = float(wclock[2])
+#     s = int(round(s))  # Round to nearest second
+#     time0 = datetime(y, m, d, h, mi, s)
+#     return time0 + timedelta(seconds=value)
