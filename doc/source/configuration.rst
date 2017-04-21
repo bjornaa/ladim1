@@ -8,8 +8,8 @@ The goal is that a user should not have to touch the code, every necessary
 aspect should be customizable by the configuration file.
 
 The name of the configuration file is given as a command line argument to the
-main ladim script. If the name is missing, a default name of :file:`ladim.yaml` is
-supposed.
+main ladim script. If the name is missing, a default name of :file:`ladim.yaml`
+is supposed.
 
 It is a goal to provide sane defaults in the configuration file, so that
 enhancements of the configuration setup do not break existing configuration
