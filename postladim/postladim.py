@@ -1,9 +1,33 @@
+"""Main class ParticleFile for reading LADiM output
+
+   Inspired by the general netcdf4 package, but
+   adapted for ragged array indexing.
+
+"""
+
+# ---------------------------------
+# Bjørn Ådlandsvik <bjorn@imr.no>
+# Institute of Marine Research
+# ---------------------------------
+
 import numpy as np
 from netCDF4 import Dataset, num2date
 
-
 class InstanceVariable():
+    """Particle instance variable
 
+    parameters
+    ----------
+    particlefile : ParticleFile instance
+    name : Variable name
+
+    Example
+    -------
+    temp = pf.variables['temp'][n]
+        Here pf is a ParticleFile instance
+        Get array of particle temperatures at time frame n in the file
+
+    """
     def __init__(self, particlefile, name):
         self._pf = particlefile
         self._name = name
@@ -16,7 +40,20 @@ class InstanceVariable():
 
 
 class ParticleVariable():
+    """Particle variable
 
+    parameters
+    ----------
+    particlefile : ParticleFile instance
+    name : Variable name
+
+    Example
+    -------
+    rtime = pf.variables['release_time'][pid]
+        Here pf is a ParticleFile instance
+        Get release time of particle with identifier = pid
+
+    """
     def __init__(self, particlefile, name):
         self._pf = particlefile
         self._name = name
@@ -30,7 +67,13 @@ class ParticleVariable():
 
 
 class ParticleFile():
+    """Dataset from a LADiM output file
 
+    parameters
+    ----------
+    filename : Name of particle file
+
+    """
     def __init__(self, filename):
         self.nc = Dataset(filename, mode='r')
         self.num_times = len(self.nc.dimensions['time'])
@@ -54,14 +97,16 @@ class ParticleFile():
         return self.nc.variables[name][start:start+count]
 
     def time(self, n):
+        """Get timestamp from a time frame"""
         tvar = self.nc.variables['time']
         return num2date(tvar[n], tvar.units)
 
     def particle_count(self, n):
+        """Return number of particles at a time frame"""
         return self._count[n]
 
     def position(self, n):
-        """Get particle positions at n-th time times"""
+        """Get particle positions at n-th time frame"""
         start = self._start[n]
         count = self._count[n]
         X = self.nc.variables['X'][start:start+count]
