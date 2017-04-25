@@ -1,7 +1,7 @@
-LADIM aka LADIM3 aka pyladim
+LADiM aka LADIM3 aka pyladim
 ============================
 
-This is a developing new version of the Lagrangian Advection and DIffusion
+This is a developing new version of the Lagrangian Advection and Diffusion
 Model. It is an off-line particle tracking code. Presently  using results from
 the ocean model `ROMS <http://www.myroms.org/>`_ as input.
 

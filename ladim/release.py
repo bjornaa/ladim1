@@ -23,7 +23,7 @@ class ParticleReleaser:
 
     def __init__(self, config):
 
-        logging.info('Initalizing the particle releaser')
+        logging.info('Initializing the particle releaser')
 
         # Read the particle release file
         A = pd.read_table(config.particle_release_file,
@@ -35,14 +35,20 @@ class ParticleReleaser:
         if 'mult' not in config.release_format:
             A['mult'] = 1
 
-        # self.A = A
+        # Remove everything outside simulation time
+        A = A[A['release_time'] >= config.start_time]
+        A = A[A['release_time'] <= config.stop_time]   # Use < ?
+
+        if len(A) == 0:
+            logging.error("Empty particle release")
+            raise SystemExit
 
         # The timeframes present in the release file
         self._file_times = A['release_time'].unique()
 
         # Handle continuous release
         if config.release_type == 'continuous':
-            time0 = A['release_time'][0]
+            time0 = self._file_times[0]
             self.times = np.arange(
                 time0, config.stop_time, config.release_frequency)
             # Append stop_time to allow releases after last file time
@@ -93,6 +99,12 @@ class ParticleReleaser:
 
         # Reset the counters after the particle count
         self._index = 0    # Index of next release
+        # Find first index in release_file, skip  before start
+        # for i, ft in self._file_times:
+        #    if ft >= self.times[0]:
+        #        self._file_index = i
+        #        break
+
         self._file_index = 0      # Index of next data from release file
         self._particle_count = 0
 

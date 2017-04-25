@@ -11,9 +11,7 @@ with Dataset(grid_file) as f:
 with Dataset(conc_file) as f:
     C = f.variables['conc'][:, :]
 
-
-
-C = C / 800**2
+C /= 800 ** 2
 
 C = C.clip(0, 1)
 

@@ -57,7 +57,7 @@ shown below, in NetCDF CFL format::
   // global attributes:
                 :Conventions = "CF-1.5" ;
                 :institution = "Institute of Marine Research" ;
-                :source = "Lagrangian Advection and DIffusion Model, python version" ;
+                :source = "Lagrangian Advection and Diffusion Model, python version" ;
                 :history = "2012-11-28 created by pyladim" ;
   }
 

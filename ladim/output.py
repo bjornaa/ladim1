@@ -74,7 +74,7 @@ class OutPut:
         # hvis andre skulle bruke
         nc.Conventions = "CF-1.5"
         nc.institution = "Institute of Marine Research"
-        nc.source = "Lagrangian Advection and DIffusion Model, python version"
+        nc.source = "Lagrangian Advection and Diffusion Model, python version"
         nc.history = "Created by pyladim"
         nc.date = str(datetime.date.today())
 

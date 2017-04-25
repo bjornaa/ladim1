@@ -55,6 +55,13 @@ Alternatively a better format might be developed.
 For time the point is that the clock part should not be interpreted as
 the X-coordinate. An alternative would be to use a comma-separated format (csv).
 
+Entries with release_time before the start or after the stop time of LADiM are
+ignorered. In particular, constant continuous release will not work if the
+release_time is before the models start time. Strange things may happen if
+particle release is not aligned with the model time stepping.
+The user is presently responsible for syncronizing model and release times.
+
+
 .. seealso::
   Module :mod:`release`
     Documentation of the :mod:`release` module

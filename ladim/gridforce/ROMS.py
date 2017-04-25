@@ -34,7 +34,7 @@ class Grid:
 
     def __init__(self, config):
 
-        logging.info("Initalizing ROMS-type grid object")
+        logging.info("Initializing ROMS-type grid object")
         try:
             ncid = Dataset(config.grid_file)
         except OSError:
@@ -592,7 +592,7 @@ def z2s(z_w, X, Y, Z):
     """
 
     kmax = z_w.shape[0] - 1  # Number of vertical
-    jmax, imax = z_w.shape[1:]  # Number of horizontal cells
+    # jmax, imax = z_w.shape[1:]  # Number of horizontal cells
 
     # Find rho-based horizontal grid cell
     # i.e. closest rho-point

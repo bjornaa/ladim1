@@ -6,7 +6,7 @@ The frequency of output, the variables included and their attributes
 are determined by the configuration file.
 
 This is a not backwards compatible modification of the old LADIM format.
-The fundamental data structure is the same, so cripts should be easy to modify.
+The fundamental data structure is the same, so scripts should be easy to modify.
 The change is done to follow the CF-standard
 as far as possible, and to increase flexibility.
 

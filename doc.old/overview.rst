@@ -8,7 +8,7 @@ for offline use based on output from the ROMS ocean model.
 
 The horizontal coordinates used are ROMS grid coordinates.
 (continuous X, Y s.t. X = i and Y = j in the center of
-grid cell (i,j)). The landmask is taken directly from ROMS.
+grid cell (i,j)). The land mask is taken directly from ROMS.
 In the vertical, depth is used as a coordinate. A full version
 handle input/output in longitude/latitude.
 

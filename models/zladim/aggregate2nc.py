@@ -92,7 +92,7 @@ C, Xb, Yb = np.histogram2d(Y, X, (jmax, imax), weights=S,
                            range=[[-0.5,jmax-0.5], [-0.5,imax-0.5]])
 
 # Get average
-C = C / (n1 + 1 - n0)
+C /= n1 + 1 - n0
 
 # --------------------------
 # Define output NetCDF file

@@ -2,8 +2,8 @@ from distutils.core import setup
 
 setup(
    name='Ladim',
-   version='2.8',
-   description='Lagrangian Advection and DIffusion Model',
+   version='1.0',
+   description='Lagrangian Advection and Diffusion Model',
    author='Bjørn Ådlandsvik',
    author_email='bjorn@imr.no',
    packages=['ladim', 'postladim', 'ladim.ibms', 'ladim.gridforce'],

@@ -217,7 +217,7 @@ class test_z2s(unittest.TestCase):
         assert(0 <= A <= 1)
         assert(abs(A*z_w[K] + (1-A)*z_w[K+1] + Z) < 1.e-5)
 
-# --------------------------------------
 
+# --------------------------------------
 if __name__ == '__main__':
     unittest.main()

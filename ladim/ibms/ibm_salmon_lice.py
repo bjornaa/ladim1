@@ -11,7 +11,7 @@ class IBM:
 
         # mm2m = 0.001
         # g = 9.81
-        # tempB = 7.0  # setter default temperatur
+        # tempB = 7.0  # set default temperature
 
         self.k = 0.2             # Light extinction coefficient
         self.swim_vel = 5e-4     # m/s
@@ -49,7 +49,7 @@ class IBM:
             rand = np.random.normal(size=len(W))
             W += rand * (2*self.D/self.dt)**0.5
 
-        # Update vertical position, using reflextive boundary condition
+        # Update vertical position, using reflexive boundary condition
         state.Z += W * self.dt
 
         # For z-version, do not go below 20 m
