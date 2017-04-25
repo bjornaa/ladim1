@@ -3,9 +3,8 @@
 LADIM configuration
 ===================
 
-The LADIM model is highly configurable using a separate configuration file.
-The goal is that a user should not have to touch the code, every necessary
-aspect should be customizable by the configuration file.
+The LADiM model system is highly configurable using a separate configuration file. The goal is that a user should not have to touch the code, every
+necessary aspect should be customizable by the configuration file.
 
 The name of the configuration file is given as a command line argument to the
 main ladim script. If the name is missing, a default name of :file:`ladim.yaml`
@@ -20,14 +19,7 @@ The configuration file format is a subset of :abbr:`yaml
 necessary. The example configuration files are self-describing and can
 easily be modified.
 
-Question
-
-LADIM can be used with different :abbr:`IBMs (Individual Based Models)`.
-These may require quite different
-configurations. Should they be accompanied by a separate configuration file?
-Main configuration may just state which IBM module to use,
-and the name of the IBM configuration file.
-
+Note that the indentation in a yaml file is mandatory, it i spart of the syntax. The indentation has to be done by spaces, not tabs. Reasonable editors will recognize yaml-files by the extension and will automatically produce spaces when you hit the tab key.
 
 .. seealso::
   Module :mod:`configuration`

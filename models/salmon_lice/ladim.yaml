@@ -1,19 +1,9 @@
-# Configuration file for ladim
+# Configuration file salmon lice model using ROMS output
 #
-# format examples
-# time:
-#   start_time: 2017-01-08 13:00:00
-#
-# output variables:
-#   X:
-#     nctype: f4
-#     long_name: particle X-coordinate
-#   Y: {nctype: f4, long_name: particle Y-coordinate}
-
 
 time_control:
     # Start and stop of simulation
-    # use an alias &t0 if used again
+    # use an alias &time0 if used again
     start_time: &time0 2015-04-01 00:00:00
     stop_time:  2015-04-01 12:00:00
     # Reference time for netcdf output

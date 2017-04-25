@@ -1,10 +1,12 @@
 Postladim
 =========
 
-A simple python package for analyzing LADIM output
+A simple python package for analyzing LADiM output
 
-postladim defines a class ParticleFile
-for reading LADIM output.
+particlefile defines a class ParticleFile
+for reading LADiM output.
+
+cellcount defines a function for counting particles in cells
 
 The ladim/examples directories shows examples on how to use
 this with matplotlib for simple plotting and animation.
