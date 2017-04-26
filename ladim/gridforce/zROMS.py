@@ -318,7 +318,7 @@ class Forcing:
         for name in self.ibm_forcing:
             self[name] = self._read_field(name, prestep)
             self[name+'new'] = self._read_field(name, 0)
-            self['d'+name] = (self[name] - self[name+'new']) / prestep
+            self['d'+name] = (self[name] - self[name+'new']) / stepdiff
 
         self.steps = steps
         self._files = files
