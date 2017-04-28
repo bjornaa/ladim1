@@ -20,10 +20,6 @@ else:
     config_file = 'ladim.yaml'
 config = Configure(config_file)
 
-
-# numsteps = config.numsteps
-# dt = config.dt
-
 # --- Initiate the grid and the forcing ---
 grid = Grid(config)
 forcing = Forcing(config, grid)
@@ -49,7 +45,6 @@ for step in range(config.numsteps+1):
     forcing.update(step)
 
     # --- Particle release ---
-    # TODO: Find better name than unique_steps
     if step in releaser.steps:
         V = next(releaser)
         state.append(V)

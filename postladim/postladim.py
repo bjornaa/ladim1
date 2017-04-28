@@ -13,6 +13,7 @@
 import numpy as np
 from netCDF4 import Dataset, num2date
 
+
 class InstanceVariable():
     """Particle instance variable
 
@@ -92,8 +93,12 @@ class ParticleFile():
     def _get_variable(self, name, n):
         """Read an instance variable at given time"""
         # Må ha test, om name er variabel
-        start = self._start[n]
-        count = self._count[n]
+        if isinstance(n, slice):
+            start = self._start[n.start]
+            count = sum(self._count[n])
+        else:   # Integer
+            start = self._start[n]
+            count = self._count[n]
         return self.nc.variables[name][start:start+count]
 
     def time(self, n):
@@ -112,3 +117,6 @@ class ParticleFile():
         X = self.nc.variables['X'][start:start+count]
         Y = self.nc.variables['Y'][start:start+count]
         return X, Y
+
+    def close(self):
+        self.nc.close()

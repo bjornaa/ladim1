@@ -64,7 +64,7 @@ output_variables:
     outper: [1, h]
     # Variable names
     particle: [release_time, farmid]
-    instance: [pid, X, Y, Z, super, age]
+    instance: [pid, X, Y, Z, super, age, temp, salt]
     # NetCDF arguments
     release_time:
         ncformat: f8
@@ -87,6 +87,8 @@ output_variables:
         units: Celcius days
         standard_name: integral_of_sea_water_temperature_wrt_time
     super: {ncformat: f4, long_name: number of individuals in instance}
+    temp: {ncformat: f4, long_name: temperature, units: Celsius}
+    salt: {ncformat: f4, long_name: salinity, units=g/kg}
 
 numerics:
     # Model time step, [value, unit]
