@@ -75,12 +75,13 @@ class State:
     def update(self, grid, forcing):
         """Update the model state to the next timestep"""
 
+        # From physics all particles are alive
+        self.alive = np.ones(len(self), dtype='bool')
+
         self.timestep += 1
         self.timestamp += np.timedelta64(self.dt, 's')
         self.track.move_particles(grid, forcing, self)
 
-        # From physics all particles are alive
-        self.alive = np.ones(len(self), dtype='bool')
 
         # Update the IBM
         if self.ibm:

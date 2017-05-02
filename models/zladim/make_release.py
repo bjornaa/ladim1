@@ -3,7 +3,7 @@
 # Fixed depth at 5 m
 
 f0 = open('multifarm_Lus_29jan.dat')
-f1 = open('lice_2917-01.29.rls', mode='w')
+f1 = open('lice_2017-01-29.rls', mode='w')
 
 mult = 5
 

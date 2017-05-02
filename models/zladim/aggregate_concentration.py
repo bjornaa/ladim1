@@ -20,7 +20,7 @@ print("LADiM output file:", ladimfile)
 concentration_file = "Lus_2016_1apr_anlegg-0100-0150.nc"
 
 # Aggregation period (number of output time frames)
-aggper = 24   # Dayly given hourly output from LADiM
+aggper = 24   # Daily given hourly output from LADiM
 
 # Min, max day-degrees to consider
 ddmin, ddmax = 40, 170
