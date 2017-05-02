@@ -27,9 +27,12 @@ class IBM:
         # Mortality
         state.super *= self.mortality_factor
 
+        # Update forcing
+        state.temp = forcing.field(state.X, state.Y, state.Z, 'temp')
+        state.salt = forcing.field(state.X, state.Y, state.Z, 'salt')
+        
         # Age in degree-days
-        temp = forcing.field(state.X, state.Y, state.Z, 'temp')
-        state.age += temp * state.dt / 86400
+        state.age += state.temp * state.dt / 86400
 
         # Light at depth
         lon, lat = grid.lonlat(state.X, state.Y)
@@ -41,8 +44,7 @@ class IBM:
         # Upwards if light enough (decreasing depth)
         W[Eb >= 0.01] = - self.swim_vel
         # Downwards if salinity < 20
-        salt = forcing.field(state.X, state.Y, state.Z, 'salt')
-        W[salt < 20] = self.swim_vel
+        W[state.salt < 20] = self.swim_vel
 
         # Random diffusion velocity
         if self.vertical_diffusion:

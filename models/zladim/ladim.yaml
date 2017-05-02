@@ -51,7 +51,7 @@ state:
 particle_release:
     release_type: continuous
     release_frequency: [1, h]
-    variables: [mult, release_time, X, Y, Z, farmid, super]
+    variables: [mult, release_time, X, Y, Z, temp, salt, farmid, super]
     # Converters (if not float)
     mult: int
     release_time: time
@@ -89,6 +89,16 @@ output_variables:
     super: {ncformat: f4, long_name: number of individuals in instance}
     temp: {ncformat: f4, long_name: temperature, units: Celsius}
     salt: {ncformat: f4, long_name: salinity, units=g/kg}
+    temp:
+          ncformat: f4
+          long_name: temperature
+          standard_name: sea_water_temperature
+          units: Celcius
+    salt:
+          ncformat: f4
+          long_name: salinity
+          standard_name: sea_water_salinity
+
 
 numerics:
     # Model time step, [value, unit]
