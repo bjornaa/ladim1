@@ -92,7 +92,7 @@ class OutPut:
         logging.debug("Writing: timestep, timestamp = {} {}".
                       format(state.timestep, state.timestamp))
         t = self.outcount
-        pcount = len(state)
+        pcount = len(state)            # Present number of particles
         pstart = self.instance_count
 
         logging.debug("Writing {} particles".format(pcount))
@@ -103,6 +103,10 @@ class OutPut:
         for name in self.instance_variables:
             self.nc.variables[name][pstart:pstart+pcount] = state[name]
 
+        # Flush the data to the file
+        self.nc.sync()
+
+        # Update counters
         self.outcount += 1
         self.instance_count += pcount
 

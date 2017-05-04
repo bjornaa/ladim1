@@ -15,7 +15,7 @@ time_control:
     # Start and stop of simulation
     # use an alias &t0 if used again
     start_time: &time0 2017-01-29 00:00:00
-    stop_time:  2017-02-01 00:00:00
+    stop_time:  2017-01-30 00:00:00
     # Reference time for netcdf output
     # by default set to start_time
     # can be overridden explicitly
@@ -25,7 +25,8 @@ files:
     grid_file: /data/model_data006/anneds/Lusedata/Gridfiler/norkyst_800m_grid_full.nc
     input_file: /hexagon/vol1/bjorn/NorKyst-800m_ZDEPTHS_CGRID_his.*2017*.nc4
     particle_release_file : lice_2017-01-29.rls
-    output_file           : /hexagon/vol1/bjorn_rhea/out.nc
+    #output_file           : /hexagon/vol1/bjorn_rhea/out.nc
+    output_file           : out.nc
 
 gridforce:
     # Format = [i0, i1, j0, j1]
