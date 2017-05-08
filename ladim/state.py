@@ -81,7 +81,11 @@ class State:
         self.timestep += 1
         self.timestamp += np.timedelta64(self.dt, 's')
         self.track.move_particles(grid, forcing, self)
-
+        # logging.info(
+        #        "Model time = {}".format(self.timestamp.astype('M8[h]')))
+        if self.timestamp.astype('int') % 3600 == 0:     # New hour
+            logging.info(
+                "Model time = {}".format(self.timestamp.astype('M8[h]')))
 
         # Update the IBM
         if self.ibm:

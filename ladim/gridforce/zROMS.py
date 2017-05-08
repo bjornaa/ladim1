@@ -74,7 +74,7 @@ class Grid:
 
         # Vertical z-levels
         # self.z_levels = ncid.variables['zlevels'][:]
-        self.z_levels =  np.array([0, 1, 2, 3, 5, 10, 15, 20])
+        self.z_levels = np.array([0, 1, 2, 3, 5, 10, 15, 20])
 
         # Read some variables
         self.H = ncid.variables['h'][self.J, self.I]
@@ -372,7 +372,7 @@ class Forcing:
 
         # Handle file opening/closing
         # Always read velocity before other fields
-        logging.info('Reading velocity for time step = {}'.format(n))
+        logging.debug('Reading velocity for time step = {}'.format(n))
         first = True
         if first:   # Open file initiallt
             self._nc = Dataset(self._files[self.file_idx[n]])

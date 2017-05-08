@@ -62,5 +62,7 @@ for step in range(config.numsteps+1):
 # Clean up
 # ========
 
+print('\nLADiM: end of simulation')
+
 forcing.close()
 out.close()
