@@ -1,6 +1,6 @@
-.. _installation:
-
 .. index:: installation
+
+.. _installation:
 
 Installation
 ============
