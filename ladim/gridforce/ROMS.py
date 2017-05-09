@@ -192,6 +192,7 @@ class Forcing:
 
         # Test for glob, use MFDataset if needed
         files = glob.glob(config.input_file)
+        files = files.sort()
         numfiles = len(files)
         if numfiles == 0:
             logging.error("No input file: {}".format(config.input_file))
