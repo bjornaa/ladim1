@@ -183,7 +183,6 @@ class Forcing:
 
     def __init__(self, config, grid):
 
-        logging.basicConfig(level=logging.INFO)
         logging.info("Initiating forcing")
 
         self._grid = grid  # Get the grid object, make private?
@@ -192,12 +191,12 @@ class Forcing:
 
         # Test for glob, use MFDataset if needed
         files = glob.glob(config.input_file)
-        files = files.sort()
+        files.sort()
         numfiles = len(files)
         if numfiles == 0:
             logging.error("No input file: {}".format(config.input_file))
             raise SystemExit(3)
-        logging.info('Number of forcing files = {}'.format(numfiles))
+        logging.info('Number of available forcing files = {}'.format(numfiles))
 
         # ----------------------------------------
         # Open first file for some general info
@@ -282,10 +281,6 @@ class Forcing:
             otime = np.datetime64(num2date(t, time_units))
             dtime = np.timedelta64(otime - start_time, 's').astype(int)
             steps.append(int(dtime / config.dt))
-
-        # print(steps)
-
-        # change_steps = [steps[t] for t in change_times]
 
         file_idx = dict()
         frame_idx = dict()
