@@ -189,7 +189,7 @@ class Forcing:
 
         self.ibm_forcing = config.ibm_forcing
 
-        # Test for glob, use MFDataset if needed
+        # Forcing file(s)
         files = glob.glob(config.input_file)
         files.sort()
         numfiles = len(files)
@@ -257,8 +257,6 @@ class Forcing:
         time1 = num2date(times[-1], time_units)
         logging.info('time0 = {}'.format(str(time0)))
         logging.info('time1 = {}'.format(str(time1)))
-        # print(time0)
-        # print(time1)
         start_time = np.datetime64(config.start_time)
         # self.time = start_time
         self.dt = np.timedelta64(int(config.dt), 's')  # or use

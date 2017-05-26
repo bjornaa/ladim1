@@ -1,10 +1,5 @@
 import numpy as np
 
-
-# Question: should it return x_edges and y_edges as well
-# May simplify further use, but is confusing
-
-
 def cellcount(X, Y, W=None, gridspec=None, return_edges=False):
     """Count the (weighted) number of particles in grid cells
 

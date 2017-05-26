@@ -27,7 +27,7 @@ import numpy as np
 # ---------------------
 
 
-def sample2D2(F, X, Y):
+def sample2D2(F: np.ndarray, X, Y) -> np.ndarray:
     """Bilinear sample of a 2D field
 
     *F* : 2D array
