@@ -15,15 +15,15 @@ class Tracker:
     """The physical particle tracking kernel"""
 
     def __init__(self, config):
-        self.dt = config.dt
-        if config.advection:
-            self.advect = getattr(self, config.advection)
+        self.dt = config['dt']
+        if config['advection']:
+            self.advect = getattr(self, config['advection'])
         else:
             self.advect = None
         # Read from config:
-        self.diffusion = config.diffusion
+        self.diffusion = config['diffusion']
         if self.diffusion:
-            self.D = config.diffusion_coefficient  # [m2.s-1]
+            self.D = config['diffusion_coefficient']  # [m2.s-1]
 
     def move_particles(self, grid, forcing, state):
         """Move the particles"""

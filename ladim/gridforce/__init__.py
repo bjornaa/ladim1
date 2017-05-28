@@ -14,7 +14,7 @@ class Grid:
         # Allow gridforce module in current directory
         sys.path.insert(0, os.getcwd())
         # Import correct gridforce_module
-        gridforce_module = importlib.import_module(config.gridforce_module)
+        gridforce_module = importlib.import_module(config['gridforce_module'])
         self.grid = gridforce_module.Grid(config)
         # Make it a proxy
 
@@ -50,7 +50,7 @@ class Forcing:
         # Allow gridforce module in current directory
         sys.path.insert(0, os.getcwd())
         # Import correct gridforce_module
-        gridforce_module = importlib.import_module(config.gridforce_module)
+        gridforce_module = importlib.import_module(config['gridforce_module'])
         self.forcing = gridforce_module.Forcing(config, grid.grid, **args)
         # self.steps = self.forcing.steps
         # self.U = self.forcing.U

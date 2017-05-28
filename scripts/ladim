@@ -3,7 +3,7 @@
 import sys
 # from netCDF4 import num2date
 
-from ladim.configuration import Configure
+from ladim.configuration import configure
 from ladim.gridforce import Grid, Forcing
 from ladim.release import ParticleReleaser
 from ladim.state import State
@@ -18,7 +18,7 @@ if len(sys.argv) > 1:   # configuration file from command line
     config_file = sys.argv[1]
 else:
     config_file = 'ladim.yaml'
-config = Configure(config_file)
+config = configure(config_file)
 
 # --- Initiate the grid and the forcing ---
 grid = Grid(config)

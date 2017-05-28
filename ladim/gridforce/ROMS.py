@@ -36,9 +36,9 @@ class Grid:
 
         logging.info("Initializing ROMS-type grid object")
         try:
-            ncid = Dataset(config.grid_file)
+            ncid = Dataset(config['grid_file'])
         except OSError:
-            logging.error('Grid file {} not found'.format(config.grid_file))
+            logging.error('Grid file {} not found'.format(config['grid_file']))
             raise SystemExit(1)
 
         # Subgrid, only considers internal grid cells
@@ -47,8 +47,8 @@ class Grid:
         # Here, imax, jmax refers to whole grid
         jmax, imax = ncid.variables['h'].shape
         whole_grid = [1, imax - 1, 1, jmax - 1]
-        if 'subgrid' in config.grid_args:
-            limits = list(config.grid_args['subgrid'])
+        if 'subgrid' in config['grid_args']:
+            limits = list(config['grid_args']['subgrid'])
         else:
             limits = whole_grid
         # Allow None if no imposed limitation
@@ -74,8 +74,8 @@ class Grid:
 
         # Vertical grid
 
-        if 'Vinfo' in config.grid_args:
-            Vinfo = config.grid_args['Vinfo']
+        if 'Vinfo' in config['grid_args']:
+            Vinfo = config['grid_args']['Vinfo']
             self.N = Vinfo['N']
             self.hc = Vinfo['hc']
             self.Vstretching = Vinfo.get('Vstretching', 1)
@@ -187,14 +187,14 @@ class Forcing:
 
         self._grid = grid  # Get the grid object, make private?
 
-        self.ibm_forcing = config.ibm_forcing
+        self.ibm_forcing = config['ibm_forcing']
 
         # Forcing file(s)
-        files = glob.glob(config.input_file)
+        files = glob.glob(config['input_file'])
         files.sort()
         numfiles = len(files)
         if numfiles == 0:
-            logging.error("No input file: {}".format(config.input_file))
+            logging.error("No input file: {}".format(config['input_file']))
             raise SystemExit(3)
         logging.info('Number of available forcing files = {}'.format(numfiles))
 
@@ -257,9 +257,9 @@ class Forcing:
         time1 = num2date(times[-1], time_units)
         logging.info('time0 = {}'.format(str(time0)))
         logging.info('time1 = {}'.format(str(time1)))
-        start_time = np.datetime64(config.start_time)
+        start_time = np.datetime64(config['start_time'])
         # self.time = start_time
-        self.dt = np.timedelta64(int(config.dt), 's')  # or use
+        self.dt = np.timedelta64(int(config['dt']), 's')  # or use
 
         # Check that forcing period covers the simulation period
         # ------------------------------------------------------
@@ -268,7 +268,7 @@ class Forcing:
         if time0 > start_time:
             logging.error("No forcing at start time")
             raise SystemExit(3)
-        if time1 < config.stop_time:
+        if time1 < config['stop_time']:
             logging.error("No forcing at stop time")
             raise SystemExit(3)
 
@@ -278,7 +278,7 @@ class Forcing:
         for t in times:
             otime = np.datetime64(num2date(t, time_units))
             dtime = np.timedelta64(otime - start_time, 's').astype(int)
-            steps.append(int(dtime / config.dt))
+            steps.append(int(dtime / config['dt']))
 
         file_idx = dict()
         frame_idx = dict()

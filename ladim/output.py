@@ -8,13 +8,18 @@
 
 import logging
 import datetime
+from typing import Any, Dict
 from netCDF4 import Dataset
+from .state import State                  # For mypy
+from .release import ParticleReleaser     # For mypy
 
 
 # Gjør til en iterator
 class OutPut:
 
-    def __init__(self, config, release):
+    def __init__(self,
+                 config: Dict[str, Any],
+                 release: ParticleReleaser) -> None:
 
         logging.info('Initializing output')
 
@@ -22,29 +27,31 @@ class OutPut:
         self.instance_variables = config['output_instance']
         self.instance_count = 0
         self.outcount = 0    # No output yet
-        self.dt = config.dt
+        self.dt = config['dt']
 
     def close(self):
         self.nc.close()
 
-    def _define_netcdf(self, config, release):
+    def _define_netcdf(self, config: Dict[str, Any],
+                       release: ParticleReleaser) -> Dataset:
         """Define a NetCDF output file"""
 
         logging.debug("Defining netCDF file")
-        nc = Dataset(config.output_file, mode='w',
+        # nc = Dataset(config['output_file'], mode='w',
+        nc = Dataset(config['output_file'], mode='w',
                      format="NETCDF3_CLASSIC")
         # --- Dimensions
         nc.createDimension('particle', release.total_particle_count)
         nc.createDimension('particle_instance', None)  # unlimited
         # Sett output-period i config (bruk naturlig enhet)
         # regne om til antall tidsteg og få inn under
-        nc.createDimension('time', config.num_output)
+        nc.createDimension('time', config['num_output'])
 
         # ---- Coordinate variable for time
         v = nc.createVariable('time', 'f8', ('time',))
         v.long_name = 'time'
         v.standard_name = 'time'
-        v.units = 'seconds since {:s}'.format(str(config.reference_time))
+        v.units = 'seconds since {:s}'.format(str(config['reference_time']))
 
         # Particle count
         v = nc.createVariable('particle_count', 'i4', ('time',))
@@ -81,12 +88,12 @@ class OutPut:
         logging.debug("Netcdf output file defined")
 
         # Save particle variables
-        for name in config.output_particle:
+        for name in config['output_particle']:
             nc.variables[name][:] = release.particle_variables[name][:]
 
         return nc
 
-    def write(self, state):
+    def write(self, state: State) -> None:
         """Write the model state to NetCDF"""
 
         logging.debug("Writing: timestep, timestamp = {} {}".

@@ -19,7 +19,7 @@ class IBM:
         self.D = 1e-4            # Vertical mixing [m*2/s]
         # Ingrid har 1e-3
 
-        self.dt = config.dt
+        self.dt = config['dt']
         self.mortality_factor = np.exp(-mortality*self.dt/86400)
 
     def update_ibm(self, grid, state, forcing):
@@ -30,7 +30,7 @@ class IBM:
         # Update forcing
         state.temp = forcing.field(state.X, state.Y, state.Z, 'temp')
         state.salt = forcing.field(state.X, state.Y, state.Z, 'salt')
-        
+
         # Age in degree-days
         state.age += state.temp * state.dt / 86400
 

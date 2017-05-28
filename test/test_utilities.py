@@ -1,14 +1,7 @@
 import numpy as np
 from ladim.utilities import timestep2stamp, timestamp2step
 
-
-class Container:
-    dt = 600
-    start_time = np.datetime64('2017-02-10 20')
-
-
-config = Container()
-
+config = dict(dt=600, start_time=np.datetime64('2017-02-10 20'))
 
 def test_step2stamp():
     n = 24 * 3600 // config.dt    # 24 hours

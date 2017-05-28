@@ -4,13 +4,14 @@ import sys
 import os
 import importlib
 import logging
+from typing import Sized
 from ladim.tracker import Tracker
 import numpy as np
 
 # ------------------------
 
 
-class State:
+class State(Sized):
     """The model variables at a given time"""
 
     def __init__(self, config):
@@ -18,11 +19,11 @@ class State:
         logging.info("Initializing the model state")
 
         self.timestep = 0
-        self.timestamp = config.start_time.astype('datetime64[s]')
-        self.dt = np.timedelta64(config.dt, 's')
+        self.timestamp = config['start_time'].astype('datetime64[s]')
+        self.dt = np.timedelta64(config['dt'], 's')
         self.position_variables = ['X', 'Y', 'Z']
-        self.ibm_variables = config.ibm_variables
-        self.particle_variables = config.particle_variables
+        self.ibm_variables = config['ibm_variables']
+        self.particle_variables = config['particle_variables']
         self.instance_variables = (
             self.position_variables +
             [var for var in self.ibm_variables
@@ -34,16 +35,16 @@ class State:
 
         for name in self.particle_variables:
             setattr(self, name,
-                    np.array([], dtype=config.release_dtype[name]))
+                    np.array([], dtype=config['release_dtype'][name]))
 
         self.track = Tracker(config)
-        self.dt = config.dt
+        self.dt = config['dt']
 
-        if config.ibm_module:
+        if config['ibm_module']:
             # Import the module
             logging.info("Initializing the IBM")
             sys.path.insert(0, os.getcwd())
-            ibm_module = importlib.import_module(config.ibm_module)
+            ibm_module = importlib.import_module(config['ibm_module'])
             # Initiate the IBM object
             self.ibm = ibm_module.IBM(config)
         else:
