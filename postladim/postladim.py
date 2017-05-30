@@ -14,7 +14,7 @@ import numpy as np
 from netCDF4 import Dataset, num2date
 
 
-class InstanceVariable():
+class InstanceVariable:
     """Particle instance variable
 
     parameters
@@ -40,7 +40,7 @@ class InstanceVariable():
         return self._pf._get_variable(self._name, n)
 
 
-class ParticleVariable():
+class ParticleVariable:
     """Particle variable
 
     parameters
@@ -67,7 +67,7 @@ class ParticleVariable():
         return self._pf.nc.variables[self._name][pid]
 
 
-class ParticleFile():
+class ParticleFile:
     """Dataset from a LADiM output file
 
     parameters

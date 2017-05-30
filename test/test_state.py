@@ -1,42 +1,43 @@
 # from ladim.configuration import Configure
-from typing import List
+# from typing import List
 import numpy as np
 from ladim.state import State
 
 
-class Container:
-    dt = 600
-    start_time = np.datetime64('2017-02-10 20')
-    ibm_variables = ['super', 'age']
-    particle_variables = []  # type: List[str]
-    advection = 'RK4'
-    diffusion = False
-    ibm_module = 'ladim.ibms.luseibm'
-    pid = np.array([0])
-    X = np.array([10.2])
-    Y = np.array([100.5])
-    Z = np.array([5.0])
-    super = np.array([1001.0])
-    age = np.array([0.0])
+config = dict(
+    start_time=np.datetime64('2017-02-10 20'),
+    dt=600,
+    ibm_variables=['super', 'age'],
+    particle_variables=[],
+    advection='RK4',
+    diffusion=False,
+    ibm_module='ladim.ibms.ibm_salmon_lice')
+
+state = State(config)
+
+state['pid'] = np.array([0])
+state['X'] = np.array([10.2])
+state['Y'] = np.array([100.5])
+state['Z'] = np.array([5.0])
+state['super'] = np.array([1001.0])
+state['age'] = np.array([0.0])
 
 
 def test_state():
-
-    state = Container()
+    """Test state initiation"""
     assert(len(state) == 1)
     assert(state.ibm_variables == ['super', 'age'])
     assert(state.X == state['X'])
 
 
 def test_append():
-
-    state = Container()
-    new = {'pid': [1],
-           'X': [2.0],
-           'Y': [222.2],
-           'Z': [5],
-           'super': [1002],
-           'age': [0]}
+    """Append to the state"""
+    new = dict(pid=[1],
+               X=[2.0],
+               Y=[222.2],
+               Z=[5],
+               super=[1002],
+               age=[0])
 
     state.append(new)
     assert(len(state) == 2)

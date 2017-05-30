@@ -4,7 +4,7 @@ import sys
 import os
 import importlib
 import logging
-from typing import Sized
+from typing import Sized     # mypy
 from ladim.tracker import Tracker
 import numpy as np
 

@@ -4,7 +4,7 @@ Configuration class for ladim
 
 # ----------------------------------
 # Bjørn Ådlandsvik <bjorn@imr.no>
-# Institue of Marine Research
+# Institute of Marine Research
 # 2017-01-17
 # ----------------------------------
 
@@ -66,7 +66,7 @@ def configure(config_file: str,
         config[name] = conf['files'][name]
         logging.info('    {:15s}: {}'.format(name, config[name]))
 
-    # --- Time steping ---
+    # --- Time stepping ---
     logging.info('Configuration: Time Stepping')
     # Read time step and convert to seconds
     dt = np.timedelta64(*tuple(conf['numerics']['dt']))
