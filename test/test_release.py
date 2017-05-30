@@ -216,3 +216,39 @@ def test_too_early_stop() -> None:
 
     # Clean up
     os.remove('release.rls')
+
+
+def test_subgrid() -> None:
+    """Particle release outside subgrid should be ignored"""
+
+    config = {
+        'start_time': np.datetime64('2015-03-01'),
+        'stop_time': np.datetime64('2015-03-03'),
+        'dt': 3600,
+        'particle_release_file': 'release.rls',
+        'release_format': ['mult', 'release_time', 'X', 'Y'],
+        'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_type': 'continuous',
+        'release_frequency': np.timedelta64(12, 'h'),
+        'particle_variables': [],
+        'grid_args': dict(subgrid=[100, 120, 10, 20])
+        }
+
+    # Release file: create, read and remove
+    with open('release.rls', mode='w') as f:
+        f.write('2 2015-03-01 110 15\n')   # Inside
+        f.write('3 2015-03-01 200 30\n')   # Outside
+
+    # Make the ParticleReleaser object
+    release = ParticleReleaser(config)
+    # Clean out the release file
+    os.remove('release.rls')
+
+    # Check some overall sizes
+    assert(len(release.times) == 4)
+    assert(config['total_particle_count'] == 2*4)
+
+    for t, S in enumerate(release):
+        assert(np.all(S['pid'] == [2*t, 2*t+1]))
+        assert(np.all(S['X'] == [110, 110]))
+        assert(np.all(S['Y'] == [15, 15]))

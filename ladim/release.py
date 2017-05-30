@@ -15,6 +15,7 @@ import logging
 import numpy as np
 import pandas as pd
 from typing import Dict, Any, Iterator
+from .utilities import ingrid
 
 
 class ParticleReleaser(Iterator):
@@ -34,9 +35,21 @@ class ParticleReleaser(Iterator):
         if 'mult' not in config['release_format']:
             A['mult'] = 1
 
+        # ## Not good enough
         # Remove everything outside simulation time
         A = A[A['release_time'] >= config['start_time']]
         A = A[A['release_time'] <= config['stop_time']]   # Use < ?
+
+        # Remove everything outside a subgrid
+        try:
+            subgrid: List[int] = config['grid_args']['subgrid']
+        except KeyError:
+            subgrid = []
+        if subgrid:
+            lenA = len(A)
+            A = A[ingrid(A['X'], A['Y'], subgrid)]
+            if len(A) < lenA:
+                logging.warning('Ignoring particle release outside subgrid')
 
         if len(A) == 0:
             logging.error("Empty particle release")

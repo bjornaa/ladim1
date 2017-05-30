@@ -39,7 +39,7 @@ out = OutPut(config, releaser)
 # ==============
 
 print("============ starting time loop")
-for step in range(config.numsteps+1):
+for step in range(config['numsteps']+1):
 
     # --- Update forcing ---
     forcing.update(step)
@@ -52,7 +52,7 @@ for step in range(config.numsteps+1):
     # --- Save to file ---
     # Output before update???
     # Have an optional initial output
-    if step % config.output_period == 0:
+    if step % config['output_period'] == 0:
         out.write(state)
 
     # --- Update the model state ---
