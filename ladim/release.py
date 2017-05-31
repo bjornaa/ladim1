@@ -14,14 +14,15 @@
 import logging
 import numpy as np
 import pandas as pd
-from typing import Dict, Any, Iterator
+from typing import Iterator
 from .utilities import ingrid
+from .configuration import Config
 
 
 class ParticleReleaser(Iterator):
     """Particle Release Class"""
 
-    def __init__(self, config: Dict[str, Any]) -> None:
+    def __init__(self, config: Config) -> None:
 
         logging.info('Initializing the particle releaser')
 
@@ -35,12 +36,27 @@ class ParticleReleaser(Iterator):
         if 'mult' not in config['release_format']:
             A['mult'] = 1
 
-        # ## Not good enough
-        # Remove everything outside simulation time
-        A = A[A['release_time'] >= config['start_time']]
-        A = A[A['release_time'] <= config['stop_time']]   # Use < ?
+        # Use release_time as index
+        A.index = A['release_time']
 
-        # Remove everything outside a subgrid
+        print(A)
+        print('   --- ')
+
+        # Remove everything after simulation stop time
+        A = A[A['release_time'] <= config['stop_time']]   # Use < ?
+        if len(A) == 0:  # All release after simulation time
+            logging.error("All particles released after similation stop")
+            raise SystemExit
+
+        # Find first effective release
+        # Clip out too early releases,
+        n = np.sum(A['release_time'] <= config['start_time'])
+        if n == 0:
+            logging.warning("No particles released at simulation start")
+            n = 1
+        A = A.iloc[n-1:]
+
+        # Optionally, remove everything outside a subgrid
         try:
             subgrid: List[int] = config['grid_args']['subgrid']
         except KeyError:
@@ -51,24 +67,29 @@ class ParticleReleaser(Iterator):
             if len(A) < lenA:
                 logging.warning('Ignoring particle release outside subgrid')
 
-        if len(A) == 0:
-            logging.error("Empty particle release")
-            raise SystemExit
 
-        # The timeframes present in the release file
-        self._file_times = A['release_time'].unique()
+        print(A)
 
-        # Handle continuous release
+        file_times = A['release_time'].unique()
+        print('file_times = ', file_times)
+
+        # Fill out if continuous release
         if config['release_type'] == 'continuous':
-            time0 = self._file_times[0]
-            self.times = np.arange(
-                time0, config['stop_time'], config['release_frequency'])
-            # Append stop_time to allow releases after last file time
-            if config['stop_time'] > self._file_times[-1]:
-                self._file_times = np.concatenate(
-                    (self._file_times, [config['stop_time']]))
-        else:
-            self.times = A['release_time'].unique()
+            time0 = file_times[0]
+            time1 = max(file_times[1], config['stop_time'])
+            times = np.arange(time0, time1, config['release_frequency'])
+            print(times)
+            A = A.reindex(times, method='pad')
+            A['release_time'] = A.index
+
+        # Remove new instances before start time
+        n = np.sum(A['release_time'] <= config['start_time'])
+        A = A.iloc[n-1:]
+        A[A['release_time'] < config['start_time']] = config['start_time']
+        print(A)
+
+        # Release times
+        self.times = A['release_time'].unique()
 
         logging.info("Number of release times = {}".format(len(self.times)))
 
@@ -76,15 +97,19 @@ class ParticleReleaser(Iterator):
         self._B = [x[1] for x in A.groupby('release_time')]
 
         # Read the particle variables
-        self._index = 0            # Index of next release
-        self._file_index = 0       # Index of next data from release file
-        self._particle_count = 0   # Particle counter
+        # self.release_index = 0
+        # self._index = 0            # Index of next release
+        # self._file_index = 0       # Index of next data from release file
+        # self._particle_count = 0   # Particle counter
+
+        # Read the particle variables
         pvars = dict()
         for name in config['particle_variables']:
             dtype = config['release_dtype'][name]
             if dtype == np.datetime64:
                 dtype = np.float64
             pvars[name] = np.array([], dtype=dtype)
+        print(pvars)
 
         for t in self.times:
             V = next(self)

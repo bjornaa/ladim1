@@ -15,13 +15,16 @@ import numpy as np
 import yaml
 import yaml.parser
 
+Config = Dict[str, Any]   # type of the config dictionary
+
 
 def configure(config_file: str,
-              loglevel: int =logging.WARNING) -> Dict[str, Any]:
+              loglevel: int = logging.WARNING) -> Config:
 
     config = dict()
 
     # --- Read the configuration file ---
+    # TODO: use logging.ERROR instead of print
     try:
         with open(config_file) as fp:
             conf = yaml.safe_load(fp)
@@ -50,7 +53,6 @@ def configure(config_file: str,
                  50: 'CRITICAL'}
     logging.info('Configuration: Logging')
     logging.info('    {:15s}: {}'.format('loglevel', level2str[loglevel]))
-    logging.debug('AAAA')
 
     # --- Time control ---
     logging.info('Configuration: Time Control')

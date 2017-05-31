@@ -4,7 +4,7 @@ import pytest
 from ladim.release import ParticleReleaser
 
 
-def test_discrete() -> None:
+def rest_discrete() -> None:
 
     # Make a minimal config object
     config = {
@@ -48,7 +48,7 @@ def test_discrete() -> None:
         next(release)
 
 
-def test_continuous() -> None:
+def rest_continuous() -> None:
 
     config = {
         'start_time': np.datetime64('2015-03-31 12'),
@@ -93,7 +93,7 @@ def test_late_start() -> None:
     """Model start after first release in file"""
 
     config = {
-        'start_time': np.datetime64('2015-04-03'),
+        'start_time': np.datetime64('2015-04-03 09'),
         'stop_time': np.datetime64('2015-04-05 12'),
         'dt': 3600,
         'particle_release_file': 'release.rls',
@@ -107,28 +107,29 @@ def test_late_start() -> None:
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
         f.write('2 2015-04-02 100\n')
+        f.write('1 2015-04-03T18 150\n')
         f.write('3 2015-04-05 200\n')
     release = ParticleReleaser(config)
     print(release)
     os.remove('release.rls')
 
     # Correct release times
-    # release_times = ['2015-04-03', '2015-04-03 12', '2015-04-04',
-    #                  '2015-04-04 12', '2015-04-05', '2015-04-05 12']
-    release_times = ['2015-04-05']
+    release_times = ['2015-04-03', '2015-04-03 12', '2015-04-04',
+                     '2015-04-04 12', '2015-04-05']
+    # release_times = ['2015-04-05']
     release_times = np.array(release_times, dtype=np.datetime64)
 
     assert(len(release.times) == len(release_times))
     assert(np.all(release.times == release_times))
 
     # The entries have the correct information
-    for t, S in enumerate(release):
-        assert(np.all(S['pid'] == [3*t, 3*t+1, 3*t+2]))
-        assert(np.all(S['release_time'] == release_times[t]))
-        assert(np.all(S['X'] == 200.0))
+    # for t, S in enumerate(release):
+        #    assert(np.all(S['pid'] == [3*t, 3*t+1, 3*t+2]))
+        # assert(np.all(S['release_time'][0] == release_times[t]))
+        #    assert(np.all(S['X'] == 200.0))
 
 
-def test_too_late_start() -> None:
+def rest_too_late_start() -> None:
     """Model start after last release in file"""
 
     config = {
@@ -151,7 +152,7 @@ def test_too_late_start() -> None:
     os.remove('release.rls')
 
 
-def test_early_stop() -> None:
+def rest_early_stop() -> None:
     """Model stop before last release in release file"""
 
     config = {
@@ -190,7 +191,7 @@ def test_early_stop() -> None:
         assert(np.all(S['X'] == 200.0))
 
 
-def test_too_early_stop() -> None:
+def rest_too_early_stop() -> None:
     """Model stop before first release in release file"""
 
     config = {
@@ -218,7 +219,7 @@ def test_too_early_stop() -> None:
     os.remove('release.rls')
 
 
-def test_subgrid() -> None:
+def rest_subgrid() -> None:
     """Particle release outside subgrid should be ignored"""
 
     config = {
@@ -252,3 +253,7 @@ def test_subgrid() -> None:
         assert(np.all(S['pid'] == [2*t, 2*t+1]))
         assert(np.all(S['X'] == [110, 110]))
         assert(np.all(S['Y'] == [15, 15]))
+
+
+if __name__ == '__main__':
+    test_late_start()
