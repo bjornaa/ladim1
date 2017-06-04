@@ -94,7 +94,7 @@ def test_late_start() -> None:
 
     config = {
         'start_time': np.datetime64('2015-04-03 09'),
-        'stop_time': np.datetime64('2015-04-05 12'),
+        'stop_time': np.datetime64('2015-04-05 13'),
         'dt': 3600,
         'particle_release_file': 'release.rls',
         'release_format': ['mult', 'release_time', 'X'],
