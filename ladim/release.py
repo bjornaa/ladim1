@@ -19,6 +19,18 @@ from .utilities import ingrid
 from .configuration import Config
 
 
+def mylen(df: pd.DataFrame) -> int:
+    """Compute the number of rows in a DataFrame
+
+    returns 1 if pd is 1D
+    """
+
+    if df.ndim == 1:
+        return 1
+    else:
+        return df.shape[0]
+    
+
 class ParticleReleaser(Iterator):
     """Particle Release Class"""
 
@@ -91,9 +103,8 @@ class ParticleReleaser(Iterator):
             print('XXX', A.loc[i].shape)
 
             # Får antall kolonner her = 3, få bedre grep på lengden
-            M = {i: len(A.loc[i]) for i in I}
+            M = {i: mylen(A.loc[i]) for i in I}
             print(M)
-            1/0
             A = A.loc[J]
             print(A)
             # Correct time index
