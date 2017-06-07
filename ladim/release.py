@@ -19,6 +19,20 @@ from .utilities import ingrid
 from .configuration import Config
 
 
+def mylen(df: pd.DataFrame) -> int:
+    """Number of rows in a DataFrame,
+
+    A workaround for len() which does not
+    have the expected behaviour with itemizing,
+
+    """
+
+    if df.ndim == 1:
+        return 1
+    else:
+        return df.shape[0]
+
+
 class ParticleReleaser(Iterator):
     """Particle Release Class"""
 
@@ -48,14 +62,6 @@ class ParticleReleaser(Iterator):
             logging.error("All particles released after similation stop")
             raise SystemExit
 
-        # Find first effective release
-        # Remove too early releases
-        n = np.sum(A['release_time'] <= start_time)
-        if n == 0:
-            logging.warning("No particles released at simulation start")
-            n = 1
-        A = A.iloc[n-1:]
-
         # Optionally, remove everything outside a subgrid
         try:
             subgrid: List[int] = config['grid_args']['subgrid']
@@ -71,40 +77,31 @@ class ParticleReleaser(Iterator):
 
         # Fill out if continuous release
         if config['release_type'] == 'continuous':
+
+            # Find first effective release
+            #   and remove too early releases
+            # Can be moved out of if-block?
+            n = np.sum(A['release_time'] <= start_time)
+            if n == 0:
+                logging.warning("No particles released at simulation start")
+                n = 1
+            A = A.iloc[n-1:]
+
             time0 = file_times[0]
-            time1 = max(file_times[1], stop_time)
+            time1 = max(file_times[-1], stop_time)
             times = np.arange(time0, time1, config['release_frequency'])
             # A = A.reindex(times, method='pad')
             # A['release_time'] = A.index
             # Reindex does not work with non-unique index
-            print(A)
             I = A.index.unique()
             J = pd.Series(I, index=I).reindex(times, method='pad')
-            # Number of releases with given time
-            i = I[0]
-            print('---', i, len(A.loc[i]))
-            # print(A.loc[i])
-            print('XXX', A.loc[i].shape)
-            i = I[1]
-            print('---', i, len(A.loc[i]))
-            # print(A.loc[i])
-            print('XXX', A.loc[i].shape)
-
-            # Får antall kolonner her = 3, få bedre grep på lengden
-            M = {i: len(A.loc[i]) for i in I}
-            print(M)
-            1/0
+            M = {i: mylen(A.loc[i]) for i in I}
             A = A.loc[J]
-            print(A)
             # Correct time index
-            print("I =", I)
-            print("J = ", J)
-            print("M = ", M)
             S: List[int] = []
             for t in times:
-                print(t, J[t], M[J[t]], t)
-                print('len(S) =', len(S))
                 S.extend(M[J[t]]*[t])
+            A['release_time'] = S
             A.index = S
 
             # Remove any new instances before start time
@@ -113,8 +110,14 @@ class ParticleReleaser(Iterator):
                 n = 1
             A = A.iloc[n-1:]
 
-        # If first release is early set it to start time
-        A['release_time'] = np.maximum(A['release_time'], start_time)
+            # If first release is early set it to start time
+            A['release_time'] = np.maximum(A['release_time'], start_time)
+
+        # If discrete, there is an error to have only early releases
+        else:   # Discrete
+            if A['release_time'][-1] < start_time:
+                logging.error("All particles released before similation start")
+                raise SystemExit
 
         # Release times
         self.times = A['release_time'].unique()
