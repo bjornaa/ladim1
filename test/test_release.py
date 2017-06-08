@@ -104,6 +104,7 @@ def test_late_start() -> None:
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
+        f.write('3 2015-04-01 50\n')
         f.write('2 2015-04-02 100\n')
         f.write('1 2015-04-03T18 150\n')
         f.write('3 2015-04-05 200\n')
@@ -273,6 +274,6 @@ if __name__ == '__main__':
     pass
     # test_discrete()
     # test_continuous()
-    # test_late_start()
+    test_late_start()
     # test_too_late_start()
     # test_early_stop()

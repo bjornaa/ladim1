@@ -73,7 +73,7 @@ class ParticleReleaser(Iterator):
             if len(A) < lenA:
                 logging.warning('Ignoring particle release outside subgrid')
 
-        file_times = A['release_time'].unique()
+        # file_times = A['release_time'].unique()
 
         # Fill out if continuous release
         if config['release_type'] == 'continuous':
@@ -87,8 +87,10 @@ class ParticleReleaser(Iterator):
                 n = 1
             A = A.iloc[n-1:]
 
-            time0 = file_times[0]
-            time1 = max(file_times[-1], stop_time)
+            # time0 = file_times[0]
+            # time1 = max(file_times[-1], stop_time)
+            time0 = A['release_time'][0]
+            time1 = max(A['release_time'][-1], pd.tslib.Timestamp(stop_time))
             times = np.arange(time0, time1, config['release_frequency'])
             # A = A.reindex(times, method='pad')
             # A['release_time'] = A.index

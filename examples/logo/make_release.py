@@ -1,4 +1,4 @@
-# Particle release for the LADIM logo
+# Particle release for the LADiM logo
 
 import numpy as np
 

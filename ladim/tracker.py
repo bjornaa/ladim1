@@ -8,13 +8,20 @@
 # Licenced under the MIT license
 # ------------------------------------
 
+from typing import Tuple
 import numpy as np
+
+from .gridforce import Grid, Forcing
+from .state import State
+from .configuration import Config
+
+Velocity = Tuple[np.ndarray, np.ndarray]
 
 
 class Tracker:
     """The physical particle tracking kernel"""
 
-    def __init__(self, config):
+    def __init__(self, config: Config) -> None:
         self.dt = config['dt']
         if config['advection']:
             self.advect = getattr(self, config['advection'])
@@ -25,7 +32,10 @@ class Tracker:
         if self.diffusion:
             self.D = config['diffusion_coefficient']  # [m2.s-1]
 
-    def move_particles(self, grid, forcing, state):
+    def move_particles(self,
+                       grid:  Grid,
+                       forcing: Forcing,
+                       state: State) -> None:
         """Move the particles"""
 
         X, Y = state.X, state.Y
@@ -73,7 +83,9 @@ class Tracker:
         state.X = X
         state.Y = Y
 
-    def EF(self, forcing, state):
+    def EF(self,
+           forcing: Forcing,
+           state: State) -> Velocity:
         """Euler-Forward advection"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
@@ -84,7 +96,9 @@ class Tracker:
 
         return U, V
 
-    def RK2(self, forcing, state):
+    def RK2(self,
+            forcing: Forcing,
+            state: State) -> Velocity:
         """Runge-Kutta second order = Heun scheme"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
@@ -97,7 +111,9 @@ class Tracker:
         U, V = forcing.velocity(X1, Y1, Z, tstep=0.5)
         return U, V
 
-    def RK4(self, forcing, state):
+    def RK4(self,
+            forcing: Forcing,
+            state: State) -> Velocity:
         """Runge-Kutta fourth order advection"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
@@ -123,7 +139,7 @@ class Tracker:
 
         return U, V
 
-    def diffuse(self):
+    def diffuse(self) -> Velocity:
         """Random walk diffusion"""
 
         # Diffusive velocity
