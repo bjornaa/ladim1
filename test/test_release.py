@@ -27,7 +27,6 @@ def test_discrete() -> None:
     release = ParticleReleaser(config)
     os.remove('release.rls')
 
-    print("times = ", release.times)
     assert(len(release.times) == 2)
     assert(release.total_particle_count == 6)
 
@@ -88,7 +87,6 @@ def test_continuous() -> None:
             assert(np.all(S['X'] == [200, 200, 200]))
 
 
-# This does not work as expected
 def test_late_start() -> None:
     """Model start after first release in file"""
 
@@ -106,6 +104,7 @@ def test_late_start() -> None:
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
+        f.write('3 2015-04-01 50\n')
         f.write('2 2015-04-02 100\n')
         f.write('1 2015-04-03T18 150\n')
         f.write('3 2015-04-05 200\n')
@@ -137,7 +136,7 @@ def test_late_start() -> None:
             assert(np.all(S['X'] == 200))
 
 
-def rest_too_late_start() -> None:
+def test_too_late_start() -> None:
     """Model start after last release in file"""
 
     config = {
@@ -146,6 +145,9 @@ def rest_too_late_start() -> None:
         'particle_release_file': 'release.rls',
         'release_format': ['mult', 'release_time', 'X'],
         'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_type': 'discrete',
+        'dt': 3600,
+        'particle_variables': []
         }
 
     # Make a release file
@@ -160,7 +162,7 @@ def rest_too_late_start() -> None:
     os.remove('release.rls')
 
 
-def rest_early_stop() -> None:
+def test_early_stop() -> None:
     """Model stop before last release in release file"""
 
     config = {
@@ -185,7 +187,8 @@ def rest_early_stop() -> None:
 
     # Correct release times
     # First release neglected since before start
-    release_times = ['2015-04-03', '2015-04-03 12',
+    release_times = ['2015-04-02', '2015-04-02 12',
+                     '2015-04-03', '2015-04-03 12',
                      '2015-04-04', '2015-04-04 12']
     release_times = np.array(release_times, dtype=np.datetime64)
 
@@ -194,12 +197,16 @@ def rest_early_stop() -> None:
 
     # The entries have the correct information
     for t, S in enumerate(release):
-        assert(np.all(S['pid'] == [3*t, 3*t+1, 3*t+2]))
         assert(np.all(S['release_time'] == release_times[t]))
-        assert(np.all(S['X'] == 200.0))
+        if t < 2:
+            assert(np.all(S['pid'] == [2*t, 2*t+1]))
+            assert(np.all(S['X'] == 100.0))
+        if t > 2:
+            assert(np.all(S['pid'] == np.array([3*t, 3*t+1, 3*t+2])-2))
+            assert(np.all(S['X'] == 200.0))
 
 
-def rest_too_early_stop() -> None:
+def test_too_early_stop() -> None:
     """Model stop before first release in release file"""
 
     config = {
@@ -227,7 +234,7 @@ def rest_too_early_stop() -> None:
     os.remove('release.rls')
 
 
-def rest_subgrid() -> None:
+def test_subgrid() -> None:
     """Particle release outside subgrid should be ignored"""
 
     config = {
@@ -264,6 +271,9 @@ def rest_subgrid() -> None:
 
 
 if __name__ == '__main__':
+    pass
     # test_discrete()
-    test_continuous()
-    # test_late_start()
+    # test_continuous()
+    test_late_start()
+    # test_too_late_start()
+    # test_early_stop()

@@ -21,7 +21,7 @@ Config = Dict[str, Any]   # type of the config dictionary
 def configure(config_file: str,
               loglevel: int = logging.WARNING) -> Config:
 
-    config = dict()
+    config: Config = dict()
 
     # --- Read the configuration file ---
     # TODO: use logging.ERROR instead of print

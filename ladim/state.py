@@ -4,17 +4,20 @@ import sys
 import os
 import importlib
 import logging
-from typing import Sized     # mypy
-from ladim.tracker import Tracker
+from typing import Any, Dict, Sized     # mypy
 import numpy as np
+from .tracker import Tracker
+from .gridforce import Grid, Forcing
 
 # ------------------------
+
+Config = Dict[str, Any]
 
 
 class State(Sized):
     """The model variables at a given time"""
 
-    def __init__(self, config):
+    def __init__(self, config: Config) -> None:
 
         logging.info("Initializing the model state")
 
@@ -53,16 +56,16 @@ class State(Sized):
         # self.num_particles = len(self.X)
         self.nnew = 0
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: str) -> None:
         return getattr(self, name)
 
-    def __setitem__(self, name, value):
+    def __setitem__(self, name: str, value: Any) -> None:
         return setattr(self, name, value)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(getattr(self, 'X'))
 
-    def append(self, new):
+    def append(self, new: Dict[str, Any]) -> None:
         """Append new particles to the model state"""
         nnew = len(new['pid'])
         self.pid = np.concatenate((self.pid, new['pid']))
@@ -73,7 +76,7 @@ class State(Sized):
                 self[name] = np.concatenate((self[name], np.zeros(nnew)))
         self.nnew = nnew
 
-    def update(self, grid, forcing):
+    def update(self, grid: Grid, forcing: Forcing) -> None:
         """Update the model state to the next timestep"""
 
         # From physics all particles are alive

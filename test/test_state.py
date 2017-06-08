@@ -23,14 +23,14 @@ state['super'] = np.array([1001.0])
 state['age'] = np.array([0.0])
 
 
-def test_state():
+def test_state() -> None:
     """Test state initiation"""
     assert(len(state) == 1)
     assert(state.ibm_variables == ['super', 'age'])
     assert(state.X == state['X'])
 
 
-def test_append():
+def test_append() -> None:
     """Append to the state"""
     new = dict(pid=[1],
                X=[2.0],

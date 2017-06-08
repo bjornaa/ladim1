@@ -66,13 +66,13 @@ def sample2D2(F: np.ndarray, X, Y) -> np.ndarray:
 # --------------------------------------------------
 
 
-def sample2DU(F, X, Y):
+def sample2DU(F: np.ndarray, X, Y) -> np.ndarray:
     return sample2D(F, X-0.5, Y)
 
 # --------------------------------------------------
 
 
-def sample2DV(F, X, Y):
+def sample2DV(F: np.ndarray, X, Y) -> np.ndarray:
     return sample2D(F, X, Y-0.5)
 
 # -------------------------------------------------

@@ -53,7 +53,7 @@ nc.createDimension('eta_rho', jmax)
 nc.createDimension('time', None)
 
 # Variables
-v = nc.createVariable('time', 'd', ('time'))
+v = nc.createVariable('time', 'd', ('time',))
 v.standard_name = 'Time'
 v.units = pf.nc.variables['time'].units
 
