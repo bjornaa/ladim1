@@ -14,7 +14,7 @@
 import logging
 import numpy as np
 import pandas as pd
-from typing import Iterator, List
+from typing import Iterator
 from .utilities import ingrid
 from .configuration import Config
 
@@ -55,7 +55,7 @@ class ParticleReleaser(Iterator):
         A.index = A['release_time']
 
         # Remove everything after simulation stop time
-        A = A[A['release_time'] <= stop_time]   # Use < ?
+        A = A[A['release_time'] < stop_time]   # Use < ?
         if len(A) == 0:  # All release after simulation time
             logging.error("All particles released after similation stop")
             raise SystemExit
@@ -76,19 +76,23 @@ class ParticleReleaser(Iterator):
         # Fill out if continuous release
         if config['release_type'] == 'continuous':
 
-            # Find first effective release
+            # Find first effective release time
+            # i.e. the last time <= start_time
             #   and remove too early releases
             # Can be moved out of if-block?
             n = np.sum(A['release_time'] <= start_time)
             if n == 0:
                 logging.warning("No particles released at simulation start")
                 n = 1
-            A = A.iloc[n-1:]
+            # First effective release:
+            release_time0 = A.iloc[n-1].release_time
+            A = A[A['release_time'] >= release_time0]
 
             # time0 = file_times[0]
             # time1 = max(file_times[-1], stop_time)
             time0 = A['release_time'][0]
-            time1 = max(A['release_time'][-1], pd.tslib.Timestamp(stop_time))
+            time1 = max(A['release_time'][-1], pd.Timestamp(stop_time))
+            # time1 = max(A['release_time'][-1], stop_time)
             times = np.arange(time0, time1, config['release_frequency'])
             # A = A.reindex(times, method='pad')
             # A['release_time'] = A.index
@@ -105,10 +109,10 @@ class ParticleReleaser(Iterator):
             A.index = S
 
             # Remove any new instances before start time
-            n = np.sum(A['release_time'] <= start_time)
-            if n == 0:
-                n = 1
-            A = A.iloc[n-1:]
+            # n = np.sum(A['release_time'] <= start_time)
+            # if n == 0:
+            #     n = 1
+            # A = A.iloc[n-1:]
 
             # If first release is early set it to start time
             A['release_time'] = np.maximum(A['release_time'], start_time)
