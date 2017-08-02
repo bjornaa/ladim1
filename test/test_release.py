@@ -46,7 +46,9 @@ def test_discrete() -> None:
     with pytest.raises(StopIteration):
         next(release)
 
-
+#
+# ------------------------------------------------------
+#
 def test_continuous() -> None:
 
     config = {
@@ -86,12 +88,12 @@ def test_continuous() -> None:
         else:
             assert(np.all(S['X'] == [200, 200, 200]))
 
-
+# --------------------------------------------------
 def test_late_start() -> None:
     """Model start after first release in file"""
 
     config = {
-        'start_time': np.datetime64('2015-04-03 09'),
+        'start_time': np.datetime64('2015-04-03 00'),
         'stop_time': np.datetime64('2015-04-05 13'),
         'dt': 3600,
         'particle_release_file': 'release.rls',
@@ -120,7 +122,7 @@ def test_late_start() -> None:
     os.remove('release.rls')
 
     # Correct release times
-    release_times = ['2015-04-03 09', '2015-04-03 12',
+    release_times = ['2015-04-03', '2015-04-03 12',
                      '2015-04-04', '2015-04-04 12',
                      '2015-04-05', '2015-04-05 12']
     release_times = np.array(release_times, dtype=np.datetime64)
@@ -128,6 +130,7 @@ def test_late_start() -> None:
     counts = [5, 5, 3, 3, 4, 4]
     cumcount = [0] + list(np.cumsum(counts))
 
+    print(release.times)
     # Check the release times
     assert(len(release.times) == len(release_times))
     assert(np.all(release.times == release_times))
@@ -206,7 +209,6 @@ def test_early_stop() -> None:
     for t, S in enumerate(release):
         assert(np.all(S['release_time'] == release_times[t]))
         if t < 2:
-            print(S['pid'], [2*t, 2*t+1])
             assert(np.all(S['pid'] == [2*t, 2*t+1]))
             # assert(np.all(S['X'] == 100.0))
         if t > 2:
@@ -281,7 +283,7 @@ def test_subgrid() -> None:
 if __name__ == '__main__':
     pass
     # test_discrete()
-    # test_continuous()
+    test_continuous()
     # test_late_start()
     # test_too_late_start()
-    test_early_stop()
+    # test_early_stop()

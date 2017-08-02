@@ -55,7 +55,8 @@ class ParticleReleaser(Iterator):
         A.index = A['release_time']
 
         # Remove everything after simulation stop time
-        A = A[A['release_time'] < stop_time]   # Use < ?
+        # A = A[A['release_time'] <= stop_time]   # Use < ?
+        A = A[A.index <= stop_time]   # Use < ?
         if len(A) == 0:  # All release after simulation time
             logging.error("All particles released after similation stop")
             raise SystemExit
@@ -80,18 +81,25 @@ class ParticleReleaser(Iterator):
             # i.e. the last time <= start_time
             #   and remove too early releases
             # Can be moved out of if-block?
-            n = np.sum(A['release_time'] <= start_time)
+            n = np.sum(A.index <= start_time)
             if n == 0:
                 logging.warning("No particles released at simulation start")
                 n = 1
             # First effective release:
-            release_time0 = A.iloc[n-1].release_time
-            A = A[A['release_time'] >= release_time0]
+            #release_time0 = A.iloc[n-1].release_time
+
+            # TODO: Check pandas, better way to delete rows?
+            times = A['release_time']
+            try:
+                release_time0 = times[times <= start_time][-1]
+            except IndexError:
+                release_time0 = times[0]
+            A = A[A.index >= release_time0]
 
             # time0 = file_times[0]
             # time1 = max(file_times[-1], stop_time)
-            time0 = A['release_time'][0]
-            time1 = max(A['release_time'][-1], pd.Timestamp(stop_time))
+            time0 = A.index[0]
+            time1 = max(A.index[-1], pd.Timestamp(stop_time))
             # time1 = max(A['release_time'][-1], stop_time)
             times = np.arange(time0, time1, config['release_frequency'])
             # A = A.reindex(times, method='pad')
@@ -115,13 +123,17 @@ class ParticleReleaser(Iterator):
             # A = A.iloc[n-1:]
 
             # If first release is early set it to start time
-            A['release_time'] = np.maximum(A['release_time'], start_time)
+            # A['release_time'] = np.maximum(A['release_time'], # tart_time)
 
         # If discrete, there is an error to have only early releases
         else:   # Discrete
-            if A['release_time'][-1] < start_time:
+            if A.index[-1] < start_time:
                 logging.error("All particles released before similation start")
                 raise SystemExit
+
+        # We are now discrete,
+        # remove everything before start time
+        A = A[A.index >= start_time]
 
         # Release times
         self.times = A['release_time'].unique()
@@ -134,7 +146,8 @@ class ParticleReleaser(Iterator):
         self.steps = rel_time // config['dt']
 
         # Make dataframes for each timeframe
-        self._B = [x[1] for x in A.groupby('release_time')]
+        # self._B = [x[1] for x in A.groupby('release_time')]
+        self._B = [x[1] for x in A.groupby(A.index)]
 
         # Read the particle variables
         self._index = 0            # Index of next release

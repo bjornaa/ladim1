@@ -33,7 +33,6 @@ particle_release:
 
 gridforce:
     module: ladim.gridforce.ROMS
-    grid:
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
