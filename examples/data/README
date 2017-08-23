@@ -1,8 +1,6 @@
 examples/data
 
-Placeholder for input data for the examples
+Some of the examples uses a forcing file, ocean_avg_0014.nc, from a ROMS simulation.
 
-The examples line, streak and station uses ocean_avg_0014.nc
-
-This dataset is available with anonymous ftp
-from ftp.imr.no/bjorn/ladim-data
+This dataset is available with anonymous ftp from ftp.imr.no/bjorn/ladim-data
+or simpler by running the attached download script

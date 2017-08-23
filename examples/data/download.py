@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# Download example ROMS forcing file for the LADiM examples
+# Download and gunzip an example ROMS forcing file
 
 # -----------------------------------
 # Bjørn Ådlandsvik <bjorn@imr.no>
@@ -15,19 +15,19 @@ import gzip
 ftp_site = 'ftp.imr.no'
 datadir = 'bjorn/ladim-data'
 datafile = 'ocean_avg_0014.nc'
+gzipped_file = datafile + '.gz'
 
-ftp = ftplib.FTP(ftp_site)
-ftp.login('anonymous', 'ladim')
-ftp.cwd(datadir)
-
-gzfile = datafile + '.gz'
-
+# --- Download by ftp ---
 # TODO: make progress bar
-print('Downloading', gzfile)
+print('Downloading', gzipped_file)
 f0 = io.BytesIO()
-ftp.retrbinary('RETR ' + gzfile, f0.write)
-f0.seek(0)
+with ftplib.FTP(ftp_site) as ftp:
+    ftp.login('anonymous', 'ladim')
+    ftp.cwd(datadir)
+    ftp.retrbinary('RETR ' + gzipped_file, f0.write)
 
+# --- gunzip the file ---
 print('Decompressing',  datafile)
+f0.seek(0)
 with open(datafile, 'wb') as outfile:
     outfile.write(gzip.decompress(f0.read()))
