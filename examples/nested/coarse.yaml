@@ -17,10 +17,10 @@ time_control:
     reference_time: *time0
 
 files:
-    grid_file             : ../data/ocean_avg_0014.nc
-    input_file            : ../data/ocean_avg_*.nc
-    particle_release_file : original.rls
-    output_file           : original.nc
+    grid_file             : forcing_northsea.nc
+    input_file            : forcing_northsea.nc
+    particle_release_file : coarse.rls
+    output_file           : coarse.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given

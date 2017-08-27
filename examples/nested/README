@@ -17,3 +17,5 @@ ladim nested.yaml      # Nesting small grid into coarse
 Bruk denne navnekonvensjonen på release-filer og resultater.
 Lag en make_release som genererer for alle.
 For animate, kan ha tre script, evt overlay
+
+# Note: bug in land treatment? visible in animate_coarse.py
