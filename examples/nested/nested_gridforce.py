@@ -1,5 +1,6 @@
 import numpy as np
 from ladim.gridforce import ROMS
+from ladim.sample import sample2D
 
 
 class Grid(object):
@@ -7,7 +8,6 @@ class Grid(object):
     def __init__(self, config):
 
         # Make a virtual grid, subgrid of original
-        # i: 80:175, j:30:100
         i0, i1 = 80, 175
         j0, j1 = 30, 100
 
@@ -22,7 +22,7 @@ class Grid(object):
         # For this example, get from original
         #
         # dx and dy can be estimated from lon/lat
-        # but here use original grid
+        # but for the example use the original grid
         from netCDF4 import Dataset
         orig_file = '../data/ocean_avg_0014.nc'
         with Dataset(orig_file) as nc:
@@ -64,15 +64,13 @@ class Grid(object):
 
         return self.dx[J, I], self.dy[J, I]
 
-    # Kan bli mange repetere beregninge av xy2fine og ingrid
-    # Lag til noe smart caching
-    # I første omgang en funksjon
-    # Enda bedre en metode-fabrikk
+    # Could perhaps be developed into a decorator
     def delegate(self, X, Y, method):
         """Delegate computation of field to the real grids"""
         X, Y = np.asarray(X), np.asarray(Y)
         X1, Y1 = self.xy2fine(X, Y)
         fine = self.fine_grid.ingrid(X1, Y1)
+        # need more conservative ingrid?
         X1, Y1 = X1[fine], Y1[fine]
         X2, Y2 = self.xy2coarse(X[~fine], Y[~fine])
 
@@ -97,12 +95,9 @@ class Grid(object):
     def sample_depth(self, X, Y):
         return self.delegate(X, Y, 'sample_depth')
 
-    # Virker ikke, siden to felt
-    # Legg inn separate metoder lon, lat t griddene
-    # def lonlat2(self, X, Y):
-    #    return self.delegate(X, Y, 'lonlat')
-
-    def lonlat(self, X, Y):
+    # Unødig, siden virtuelle grid har lon/lat ?
+    # vil ikke gi nøyaktig samme verdier, avrundingsfeil
+    def lonlat2(self, X, Y):
         """Return the longitude and latitude from grid coordinates"""
         lon = np.empty(len(X), dtype=float)
         lat = np.empty(len(X), dtype=float)
@@ -113,20 +108,20 @@ class Grid(object):
         lon[~fine], lat[~fine] = self.coarse_grid.lonlat(X2, Y2)
         return lon, lat
 
-    # def ingrid(self, X, Y):
-    #    """Returns True for points inside the subgrid"""
-    #    return ((self.i0 <= X) & (X <= self.i1-1) &
-    #            (self.j0 <= Y) & (Y <= self.j1-1))
+    def lonlat(self, X, Y):
+        """Return the longitude and latitude from grid coordinates"""
+        return (sample2D(self.lon, X, Y),
+                sample2D(self.lat, X, Y))
 
-    # def onland(self, X, Y):
-    #    """Returns True for points on land"""
-    #    I = X.round().astype(int) - self.i0
-    #    J = Y.round().astype(int) - self.j0
-    #    return self.M[J, I] < 1
+    def ingrid(self, X, Y):
+        # Hva med endepunkyrt i C-grid, er her konservativ
+        # utelukker siste grid-celle
+        """Returns True for points inside the subgrid"""
+        return ((0.5 <= X) & (X <= imax-1.5) &
+                (0.5 <= Y) & (Y <= jmax-1.5))
 
-    # Error if point outside
-    # def atsea(self, X, Y):
-    #    """Returns True for points at sea"""
-    #    I = X.round().astype(int) - self.i0
-    #    J = Y.round().astype(int) - self.j0
-    #    return self.M[J, I] > 0
+    def onland(self, X, Y):
+        return self.delegate(X, Y, 'onland') > 0.5
+
+    def atsea(self, X, Y):
+        return self.delegate(X, Y, 'atsea') > 0.5
