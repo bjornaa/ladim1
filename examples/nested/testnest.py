@@ -7,11 +7,10 @@ config = dict(grid_args=[])
 
 g = Grid(config)
 
-# Find last point, at sea in both grids
-# Velg 1 på land og 1 i sjø i utenfor fint
-# og 1 på sjø/land innenfor (ta de først)
-X = np.array([60, 75, 50, 26])
-Y = np.array([40, 15, 40, 20])
+# Two first in fine grid, land, sea
+# Two next outside, land, sea
+X = np.array([60, 80, 50, 30])
+Y = np.array([40, 30, 50, 20])
 
 print("X,  Y = ", X, Y)
 X1, Y1 = g.xy2fine(X, Y)

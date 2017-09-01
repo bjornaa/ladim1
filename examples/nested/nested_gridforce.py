@@ -9,7 +9,7 @@ class Grid(object):
 
         # Make a virtual grid, subgrid of original
         i0, i1 = 80, 175
-        j0, j1 = 30, 100
+        j0, j1 = 30, 110
 
         self._i0 = i0
         self._j0 = j0
@@ -117,8 +117,8 @@ class Grid(object):
         # Hva med endepunkyrt i C-grid, er her konservativ
         # utelukker siste grid-celle
         """Returns True for points inside the subgrid"""
-        return ((0.5 <= X) & (X <= imax-1.5) &
-                (0.5 <= Y) & (Y <= jmax-1.5))
+        return ((0.5 <= X) & (X <= self.imax-1.5) &
+                (0.5 <= Y) & (Y <= self.jmax-1.5))
 
     def onland(self, X, Y):
         return self.delegate(X, Y, 'onland') > 0.5
