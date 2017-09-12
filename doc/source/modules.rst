@@ -13,7 +13,7 @@ The code may be developed towards base classes, where alternatives
 can inherit from a common base class. Presently, alternatives must
 be written separately.
 
-.. figure:: ladim-system.jpg
+.. figure:: ladim_ecosystem.png
    :width: 500
 
    The LADIM "eco"-system; the connections between the

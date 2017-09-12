@@ -1,4 +1,5 @@
 import numpy as np
+from netCDF4 import Dataset
 from ladim.gridforce import ROMS
 from ladim.sample import sample2D
 
@@ -23,7 +24,6 @@ class Grid(object):
         #
         # dx and dy can be estimated from lon/lat
         # but for the example use the original grid
-        from netCDF4 import Dataset
         orig_file = '../data/ocean_avg_0014.nc'
         with Dataset(orig_file) as nc:
             self.lon = nc.variables['lon_rho'][j0: j1, i0: i1]
@@ -64,7 +64,7 @@ class Grid(object):
 
         return self.dx[J, I], self.dy[J, I]
 
-    # Could perhaps be developed into a decorator
+    # NOTE: Could perhaps be developed into a decorator
     def delegate(self, X, Y, method):
         """Delegate computation of field to the real grids"""
         X, Y = np.asarray(X), np.asarray(Y)
@@ -79,34 +79,8 @@ class Grid(object):
         A[~fine] = getattr(self.coarse_grid, method)(X2, Y2)
         return A
 
-    def sample_depth2(self, X, Y):
-        X, Y = np.asarray(X), np.asarray(Y)
-        H = np.empty_like(X)
-        X1, Y1 = self.xy2fine(X, Y)
-        fine = self.fine_grid.ingrid(X1, Y1)
-        X1, Y1 = X1[fine], Y1[fine]
-        H[fine] = self.fine_grid.sample_depth(X1, Y1)
-        # Funker det under selv om alle partikler i fine område?
-        X2, Y2 = self.xy2coarse(X[~fine], Y[~fine])
-        H[~fine] = self.coarse_grid.sample_depth(X2, Y2)
-        return H
-
-    # Lag litt tester, se at dette fungerer.
     def sample_depth(self, X, Y):
         return self.delegate(X, Y, 'sample_depth')
-
-    # Unødig, siden virtuelle grid har lon/lat ?
-    # vil ikke gi nøyaktig samme verdier, avrundingsfeil
-    def lonlat2(self, X, Y):
-        """Return the longitude and latitude from grid coordinates"""
-        lon = np.empty(len(X), dtype=float)
-        lat = np.empty(len(X), dtype=float)
-        X1, Y1 = self.xy2fine(X, Y)
-        fine = self.fine_grid.ingrid(X1, Y1)
-        lon[fine], lat[fine] = self.fine_grid.lonlat(X1[fine], Y1[fine])
-        X2, Y2 = self.xy2coarse(X[~fine], Y[~fine])
-        lon[~fine], lat[~fine] = self.coarse_grid.lonlat(X2, Y2)
-        return lon, lat
 
     def lonlat(self, X, Y):
         """Return the longitude and latitude from grid coordinates"""
@@ -125,3 +99,40 @@ class Grid(object):
 
     def atsea(self, X, Y):
         return self.delegate(X, Y, 'atsea') > 0.5
+
+
+class Forcing:
+
+    def __init__(self, config, grid):
+
+        # May adjust coonfig
+        self.coarse_forcing = ROMS.Forcing(config, grid.coarse_crid)
+
+        self.fine_forcing = ROMS.Forcing(config, grid.fine_grid)
+
+        # steps, hva gjøres her. Enkelt hvis samme
+        # Anta: fine step deler grove
+        # F.eks. fin hver time, grov hver tredje.
+        # Bruk fine steg.
+        self.steps = self.fine_forcing.steps
+
+    # Note: cleaner with name first?
+    # Tidskontroll?
+    def self.field(X, Y, Z, name):
+        grid = self.grid
+        X, Y = np.asarray(X), np.asarray(Y)
+        X1, Y1 = grid.xy2fine(X, Y)
+        fine = grid.fine_grid.ingrid(X1, Y1)
+        # need more conservative ingrid?
+        X1, Y1 = grid.xy2fine(X[fine], Y[fine])
+        Z1 = Z[fine]
+        X2, Y2= grid.xy2coarse(X[~fine], Y[~fine])
+        Z2 = Z[~fine]
+
+        A = np.empty(len(X), dtype=float):
+        A[fine] = self.fine_forcing.field()
+
+
+  A[fine] = getattr(self.fine_grid, method)(X1, Y1)
+        A[~fine] = getattr(self.coarse_grid, method)(X2, Y2)
+
