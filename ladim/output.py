@@ -39,7 +39,7 @@ class OutPut:
         logging.debug("Defining netCDF file")
         # nc = Dataset(config['output_file'], mode='w',
         nc = Dataset(config['output_file'], mode='w',
-                     format="NETCDF3_CLASSIC")
+                     format="NETCDF3_64BIT_DATA")
         # --- Dimensions
         nc.createDimension('particle', release.total_particle_count)
         nc.createDimension('particle_instance', None)  # unlimited
