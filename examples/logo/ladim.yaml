@@ -11,7 +11,7 @@ time_control:
     start_time: &time0 1989-05-24 12:00:00
 
     # stop_time:  1989-06-15 12:00:00
-    stop_time:  1989-05-28 12:00:00
+    stop_time:  1989-05-30 12:00:00
 
     # Reference time for netcdf output
     # by default set to start_time
