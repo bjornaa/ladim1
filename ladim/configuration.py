@@ -151,6 +151,11 @@ def configure(config_file: str,
 
     # --- Output control ---
     logging.info('Configuration: Output Control')
+    try:
+        output_format = conf['output_variables']['format']
+    except KeyError:
+        output_format = 'NETCDF3_64BIT_OFFSET'
+    config['output_format'] = output_format
     outper = np.timedelta64(*tuple(conf['output_variables']['outper']))
     outper = outper.astype('m8[s]').astype('int') // config['dt']
     config['output_period'] = outper
