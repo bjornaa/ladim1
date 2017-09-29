@@ -61,8 +61,10 @@ class OutPut:
         # Particle variables
         for name in config['output_particle']:
             v = nc.createVariable(
-                name, config['nc_attributes'][name]['ncformat'],
-                ('particle',))
+                varname=name,
+                datatype=config['nc_attributes'][name]['ncformat'],
+                dimensions=('particle',),
+                zlib=True)
             for attr, value in config['nc_attributes'][name].items():
                 if attr != 'ncformat':
                     setattr(v, attr, value)
@@ -70,8 +72,10 @@ class OutPut:
         # Instance variables
         for name in config['output_instance']:
             v = nc.createVariable(
-                name, config['nc_attributes'][name]['ncformat'],
-                ('particle_instance',))
+                varname=name,
+                datatype=config['nc_attributes'][name]['ncformat'],
+                dimensions=('particle_instance',),
+                zlib=True)
             for attr, value in config['nc_attributes'][name].items():
                 if attr != 'ncformat':
                     setattr(v, attr, value)
