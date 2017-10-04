@@ -28,3 +28,9 @@ Ycoarse = (Y-1)/3
 with open('coarse.rls', mode='w') as f:
     for i, (x, y) in enumerate(zip(Xcoarse, Ycoarse)):
         f.write('1989-05-24T12 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
+
+Xnest = X + 80 - 135
+Ynest = Y + 30 - 42
+with open('nested.rls', mode='w') as f:
+    for i, (x, y) in enumerate(zip(Xnest, Ynest)):
+        f.write('1989-05-24T12 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
