@@ -16,10 +16,10 @@ time_control:
     reference_time: *time0
 
 files:
-    grid_file             : ../data/ocean_avg_0014.nc
-    input_file            : ../data/ocean_avg_*.nc
-    particle_release_file : original.rls
-    output_file           : original.nc
+    grid_file             : ./forcing_skagerrak.nc
+    input_file            : ./forcing_skagerrak.nc
+    particle_release_file : fine.rls
+    output_file           : fine.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given

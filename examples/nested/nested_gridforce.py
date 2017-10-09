@@ -18,6 +18,8 @@ class Grid(object):
         self.imax = i1 - i0
         self.jmax = j1 - j0
 
+        print(f"Virtual grid: {self.imax} x {self.jmax}")
+
         # Geographic coordinates
         # Not generally available from real grids
         # For this example, get from original
@@ -44,7 +46,7 @@ class Grid(object):
         # subgrid: i0, i1 = 135, 172, j0, j1 = 42, 81 of orginal
         fine_config = config.copy()
         fine_config['grid_file'] = 'forcing_skagerrak.nc'
-        coarse_config['input_file'] = 'forcing_skagerrak.nc'
+        fine_config['input_file'] = 'forcing_skagerrak.nc'
         self.fine_grid = ROMS.Grid(fine_config)
         self.fine_config = fine_config
         print("Fine grid OK")
@@ -109,24 +111,28 @@ class Forcing:
 
     def __init__(self, config, grid):
 
+        self.fine_forcing = ROMS.Forcing(
+            grid.fine_config, grid.fine_grid)
+        print("Fine forcing OK")
+
         # May adjust coonfig
         self.coarse_forcing = ROMS.Forcing(
             grid.coarse_config, grid.coarse_grid)
         print("Coarse forcing OK")
 
-        self.fine_forcing = ROMS.Forcing(
-            grid.fine_config, grid.fine_grid)
-        print("Fine forcing OK")
-
-        # steps, hva gjøres her. Enkelt hvis samme
-        # Anta: fine step deler grove
-        # F.eks. fin hver time, grov hver tredje.
-        # Bruk fine steg.s
+        # TODO: generalize to consider different timings in the grids
         self.steps = self.fine_forcing.steps
         self._grid = grid
 
+    def update(self, t):
+        self.fine_forcing.update(t)
+        self.coarse_forcing.update(t)
+
+    def close(self):
+        self.fine_forcing.close()
+        self.coarse_forcing.close()
+
     # Note: cleaner with name first?
-    # Tidskontroll?
     def field(self, X, Y, Z, name):
         grid = self._grid
         X, Y = np.asarray(X), np.asarray(Y)
@@ -135,7 +141,7 @@ class Forcing:
         # need more conservative ingrid?
         X1, Y1 = grid.xy2fine(X[fine], Y[fine])
         Z1 = Z[fine]
-        X2, Y2= grid.xy2coarse(X[~fine], Y[~fine])
+        X2, Y2 = grid.xy2coarse(X[~fine], Y[~fine])
         Z2 = Z[~fine]
 
         A = np.empty(len(X), dtype=float)
@@ -144,7 +150,6 @@ class Forcing:
         return A
 
     def velocity(self, X, Y, Z, tstep=0):
-        print("Starting velocity")
         grid = self._grid
         X, Y = np.asarray(X), np.asarray(Y)
         X1, Y1 = grid.xy2fine(X, Y)
@@ -152,15 +157,13 @@ class Forcing:
         # need more conservative ingrid?
         X1, Y1 = grid.xy2fine(X[fine], Y[fine])
         Z1 = Z[fine]
-        X2, Y2= grid.xy2coarse(X[~fine], Y[~fine])
+        X2, Y2 = grid.xy2coarse(X[~fine], Y[~fine])
         Z2 = Z[~fine]
 
         U = np.empty(len(X), dtype=float)
         V = np.empty(len(X), dtype=float)
-        print("Foran fimne")
         U[fine], V[fine] = self.fine_forcing.velocity(
             X1, Y1, Z1, tstep=tstep)
-        print("U fine OK")
         U[~fine], V[~fine] = self.coarse_forcing.velocity(
             X2, Y2, Z2, tstep=tstep)
         return U, V
