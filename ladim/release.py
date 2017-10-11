@@ -15,6 +15,7 @@ import logging
 import numpy as np
 import pandas as pd
 from typing import Iterator
+
 from .utilities import ingrid
 from .configuration import Config
 
@@ -86,7 +87,7 @@ class ParticleReleaser(Iterator):
                 logging.warning("No particles released at simulation start")
                 n = 1
             # First effective release:
-            #release_time0 = A.iloc[n-1].release_time
+            # release_time0 = A.iloc[n-1].release_time
 
             # TODO: Check pandas, better way to delete rows?
             times = A['release_time']

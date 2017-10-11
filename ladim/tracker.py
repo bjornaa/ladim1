@@ -8,6 +8,7 @@
 # Licenced under the MIT license
 # ------------------------------------
 
+import logging
 from typing import Any, Tuple
 import numpy as np
 
@@ -23,6 +24,7 @@ class Tracker:
     """The physical particle tracking kernel"""
 
     def __init__(self, config: Config) -> None:
+        logging.info('Initiating the particle tracking')
         self.dt = config['dt']
         if config['advection']:
             self.advect = getattr(self, config['advection'])

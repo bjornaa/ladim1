@@ -20,24 +20,24 @@ g = Grid(dict(grid_args=[]))
 X = np.linspace(x0, x1, Npart)
 Y = np.linspace(y0, y1, Npart)
 with open('original.rls', mode='w') as f:
-    for i, (x, y) in enumerate(zip(X, Y)):
+    for x, y in zip(X, Y):
         f.write('1989-05-24T12 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
 
 # Virtual (nested) grid
 X0 = X - g._i0
 Y0 = Y - g._j0
 with open('nested.rls', mode='w') as f:
-    for i, (x, y) in enumerate(zip(X0, Y0)):
+    for x, y in zip(X0, Y0):
         f.write('1989-05-24T12 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
 
 # Same section in fine grid
 X1, Y1 = g.xy2fine(X0, Y0)
 with open('fine.rls', mode='w') as f:
-    for i, (x, y) in enumerate(zip(X1, Y1)):
+    for x, y in zip(X1, Y1):
         f.write('1989-05-24T12 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))
 
 # Same section in coarse grid
 X2, Y2 = g.xy2coarse(X0, Y0)
 with open('coarse.rls', mode='w') as f:
-    for i, (x, y) in enumerate(zip(X2, Y2)):
+    for x, y in zip(X2, Y2):
         f.write('1989-05-24T12 {:7.3f} {:7.3f} {:6.1f}\n'.format(x, y, Z))

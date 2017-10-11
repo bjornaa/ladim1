@@ -1,7 +1,10 @@
 #! /usr/bin/env python
 
 import sys
-# from netCDF4 import num2date
+import argparse
+import logging
+import datetime
+import os.path
 
 from ladim.configuration import configure
 from ladim.gridforce import Grid, Forcing
@@ -9,16 +12,40 @@ from ladim.release import ParticleReleaser
 from ladim.state import State
 from ladim.output import OutPut
 
+# ====================
+# Parse command line
+# ====================
+
+parser = argparse.ArgumentParser(
+    description='LADiM — Lagrangian Advection and Diffusion Model')
+parser.add_argument(
+    '-d', '--debug',
+    help="Show more information",
+    action="store_const", dest="loglevel", const=logging.DEBUG,
+    default=logging.INFO)
+parser.add_argument(
+    '-s', '--silent',
+    help='Show less information',
+    action="store_const", dest="loglevel", const=logging.WARNING)
+parser.add_argument('config_file', nargs='?', default='ladim.yaml')
+args = parser.parse_args()
+
 # ==================
 # Initiate the model
 # ==================
 
+# --- Logging ---
+logging.basicConfig(
+    level=args.loglevel,
+    format='%(levelname)s:%(module)s - %(message)s')
+
 # --- Configuration ---
-if len(sys.argv) > 1:   # configuration file from command line
-    config_file = sys.argv[1]
+if os.path.isfile(args.config_file):
+    now = datetime.datetime.now().replace(microsecond=0)
+    logging.info(f'LADiM simulation starting: {now}')
 else:
-    config_file = 'ladim.yaml'
-config = configure(config_file)
+    raise SystemExit('ERROR: Configuration file not found')
+config = configure(args.config_file)
 
 # --- Initiate the grid and the forcing ---
 grid = Grid(config)
@@ -38,7 +65,7 @@ out = OutPut(config, releaser)
 # Main time loop
 # ==============
 
-print("============ starting time loop")
+logging.info("Starting time loop")
 for step in range(config['numsteps']+1):
 
     # --- Update forcing ---
@@ -62,7 +89,7 @@ for step in range(config['numsteps']+1):
 # Clean up
 # ========
 
-print('\nLADiM: end of simulation')
+logging.info('\nLADiM: end of simulation')
 
 forcing.close()
 out.close()

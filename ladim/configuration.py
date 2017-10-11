@@ -18,8 +18,7 @@ import yaml.parser
 Config = Dict[str, Any]   # type of the config dictionary
 
 
-def configure(config_file: str,
-              loglevel: int = logging.WARNING) -> Config:
+def configure(config_file: str) -> Config:
 
     config: Config = dict()
 
@@ -36,23 +35,6 @@ def configure(config_file: str,
         print('ERROR: ',
               'Can not parse configuration file {}'.format(config_file))
         raise SystemExit(2)
-
-    # --- Logging control ---
-    try:
-        loglevel = conf['logging'][loglevel]
-    except KeyError:
-        loglevel = logging.INFO
-    logging.basicConfig(
-        level=loglevel,
-        format='%(levelname)s %(module)s - %(message)s')
-    level2str = {0: 'NOTSET',
-                 10: 'DEBUG',
-                 20: 'INFO',
-                 30: 'WARNING',
-                 40: 'ERROR',
-                 50: 'CRITICAL'}
-    logging.info('Configuration: Logging')
-    logging.info('    {:15s}: {}'.format('loglevel', level2str[loglevel]))
 
     # --- Time control ---
     logging.info('Configuration: Time Control')

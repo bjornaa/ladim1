@@ -10,6 +10,7 @@ import logging
 import datetime
 from typing import Any, Dict
 from netCDF4 import Dataset
+
 from .state import State                  # For mypy
 from .release import ParticleReleaser     # For mypy
 

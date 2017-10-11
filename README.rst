@@ -5,17 +5,17 @@ This is a developing new version of the Lagrangian Advection and Diffusion
 Model. It is an off-line particle tracking code. Presently  using results from
 the ocean model `ROMS <http://www.myroms.org/>`_ as input.
 
-Try out pyladim
----------------
+Try out LADiM
+-------------
 
-Presently the model depends on the package `roppy
-<https://github.com/bjornaa/roppy>`_ for handling input from ROMS.
+The model is written in python and requires python 3.6 and some scientific packages. The anaconda python distribution is recommended.
 
-It also needs an example input data file. The example file used is available::
+Download the code from github and install by python setup.py install.
 
-  ftp://ftp.imr.no/bjorn/ladim-data/ocean_avg_0014.nc.gz
+Get a small example data set by running the download script in ``examples/data``. The differnt examples can be run by the sequence of commands::
 
-Gunzip and store it in ``examples/data``.
+  python make_release.py
+  ladim
 
 
 Source code
