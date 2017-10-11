@@ -4,7 +4,6 @@
 # Line source example
 #
 
-
 time_control:
     # Start and stop of simulation
     # use an alias &t0 if used again
