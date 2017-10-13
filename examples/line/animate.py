@@ -85,11 +85,11 @@ def onClick(event):
 
 
 # Do the animation
-anim = FuncAnimation(fig, animate, frames=num_times, interval=20,
+anim = FuncAnimation(fig, animate, frames=num_times, interval=30,
                      repeat=True, repeat_delay=500, blit=True)
 
 
 # anim.save('line.gif',  writer='imagemagick')
 
-# fig.canvas.mpl_connect('button_press_event', onClick)
+fig.canvas.mpl_connect('button_press_event', onClick)
 plt.show()

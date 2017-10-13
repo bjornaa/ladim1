@@ -433,18 +433,17 @@ class Forcing:
 
         self._nc.close()
 
-    # def sample_velocity(self, X, Y, Z, tstep=0, method='bilinear'):
-    def velocity(self, X, Y, Z, tstep=0, method='nearest'):
+    def velocity(self, X, Y, Z, tstep=0, method='bilinear'):
 
         i0 = self._grid.i0
         j0 = self._grid.j0
         K, A = z2s(self._grid.z_r, X - i0, Y - j0, Z)
         if tstep < 0.001:
             return sample3DUV(self.U, self.V,
-                              X-i0, Y-j0, K, A, method=method)
+                              X-i0+0.5, Y-j0, K, A, method=method)
         else:
             return sample3DUV(self.U + tstep*self.dU, self.V + tstep*self.dV,
-                              X-i0, Y-j0, K, A, method=method)
+                              X-i0, Y-j0+0.5, K, A, method=method)
 
     # Simplify to grid cell
     def field(self, X, Y, Z, name):
@@ -622,8 +621,6 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
 
     """
 
-    # print('sample3D: method =', method)
-
     if method == 'bilinear':
         # Find rho-point as lower left corner
         I = X.astype('int')
@@ -650,6 +647,6 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
         return F[K, J, I]
 
 
-def sample3DUV(U, V, X, Y, K, A, method='bilinear'):
-    return (sample3D(U, X - 0.5, Y, K, A, method=method),
-            sample3D(V, X, Y - 0.5, K, A, method=method))
+def sample3DUV(U, V, X, Y, K, A, method='nearest'):
+    return (sample3D(U, X, Y, K, A, method=method),
+            sample3D(V, X, Y, K, A, method=method))
