@@ -25,6 +25,7 @@ def test_discrete() -> None:
         f.write('3 "2015-04-03 12" 200\n')
     # Make the ParticleReleaser object
     release = ParticleReleaser(config)
+    # Clean up the release file
     os.remove('release.rls')
 
     assert(len(release.times) == 2)
@@ -45,6 +46,7 @@ def test_discrete() -> None:
     # No more releases
     with pytest.raises(StopIteration):
         next(release)
+
 
 #
 # ------------------------------------------------------
@@ -88,7 +90,10 @@ def test_continuous() -> None:
         else:
             assert(np.all(S['X'] == [200, 200, 200]))
 
+
+#
 # --------------------------------------------------
+#
 def test_late_start() -> None:
     """Model start after first release in file"""
 
@@ -137,7 +142,6 @@ def test_late_start() -> None:
 
     # Total particle count
     assert(config['total_particle_count'] == sum(counts))
-
 
     for i, S in enumerate(release):
         assert(np.all(S['pid'] == range(cumcount[i], cumcount[i+1])))
@@ -283,7 +287,7 @@ def test_subgrid() -> None:
 if __name__ == '__main__':
     pass
     # test_discrete()
-    test_continuous()
+    # git pustest_continuous()
     # test_late_start()
     # test_too_late_start()
     # test_early_stop()

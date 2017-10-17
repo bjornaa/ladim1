@@ -118,5 +118,51 @@ class ParticleFile:
         Y = self.nc.variables['Y'][start:start+count]
         return X, Y
 
+    def trajectory(self, p):
+        """Get particle positions along a single track"""
+
+        f = self.nc
+        X, Y = [], []
+        first_time = None
+        last_time = self.num_times
+
+        # After loop
+        # particle is alive for n in [first_time:last_time]
+        # or to the end if last_time == 0
+
+        for n in range(self.num_times):
+            start = self._start[n]
+            count = self._count[n]
+            pid = f.variables['pid'][start:start+count]
+
+            if pid[-1] < p:  # particle not released yet
+                continue
+
+            if first_time is None:
+                first_time = n
+
+            # index = sum(pid < p) # eller lignende
+            index = pid.searchsorted(p)
+            if pid[index] > p:  # p is missing
+                last_time = n     #
+                break             # No need for more cycles
+
+            X.append(f.variables['X'][start + index])
+            Y.append(f.variables['Y'][start + index])
+
+        return Trajectory(list(range(first_time, last_time)), X, Y)
+
     def close(self):
         self.nc.close()
+
+
+class Trajectory:
+    """Single particle trajectory"""
+
+    def __init__(self, times, X, Y):
+        self.times = times
+        self.X = X
+        self.Y = Y
+
+    def __len__(self):
+        return len(self.times)
