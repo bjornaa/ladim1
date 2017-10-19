@@ -150,7 +150,7 @@ class ParticleFile:
             X.append(f.variables['X'][start + index])
             Y.append(f.variables['Y'][start + index])
 
-        return Trajectory(list(range(first_time, last_time)), X, Y)
+        return Trajectory(range(first_time, last_time), X, Y)
 
     def close(self):
         self.nc.close()

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def cellcount(X, Y, W=None, gridspec=None, return_edges=False):
     """Count the (weighted) number of particles in grid cells
 
