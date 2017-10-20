@@ -12,16 +12,16 @@ from postladim import ParticleFile
 particle_file = 'line.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
-# Subgrid for plot
+# Subgrid definition
 i0, i1 = 58, 150
-j0, j1 = 60, 140
+j0, j1 = 60, 130
 
-# timestamp
-t = 90
+# Particle identifiers for trajectories
+pids = range(5, 1000, 10)
 
 # ----------------
 
-# Read grid info
+# ROMS grid, plot domain
 with Dataset(grid_file) as f0:
     H = f0.variables['h'][j0:j1, i0:i1]
     M = f0.variables['mask_rho'][j0:j1, i0:i1]
@@ -37,13 +37,14 @@ Yb = np.arange(j0-0.5, j1)
 # particle_file
 pf = ParticleFile(particle_file)
 
+# Make plot
 fig = plt.figure(figsize=(12, 10))
 ax = fig.add_subplot(1, 1, 1)
 
-# Make background map
+# Background map
 #   Bathymetry
 cmap = plt.get_cmap('Blues')
-h = ax.contourf(Xcell, Ycell, H, cmap=cmap, alpha=0.3)
+h = ax.contourf(Xcell, Ycell, H, cmap=cmap, alpha=0.9)
 
 #   Landmask
 constmap = plt.matplotlib.colors.ListedColormap([0.2, 0.6, 0.4])
@@ -56,12 +57,11 @@ ax.contour(Xcell, Ycell, lat, levels=range(55, 64),
 ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2),
            colors='black', linestyles=':')
 
-# Plot particle distribution
-X, Y = pf.position(t)
-h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
-ax.set_title(pf.time(t))
 
-# Show the results
-plt.axis('image')
-plt.axis((i0+1, i1-1, j0+1, j1-1))
+# Trajectories
+for p in pids:
+    traj = pf.trajectory(p)
+    plt.plot(traj.X, traj.Y, 'r')
+    # plt.plot(traj.X[0], traj.Y[0], 'ro')  # Start points
+
 plt.show()
