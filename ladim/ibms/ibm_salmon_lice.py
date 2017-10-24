@@ -57,4 +57,4 @@ class IBM:
         state.Z[state.Z >= 20.0] = 19.0
 
         # Mark particles older than 200 degree days as dead
-        state.alive = state.age < 200
+        state.alive = state.alive & (state.age < 200)

@@ -72,7 +72,7 @@ class Tracker:
         I = ~grid.ingrid(X1, Y1)
         X1[I] = X[I]
         Y1[I] = Y[I]
-        # Kill particles moving out of the grid
+        # Kill particles trying to move out of the grid
         state.alive[I] = False
 
         # Land, boundary treatment. Do not move the particles
