@@ -9,6 +9,7 @@
 import logging
 import datetime
 from typing import Any, Dict
+import numpy as np
 from netCDF4 import Dataset
 
 from .state import State                  # For mypy
@@ -61,11 +62,22 @@ class OutPut:
 
         # Particle variables
         for name in config['output_particle']:
-            v = nc.createVariable(
-                varname=name,
-                datatype=config['nc_attributes'][name]['ncformat'],
-                dimensions=('particle',),
-                zlib=True)
+            confname = config['nc_attributes'][name]
+            if confname['ncformat'][0] == 'S':   # text
+                length = int(confname['ncformat'][1:])
+                lendimname = 'len_' + name
+                v = nc.createDimension(lendimname, length)
+                v = nc.createVariable(
+                    varname=name,
+                    datatype='S1',
+                    dimensions=('particle', lendimname),
+                    zlib=True)
+            else:   # Numeric
+                v = nc.createVariable(
+                    varname=name,
+                    datatype=config['nc_attributes'][name]['ncformat'],
+                    dimensions=('particle',),
+                    zlib=True)
             for attr, value in config['nc_attributes'][name].items():
                 if attr != 'ncformat':
                     setattr(v, attr, value)
@@ -94,7 +106,14 @@ class OutPut:
 
         # Save particle variables
         for name in config['output_particle']:
-            nc.variables[name][:] = release.particle_variables[name][:]
+            var = nc.variables[name]
+            if var.datatype == np.dtype('S1'):   # Text
+                n = len(nc.dimensions[var.dimensions[-1]])
+                A = [list(s[:n].ljust(n))
+                     for s in release.particle_variables[name][:]]
+                var[:] = np.array(A)
+            else:    # Numeric
+                nc.variables[name][:] = release.particle_variables[name][:]
 
         return nc
 

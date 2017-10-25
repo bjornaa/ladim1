@@ -114,7 +114,7 @@ def configure(config_file: str) -> Config:
     config['release_format'] = conf['particle_release']['variables']
     config['release_dtype'] = dict()
     # Map from str to converter
-    type_mapping = dict(int=int, float=float, time=np.datetime64)
+    type_mapping = dict(int=int, float=float, time=np.datetime64, str=str)
     for name in config['release_format']:
         config['release_dtype'][name] = type_mapping[
             conf['particle_release'].get(name, 'float')]
