@@ -16,7 +16,7 @@ import logging
 import numpy as np
 from netCDF4 import Dataset, num2date
 
-from ladim.sample import sample2D
+from ladim.sample import sample2D, bilin_inv
 
 
 class Grid:
@@ -168,6 +168,15 @@ class Grid:
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j0
         return self.M[J, I] > 0
+
+    def xy2ll(self, X, Y):
+        return (sample2D(self.lon, X-self.i0, Y-self.j0),
+                sample2D(self.lat, X-self.i0, Y-self.j0))
+
+    def ll2xy(self, lon, lat):
+        Y, X = bilin_inv(lon, lat, self.lon, self.lat)
+        return X + self.i0, Y + self.j0
+
 
 
 # -----------------------------------------------

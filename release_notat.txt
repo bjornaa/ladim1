@@ -1,0 +1,92 @@
+Notat 2017-08-02
+
+Particle release i LADiM
+------------------------
+
+Styres av release_schedule
+(omdøpes i config-fil fra release_type)
+
+Generelt spørsmål:
+Bruke komm-separert i rls-filene??
+Fordel: slipper hermetegn for "2017-07-20 18:00:00"
+        skiller det fra andre felt med komma
+Det er ganske vanlig med komma-separert fra regneark o.l.
+
+1) Discrete
+-----------
+
+Hver linje har tidspunkt og posisjon.
+Kan ha flere linjer for samme tidspunkt
+(også samme posisjon er mulig)
+Krav:
+  1. Tidspunktene skal være sortert kronologisk
+  2. Tidspunktene skal matche tidskritt i modellen
+
+Eksempel, start_time = 2017-08-01, dt = 1 time
+    2017-07-20  ...
+    "2017-07-20 18:00"   ...
+    "2017-08-01"  ....
+    2017-08-02  ....
+Denne er OK. To første linjer ignoreres
+
+Eksempel:
+    "2017-07-20 12:00"
+    2018-08-02
+
+OK, første linje ignoreres
+Advarsel om ingen partikler ved simulering start
+
+Eksempel:
+   2018-08-01
+   "2018-08-01 12:30"
+FEIL: utslipp utenom tidskritt
+
+Eksempel:
+  2018-08-01 12:30"
+  2018-08-01
+Forsåvidt feil, første tidspunkt er utenom helt tidskritt
+men siden det ignoreres (før start) så gjør det ikke noe.
+
+Håndtering:
+-----------
+Alle tidspunkt før start_time ignoreres
+Alle tidspunkt etter stop_time ignoreres
+(Hva gjør vi med release på stopp-tidspunkt?)
+Ingen tidspunkt igjen => ERROR
+start_time ikke blant tidspunktene => WARNING (starter uten partikler)
+Sjekker at tidspunkt - start_time delelig med dt, ellers ERROR
+Bør og sjekke at tidspunktene er sortert, ellers ERROR
+
+
+2) release_schedule = "continuous"
+
+Linjene i release-filen ser make ut.
+Også her kreve: kronologisk og matche tidskritt
+
+Gjøres om til diskret:
+time0 = største tidskritt <= start_time
+sletter alt før time0
+sletter alt etter stop_time
+Repeterer blokkene for gitt tidskritt med frekvensen til vi
+når en ny tidsverdi, eller stop_time
+
+Eksempel: start som over, stop_time = 2018-08-03, periode = 12 timer
+1948-01-01  .....
+Dette gir konstant seeding, diskret blir dette:
+2018-08-01, 2018-08-01T12, 2018-08-02, 2018-08-02T12, 2018-08-03
+
+Eksempel: situasjon som over (B1, ... forkortelse for alt ved tidspunktet)
+release-file: ..., 2018-07-29 B1, 2018-07-31 B2, 2018-08-02 B3, ....
+Diskretisert blir dette
+2018-07-31    B2
+2018-07-31T12 B2
+2018-08-01    B2
+2018-08-01T12 B2
+2018-08-02    B3
+2018-08-02T12 B3
+2018-08-03    B3
+De to første linjene fjernes under håndtering av det diskrete.
+Har på denne måten fått med B2 fra start_time.
+
+Diskretiseringen kan gjøres i et preprosseserings-skript som transformasjon av
+rls-filer, men velger å ta det inn i LADiM for å forenkle bruken

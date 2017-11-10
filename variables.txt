@@ -1,0 +1,59 @@
+Different kind of variables
+===========================
+
+particle instance = particle at a given time
+
+
+Particle variables:
+-------------------
+
+var = function(pid)
+depend on the particle, not time
+
+Instance variables:
+-------------------
+
+var = function(instance) = function(pid, time)
+depend on the particle instance
+Note: the two projections, pid and time are instance variables
+Do not use time as such, but pid all the way
+(pid is also a trivial and not useful particle variable)
+
+state variables:
+describes the physical model state
+pid, X, Y, Z
+
+position variables:
+X, Y, Z
+(include lon, lat?)
+
+ibm_variables:
+variables used by the IBM, can be both instance and particle
+examples:
+lat, initial size, size, temp, ...
+Some of these are state variables, describing biological state,
+forcing or deduced from forcing (e.g. density)
+
+forcing variables:
+U, V, W (velocity components, also reserved)
+temp, salt,  ... IBM forcing
+lon, lat, time, ... Helpers
+some particle variables (inital size?)
+
+
+
+release variables:
+variables given to the particle by the rls file
+pid, position, release time, initial size, super count, ...
+
+output variables:
+variables written to output
+Must include pid
+
+reserved variable names:
+instance: pid, X, Y, Z, lon, lat, temp, salt
+particle: release_time, release_X, release_Y, release_Z
+(could predefine NetCDF format)
+
+
+

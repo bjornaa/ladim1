@@ -24,6 +24,7 @@ files:
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
+    [lon, lat]
     # ibm_variables: []
 
 particle_release:
@@ -51,7 +52,7 @@ output_variables:
     outper: [3, h]
     # Variable names
     particle: [release_time]
-    instance: [pid, X, Y]
+    instance: [pid, X, Y, lon, lat]
     # NetCDF arguments
     release_time:
         ncformat: f8
@@ -67,6 +68,8 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
+    lon: {ncformat: f4, long_name: particle longitude, units: degrees_east}
+    lat: {ncformat: f4, long_name: particle latitude, units: degrees_north}
 
 numerics:
     # Model time step, [value, unit]
