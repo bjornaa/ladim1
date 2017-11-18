@@ -74,7 +74,7 @@ for step in range(config['numsteps']+1):
     # --- Particle release ---
     if step in releaser.steps:
         V = next(releaser)
-        state.append(V)
+        state.append(V, grid)
 
     # --- Save to file ---
     # Output before update???

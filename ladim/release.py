@@ -92,7 +92,7 @@ class ParticleReleaser(Iterator):
             # TODO: Check pandas, better way to delete rows?
             times = A['release_time']
             try:
-                release_time0 = times[times <= start_time][-1]
+                release_time0 = times[times <= pd.to_datetime(start_time)][-1]
             except IndexError:
                 release_time0 = times[0]
             A = A[A.index >= release_time0]
@@ -143,7 +143,7 @@ class ParticleReleaser(Iterator):
 
         # Compute the release time steps
         rel_time = self.times - config['start_time']
-        rel_time = rel_time.astype('m8[s]').astype('int')
+        rel_time = rel_time.astype('M8[s]').astype('int')
         self.steps = rel_time // config['dt']
 
         # Make dataframes for each timeframe

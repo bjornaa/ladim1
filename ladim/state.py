@@ -26,15 +26,19 @@ class State(Sized):
         self.timestamp = config['start_time'].astype('datetime64[s]')
         self.dt = np.timedelta64(config['dt'], 's')
         self.position_variables = ['X', 'Y', 'Z']
-        self.ibm_variables = config['ibm_variables']
+        # self.ibm_variables = config['ibm_variables']
+        self.state_variables = config['state_variables']
         self.particle_variables = config['particle_variables']
-        self.instance_variables = (
-            self.position_variables +
-            [var for var in self.ibm_variables
-             if var not in self.particle_variables])
+        # Can there be state variables that are not instance variables
+        self.instance_variables = [var for var in self.state_variables
+                                   if var not in self.particle_variables]
+        reserved_variables = ['pid', 'X', 'Y', 'Z', 'lon', 'lat']
 
+        # pid is integer, rest = float
+        # Kan ha andre heltall, f.eks. stadie nummer
+        # Generalisere til dict: var -> type?
         self.pid = np.array([], dtype=int)
-        for name in self.instance_variables:
+        for name in (set(self.instance_variables) - {'pid'}):
             setattr(self, name, np.array([], dtype=float))
 
         for name in self.particle_variables:
@@ -66,16 +70,19 @@ class State(Sized):
     def __len__(self) -> int:
         return len(getattr(self, 'X'))
 
-    def append(self, new: Dict[str, Any]) -> None:
+    def append(self, new: Dict[str, Any], grid: Grid) -> None:
         """Append new particles to the model state"""
         nnew = len(new['pid'])
-        self.pid = np.concatenate((self.pid, new['pid']))
+        # self.pid = np.concatenate((self.pid, new['pid']))
         for name in self.instance_variables:
             if name in new:
                 self[name] = np.concatenate((self[name], new[name]))
             else:   # Initialize to zero
                 self[name] = np.concatenate((self[name], np.zeros(nnew)))
         self.nnew = nnew
+
+        if 'lon' in self.instance_variables:
+            self.lon, self.lat = grid.lonlat(self['X'], self['Y'])
 
     def update(self, grid: Grid, forcing: Forcing) -> None:
         """Update the model state to the next timestep"""
@@ -92,6 +99,11 @@ class State(Sized):
             logging.info(
                 "Model time = {}".format(self.timestamp.astype('M8[h]')))
 
+        # Longitude/latitutde
+        # If not used by IBM, may not be necessary except at output
+        if 'lon' in self.instance_variables:
+            self.lon, self.lat = grid.lonlat(self['X'], self['Y'])
+
         # Update the IBM
         if self.ibm:
             self.ibm.update_ibm(grid, self, forcing)
@@ -101,7 +113,7 @@ class State(Sized):
         I = self.Z < 0
         self.Z[I] = - self.Z[I]
         #     Keep just above bottom
-        H = grid.sample_depth(self.X, self.Y)
+        H = grid.sample_depth(self['X'], self['Y'])
         I = self.Z > H
         self.Z[I] = 0.99*H[I]
 

@@ -17,6 +17,50 @@ import yaml.parser
 
 Config = Dict[str, Any]   # type of the config dictionary
 
+# config should be a dictionary - items
+#
+# start_time: np.datetime64
+# stop_time: np.datetime64
+# reference_time: np.datetime64, optional, default = start_time
+#
+# grid_file
+# input_file
+# release_file
+# output_file
+#
+# dt: int, number of seconds
+# simulation_time: computed
+# numsteps: int, computed
+#
+# gridforce_module:
+# grid_args: dictionary, optional, default = {}
+# !!ibm_forcing: list, default = []
+#    replace with below
+# forcing_variables: (U, V may not be listed)
+#
+# ibm_module: optional, default = ''
+#
+# release_type: continuous/discrete, default='discrete'
+# release_frequency: mandatory if continuous
+# release_format: liste med navn på variable
+#  -- gjør optional, overstyre med første linje i rls
+# release_dtype: dict
+# particle_variables: liste med navn
+#
+# ibm_variables:  (Flytte til IBM-seksjon)
+# extra_variables: [temp, lon, ...]
+#
+# output_format: netcdf-versjon, default='NETCDF3_64BIT_OFFSET'
+# output_perions: np.timedelta64
+# num_output: Computed
+# output_particle:
+# output_instances:
+# output_variables: dictionary med attributter
+# -- Legg inn default for vanlige typer
+#
+# advection: method_string, '' for no advection
+# diffusion: value, 0 for no diffusion
+
 
 def configure(config_file: str) -> Config:
 
@@ -125,11 +169,17 @@ def configure(config_file: str) -> Config:
     # --- Model state ---
     logging.info('Configuration: Model State Variables')
     state = conf['state']
+    config['state_variables'] = ['pid', 'X', 'Y', 'Z']  # Mandatory
     if state:
-        config['ibm_variables'] = state['ibm_variables']
-    else:
-        config['ibm_variables'] = []
-    logging.info('    ibm_variables: {}'.format(config['ibm_variables']))
+        # print('state = ', state)
+        # print(type(config['state_variables']))
+        # print(type(state['variables']))
+        config['state_variables'].extend(state['variables'])
+    config['ibm_variables'] = []  # Deprecated
+    # else:
+    #    config['ibm_variables'] = []
+    # logging.info('    ibm_variables: {}'.format(config['ibm_variables']))
+    logging.info('    state_variables: {}'.format(config['state_variables']))
 
     # --- Output control ---
     logging.info('Configuration: Output Control')
