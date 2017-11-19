@@ -14,7 +14,7 @@
 import logging
 import numpy as np
 import pandas as pd
-from typing import Iterator
+from typing import Iterator, List
 
 from .utilities import ingrid
 from .configuration import Config
@@ -37,8 +37,8 @@ class ParticleReleaser(Iterator):
 
     def __init__(self, config: Config) -> None:
 
-        start_time = config['start_time']
-        stop_time = config['stop_time']
+        start_time = pd.to_datetime(config['start_time'])
+        stop_time = pd.to_datetime(config['stop_time'])
 
         logging.info('Initializing the particle releaser')
 

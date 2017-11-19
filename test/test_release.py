@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 import pytest
 from ladim.release import ParticleReleaser
 
@@ -211,7 +212,7 @@ def test_early_stop() -> None:
 
     # The entries have the correct information
     for t, S in enumerate(release):
-        assert(np.all(S['release_time'] == release_times[t]))
+        assert(np.all(S['release_time'] == pd.to_datetime(release_times[t])))
         if t < 2:
             assert(np.all(S['pid'] == [2*t, 2*t+1]))
             # assert(np.all(S['X'] == 100.0))
