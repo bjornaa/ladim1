@@ -23,7 +23,8 @@ files:
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: []
+    # ibm_variables: []
+    variables: []
 
 particle_release:
     # type = continuous or discrete [default]

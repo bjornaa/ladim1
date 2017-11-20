@@ -142,8 +142,13 @@ class ParticleReleaser(Iterator):
         logging.info("Number of release times = {}".format(len(self.times)))
 
         # Compute the release time steps
+        # UGLY due to pandas/numpy mismatch
         rel_time = self.times - config['start_time']
-        rel_time = rel_time.astype('M8[s]').astype('int')
+        rel_time = pd.to_timedelta(rel_time)
+        rel_time = rel_time.seconds + rel_time.days*86400
+        # print(start_time, start_time.dtype)
+        # rel_time = self.times - start_time
+        # rel_time = rel_time.astype('M8[s]').astype('int')
         self.steps = rel_time // config['dt']
 
         # Make dataframes for each timeframe

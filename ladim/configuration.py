@@ -80,13 +80,17 @@ def configure(config_file: str) -> Config:
               'Can not parse configuration file {}'.format(config_file))
         raise SystemExit(2)
 
-    # --- Time control ---
+    # ------------------
+    # Time control
+    # ------------------
     logging.info('Configuration: Time Control')
     for name in ['start_time', 'stop_time', 'reference_time']:
         config[name] = np.datetime64(conf['time_control'][name])
         logging.info('    {:15s}: {}'.format(name, config[name]))
 
-    # --- Files ---
+    # ----------
+    # Files
+    # ----------
     logging.info('Configuration: Files')
     logging.info('    {:15s}: {}'.format('config_file', config_file))
     for name in ['grid_file', 'input_file',
@@ -94,7 +98,9 @@ def configure(config_file: str) -> Config:
         config[name] = conf['files'][name]
         logging.info('    {:15s}: {}'.format(name, config[name]))
 
-    # --- Time stepping ---
+    # -------------------
+    # Time stepping
+    # -------------------
     logging.info('Configuration: Time Stepping')
     # Read time step and convert to seconds
     dt = np.timedelta64(*tuple(conf['numerics']['dt']))
@@ -109,7 +115,9 @@ def configure(config_file: str) -> Config:
     logging.info(
         '    {:15s}: {}'.format('number of time steps', config['numsteps']))
 
-    #  --- Grid ---
+    # ------------
+    #  Grid
+    # ------------
     logging.info('Configuration: gridforce')
     config['gridforce_module'] = conf['gridforce']['module']
     logging.info('    {:15s}: {}'.format('module', config['gridforce_module']))
@@ -123,14 +131,18 @@ def configure(config_file: str) -> Config:
             'grid arguments', config['grid_args']))
     config['Vinfo'] = dict()
 
-    # --- Forcing ---
+    # -------------
+    # Forcing
+    # -------------
     try:
         config['ibm_forcing'] = conf['gridforce']['ibm_forcing']
     except (KeyError, TypeError):
         config['ibm_forcing'] = []
     logging.info('    {:15s}: {}'.format('ibm_forcing', config['ibm_forcing']))
 
-    # --- IBM ---
+    # -------
+    # IBM
+    # -------
     try:
         config['ibm_module'] = conf['ibm']['ibm_module']
         logging.info('Configuration: IBM')
@@ -140,7 +152,9 @@ def configure(config_file: str) -> Config:
     except KeyError:
         config['ibm_module'] = ''
 
-    # --- Particle release ---
+    # -----------------
+    # Particle release
+    # -----------------
     logging.info('Configuration: Particle Releaser')
     prelease = conf['particle_release']
     try:
@@ -166,7 +180,9 @@ def configure(config_file: str) -> Config:
             '    {:15s}: {}'.format(name, config['release_dtype'][name]))
     config['particle_variables'] = prelease['particle_variables']
 
-    # --- Model state ---
+    # -------------------
+    # Model state
+    # -------------------
     logging.info('Configuration: Model State Variables')
     state = conf['state']
     config['state_variables'] = ['pid', 'X', 'Y', 'Z']  # Mandatory
@@ -181,7 +197,9 @@ def configure(config_file: str) -> Config:
     # logging.info('    ibm_variables: {}'.format(config['ibm_variables']))
     logging.info('    state_variables: {}'.format(config['state_variables']))
 
-    # --- Output control ---
+    # --------------------
+    # Output control
+    # --------------------
     logging.info('Configuration: Output Control')
     try:
         output_format = conf['output_variables']['format']
@@ -216,7 +234,9 @@ def configure(config_file: str) -> Config:
         for item in config['nc_attributes'][name].items():
             logging.info(12 * ' ' + '{:11s}: {:s}'.format(*item))
 
-    # --- Numerics ---
+    # ---------------
+    # Numerics
+    # ---------------
     # dt belongs here, but is already read
     logging.info('Configuration: Numerics')
     try:

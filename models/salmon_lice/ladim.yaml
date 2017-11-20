@@ -36,7 +36,7 @@ ibm:
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: [super, age]
+    variables: [super, age]
 
 particle_release:
     release_type: continuous

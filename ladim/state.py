@@ -19,6 +19,7 @@ class State(Sized):
     """The model variables at a given time"""
 
     def __init__(self, config: Config) -> None:
+        """Initialize an empty initial state"""
 
         logging.info("Initializing the model state")
 
@@ -32,7 +33,7 @@ class State(Sized):
         # Can there be state variables that are not instance variables
         self.instance_variables = [var for var in self.state_variables
                                    if var not in self.particle_variables]
-        reserved_variables = ['pid', 'X', 'Y', 'Z', 'lon', 'lat']
+        # reserved_variables = ['pid', 'X', 'Y', 'Z', 'lon', 'lat']
 
         # pid is integer, rest = float
         # Kan ha andre heltall, f.eks. stadie nummer
@@ -73,6 +74,7 @@ class State(Sized):
     def append(self, new: Dict[str, Any], grid: Grid) -> None:
         """Append new particles to the model state"""
         nnew = len(new['pid'])
+        logging.debug(f"Appending {nnew} particles")
         # self.pid = np.concatenate((self.pid, new['pid']))
         for name in self.instance_variables:
             if name in new:
@@ -110,15 +112,15 @@ class State(Sized):
 
         # Surface/bottom boundary conditions
         #     Reflective  at surface
-        I = self.Z < 0
-        self.Z[I] = - self.Z[I]
+        cond = self.Z < 0
+        self.Z[cond] = - self.Z[cond]
         #     Keep just above bottom
         H = grid.sample_depth(self['X'], self['Y'])
-        I = self.Z > H
-        self.Z[I] = 0.99*H[I]
+        cond = self.Z > H
+        self.Z[cond] = 0.99*H[cond]
 
         # Compactify by removing dead particles
         # Could have a switch to avoid this if no deaths
-        self.pid = self.pid[self.alive]
+        # self.pid = self.pid[self.alive]
         for key in self.instance_variables:
             self[key] = self[key][self.alive]

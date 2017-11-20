@@ -50,7 +50,7 @@ def test_out_of_area():
         dt=600,
         particle_variables=[],
         ibm_module='ladim.ibms.ibm_salmon_lice',
-        ibm_variables=['super', 'age'],
+        state_variables=['pid', 'X', 'Y', 'Z', 'super', 'age'],
         advection='EF',
         diffusion=False,
     )
