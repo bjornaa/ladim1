@@ -48,8 +48,6 @@ pf = ParticleFile(fil)
 # N_release = len(z_release)
 print('Utsleppspunkt ok...')
 
-
-
 # ----------------
 # Read grid file
 # ----------------

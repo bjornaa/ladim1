@@ -9,8 +9,6 @@ x0, x1 = 66.55, 123.45
 y0, y1 = 95, 90
 y0, y1 = 93.4, 90
 
-
-
 # Number of particles along the line
 Npart = 1000
 

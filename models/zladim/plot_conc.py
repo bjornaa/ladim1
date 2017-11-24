@@ -32,8 +32,6 @@ constmap = plt.matplotlib.colors.ListedColormap([0.2, 0.6, 0.4])
 M = np.ma.masked_where(M > 0, M)
 plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 
-
-
 plt.axis('image')
 
 plt.show()

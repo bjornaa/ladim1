@@ -90,7 +90,7 @@ for step in range(config['numsteps']+1):
 # ========
 
 now = datetime.datetime.now().replace(microsecond=0)
-logging.info(f'End of simulation, time={now}')
+logging.info(f'End of simulation, time = {now}')
 
 forcing.close()
 out.close()

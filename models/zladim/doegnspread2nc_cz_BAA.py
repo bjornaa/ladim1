@@ -13,8 +13,8 @@ from netCDF4 import Dataset
 # User settings
 # ----------------
 
-mnd="mar"
-dag="11"
+mnd = "mar"
+dag = "11"
 
 # Opr test kjøringer2015
 gridfile = '/work/shared/norkyst/NorKyst-800m_Forcing/Grid/norkyst_800m_grid_full.nc'

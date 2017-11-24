@@ -89,7 +89,7 @@ for n in range(n0, n1+1):
 
 print("Counting")
 C, Xb, Yb = np.histogram2d(Y, X, (jmax, imax), weights=S,
-                           range=[[-0.5,jmax-0.5], [-0.5,imax-0.5]])
+                           range=[[-0.5, jmax-0.5], [-0.5, imax-0.5]])
 
 # Get average
 C /= n1 + 1 - n0
@@ -105,8 +105,6 @@ nc = Dataset(output_file, mode='w',
 nc.createDimension('xi_rho',  imax)
 nc.createDimension('eta_rho', jmax)
 
-
-
 # Variables
 v = nc.createVariable('conc', 'f', ('eta_rho', 'xi_rho'))
 v.long_name = "Particle concentration"
@@ -117,15 +115,13 @@ v.units = "number of particles in grid cell"
 nc.institution = "Institute of Marine Research"
 nc.grid_file = gridfile
 nc.particle_file = particlefile
-nc.history = "Created %s by spreading2nc.py" %  datetime.date.today()
+nc.history = "Created %s by spreading2nc.py" % datetime.date.today()
 
 # ------------------
 # Save variables
 # ------------------
 
 nc.variables['conc'][:,:] = C
-
-
 
 # -------------
 # Clean up
