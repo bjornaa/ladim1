@@ -38,7 +38,7 @@ class Forcing:
         return 8.0*np.ones_like(X)
 
 
-def test_out_of_area():git st
+def test_out_of_area():
     """Particles moving out of the area should be killed
 
        Check for bug where the IBM woke them up again
