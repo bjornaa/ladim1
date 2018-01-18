@@ -48,6 +48,10 @@ output_variables:
     # format: NETCDF3_64BIT_DATA
     format: NETCDF4_CLASSIC
 
+    # Records per file
+    # Default = 0 meaning unlimited i.e. only one (unnumbered) output file
+    numrec: 20
+
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Variable names

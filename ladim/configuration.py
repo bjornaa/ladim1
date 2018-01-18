@@ -131,13 +131,26 @@ def configure(config_file: str) -> Config:
         config['ibm_variables'] = []
     logging.info('    ibm_variables: {}'.format(config['ibm_variables']))
 
-    # --- Output control ---
+    # -----------------
+    # Output control
+    # -----------------
     logging.info('Configuration: Output Control')
     try:
         output_format = conf['output_variables']['format']
     except KeyError:
         output_format = 'NETCDF3_64BIT_OFFSET'
     config['output_format'] = output_format
+    logging.info('    {:15s}: {}'.format(
+        'output_format', config['output_format']))
+
+    try:
+        numrec = conf['output_variables']['numrec']
+    except KeyError:
+        numrec = 0
+    config['output_numrec'] = numrec
+    logging.info('    {:15s}: {}'.format(
+        'output_numrec', config['output_numrec']))
+
     outper = np.timedelta64(*tuple(conf['output_variables']['outper']))
     outper = outper.astype('m8[s]').astype('int') // config['dt']
     config['output_period'] = outper

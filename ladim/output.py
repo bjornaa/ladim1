@@ -6,6 +6,7 @@
 # 2013-01-04
 # ------------------------------------
 
+import os
 import logging
 import datetime
 from typing import Any, Dict
@@ -25,22 +26,32 @@ class OutPut:
 
         logging.info('Initializing output')
 
-        self.nc = self._define_netcdf(config, release)
         self.instance_variables = config['output_instance']
         self.instance_count = 0
         self.outcount = 0    # No output yet
         self.dt = config['dt']
+        if config['output_numrec'] > 0:
+            self.file_number = 1
+        else:
+            self.file_number = 0
+        self.nc = self.define_netcdf(config, release)
 
     def close(self):
         self.nc.close()
 
-    def _define_netcdf(self, config: Dict[str, Any],
-                       release: ParticleReleaser) -> Dataset:
+    def define_netcdf(self, config: Dict[str, Any],
+                      release: ParticleReleaser) -> Dataset:
         """Define a NetCDF output file"""
 
-        logging.debug("Defining netCDF file")
-        # nc = Dataset(config['output_file'], mode='w',
-        nc = Dataset(config['output_file'], mode='w',
+        fname = config['output_file']
+        if self.file_number > 0:   # One of a series of files
+            # fname = fname0.nc -> fname0_xxxx.nc
+            fname0, ext = os.path.splitext(fname)
+            # fname = '{:s}_{:04d}{:s}'.format(fname0, file_number, ext)
+            fname = f'{fname0}_{self.file_number:04d}{ext}'
+
+        logging.debug("Defining output netCDF file: {}".format(fname))
+        nc = Dataset(fname, mode='w',
                      format=config['output_format'])
         # --- Dimensions
         nc.createDimension('particle', release.total_particle_count)
