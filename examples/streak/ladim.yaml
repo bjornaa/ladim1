@@ -41,6 +41,9 @@ gridforce:
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
+    # Records per file
+    # numrec: 20
+
     # Variable names
     particle: [release_time]
     instance: [pid, X, Y]

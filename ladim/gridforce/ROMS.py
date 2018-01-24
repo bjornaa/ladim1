@@ -177,8 +177,6 @@ class Grid:
         Y, X = bilin_inv(lon, lat, self.lon, self.lat)
         return X + self.i0, Y + self.j0
 
-
-
 # -----------------------------------------------
 # The Forcing class from the old forcing module
 # -----------------------------------------------

@@ -1,5 +1,5 @@
 
-__all__ = ['ParticleFile']
+__all__ = ['ParticleFile', 'cellcount']
 
-from .postladim import ParticleFile, MultiParticleFile
+from .postladim import ParticleFile
 from .cellcount import cellcount

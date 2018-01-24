@@ -105,13 +105,10 @@ nc = Dataset(output_file, mode='w',
 nc.createDimension('xi_rho',  imax)
 nc.createDimension('eta_rho', jmax)
 
-
-
 # Variables
 v = nc.createVariable('conc', 'f', ('eta_rho', 'xi_rho'))
 v.long_name = "Particle concentration"
 v.units = "number of particles in grid cell"
-
 
 # Global variables
 nc.institution = "Institute of Marine Research"
@@ -124,8 +121,6 @@ nc.history = "Created %s by spreading2nc.py" %  datetime.date.today()
 # ------------------
 
 nc.variables['conc'][:,:] = C
-
-
 
 # -------------
 # Clean up

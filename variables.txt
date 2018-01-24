@@ -38,7 +38,7 @@ forcing variables:
 U, V, W (velocity components, also reserved)
 temp, salt,  ... IBM forcing
 lon, lat, time, ... Helpers
-some particle variables (inital size?)
+some particle variables (initial size?)
 
 
 
