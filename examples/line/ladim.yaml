@@ -50,7 +50,7 @@ output_variables:
 
     # Records per file
     # Default = 0 meaning unlimited i.e. only one (unnumbered) output file
-    numrec: 20
+    # numrec: 20
 
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]

@@ -28,29 +28,75 @@ class OutPut:
 
         self.instance_variables = config['output_instance']
         self.instance_count = 0
-        self.outcount = 0    # No output yet
+        self.outcount = -1    # No output yet
         self.numrec = config['output_numrec']
+        if self.numrec == 0:
+            self.multi_file = False
+            self.numrec = 999999  # A large number
+        else:
+            self.multi_file = True
         self.dt = config['dt']
         self.config = config    # Better to extract the things needed
         self.release = release
-        if config['output_numrec'] > 0:
-            self.file_number = 1
-        else:
-            self.file_number = 0
-            self.nc = self.define_netcdf()
+        self.file_counter = -1
+        self.num_output = config['num_output']
 
-    def close(self):
-        self.nc.close()
+    def write(self, state: State) -> None:
+        """Write the model state to NetCDF"""
 
-    def define_netcdf(self) -> Dataset:
+        self.outcount += 1
+        t = self.outcount % self.numrec   # in-file record counter
+
+        logging.debug("Writing: timestep, timestamp = {} {}".
+                      format(state.timestep, state.timestamp))
+
+        # Create new file?
+        # start0 = 0
+        print("t = ", t)
+        if t == 0:
+            # Close old file and open a new
+            if self.file_counter > 0:
+                self.nc.close()
+            self.file_counter += 1
+            self.pstart0 = self.instance_count      # Start of data in the file
+            self.nc = self._define_netcdf()
+            logging.info("Opened output file: {}".
+                         format(self.nc.filepath()))
+
+        pcount = len(state)            # Present number of particles
+        pstart = self.instance_count
+
+        logging.debug("Writing {} particles".format(pcount))
+        self.nc.variables['time'][t] = float(state.timestep * self.dt)
+
+        self.nc.variables['particle_count'][t] = pcount
+
+        start = pstart - self.pstart0
+        end = pstart + pcount - self.pstart0
+        print("start, end = ", start, end)
+        for name in self.instance_variables:
+            self.nc.variables[name][start:end] = state[name]
+
+        # Update counters
+        # self.outcount += 1
+        self.instance_count += pcount
+
+        # Flush the data to the file
+        self.nc.sync()
+
+        # Close final file
+        if self.outcount == self.num_output - 1:
+            self.nc.close()
+
+    def _define_netcdf(self) -> Dataset:
         """Define a NetCDF output file"""
 
+        # Generate file name
         fname = self.config['output_file']
-        if self.file_number > 0:   # One of a series of files
+        if self.multi_file:
             # fname = fname0.nc -> fname0_xxxx.nc
             fname0, ext = os.path.splitext(fname)
-            # fname = '{:s}_{:04d}{:s}'.format(fname0, file_number, ext)
-            fname = f'{fname0}_{self.file_number:04d}{ext}'
+            fname = f'{fname0}_{1+self.file_counter:04d}{ext}'
 
         logging.debug("Defining output netCDF file: {}".format(fname))
         nc = Dataset(fname, mode='w',
@@ -60,7 +106,9 @@ class OutPut:
         nc.createDimension('particle_instance', None)  # unlimited
         # Sett output-period i config (bruk naturlig enhet)
         # regne om til antall tidsteg og få inn under
-        nc.createDimension('time', self.config['num_output'])
+        outcount0 = self.outcount
+        outcount1 = min(outcount0+self.numrec, self.num_output)
+        nc.createDimension('time', outcount1-outcount0)
 
         # ---- Coordinate variable for time
         v = nc.createVariable('time', 'f8', ('time',))
@@ -68,6 +116,10 @@ class OutPut:
         v.standard_name = 'time'
         v.units = ('seconds since {:s}'.
                    format(str(self.config['reference_time'])))
+
+        # instance_offset
+        v = nc.createVariable('instance_offset', 'i', ())
+        v.long_name = "particle instance offset for file"
 
         # Particle count
         v = nc.createVariable('particle_count', 'i4', ('time',))
@@ -130,39 +182,8 @@ class OutPut:
                 nc.variables[name][:] = \
                     self.release.particle_variables[name][:]
 
+        # Set instance offset
+        var = nc.variables['instance_offset']
+        var[:] = self.instance_count
+
         return nc
-
-    def write(self, state: State) -> None:
-        """Write the model state to NetCDF"""
-
-        print("filenummer = ", self.file_number)
-        logging.debug("Writing: timestep, timestamp = {} {}".
-                      format(state.timestep, state.timestamp))
-        # New file?
-        t = self.outcount
-        if (self.numrec > 0) and (t % self.numrec == 1):
-            # Close old file and open a new
-            if self.file_number > 1:
-                self.nc.close()
-            self.file_number += 1
-            self.nc = self.define_netcdf()
-            logging.info("Opened output file: {}".
-                             format(self.nc.filepath()))
-
-        pcount = len(state)            # Present number of particles
-        pstart = self.instance_count
-
-        logging.debug("Writing {} particles".format(pcount))
-        self.nc.variables['time'][t] = float(state.timestep * self.dt)
-
-        self.nc.variables['particle_count'][t] = pcount
-
-        for name in self.instance_variables:
-            self.nc.variables[name][pstart:pstart+pcount] = state[name]
-
-        # Update counters
-        self.outcount += 1
-        self.instance_count += pcount
-
-        # Flush the data to the file
-        self.nc.sync()
