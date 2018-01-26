@@ -19,7 +19,7 @@ Suppose we are in a grid cell (i,j) and that grid cell (i+1,j) is
 land. Then :math:`u_{i+1/2} = 0` and denote :math:`u = u_{i-1/2}`.
 Define a local Courant number :math:`c = u\Delta t/\Delta x`.
 
-Ta generelt u_{i+1/2} = 0 => partikler krysser ikke kysten
+Ta generelt :math:`u_{i+1/2}` = 0 => partikler krysser ikke kysten
 
 If the velocity is constant in time and linear interpolation is used
 in space to estimate the velocity, then the differential equation is

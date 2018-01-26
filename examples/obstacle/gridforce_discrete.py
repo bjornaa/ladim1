@@ -21,8 +21,8 @@ class Grid:
         self.U0 = 1         # Undisturbed along-channel velocity [m/s]
 
         # Convert to grid coordinates
-        self.imax = self.L / self.dx
-        self.jmax = self.W / self.dy
+        self.imax = int(self.L / self.dx)
+        self.jmax = int(self.W / self.dy)
         self.X0 = X0 / self.dx
         self.R = R / self.dy
 
