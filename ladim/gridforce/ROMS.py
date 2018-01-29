@@ -131,7 +131,7 @@ class Grid:
     def sample_metric(self, X, Y):
         """Sample the metric coefficients
 
-        Changes slowly, so using nearest neighbour
+        Changes slowly, so using neareast neighbour
         """
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j0
@@ -153,8 +153,8 @@ class Grid:
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
-        return ((self.i0 <= X) & (X <= self.i1-1) &
-                (self.j0 <= Y) & (Y <= self.j1-1))
+        return ((self.i0 + 0.5 < X) & (X < self.i1-1.5) &
+                (self.j0 + 0.5 < Y) & (Y < self.j1-1.5))
 
     def onland(self, X, Y):
         """Returns True for points on land"""
@@ -615,7 +615,7 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
     F = 3D field
     S = depth structure matrix
     X, Y = 1D arrays of horizontal grid coordinates
-    Z = 1D array of depth [m, positive downwards]
+    Z = 1D arryay of depth [m, positive downwards]
 
     Everything in rho-points
 
