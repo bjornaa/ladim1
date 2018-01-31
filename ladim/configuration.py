@@ -50,6 +50,13 @@ def configure(config_file: str) -> Config:
         config[name] = conf['files'][name]
         logging.info('    {:15s}: {}'.format(name, config[name]))
 
+    try:
+        config['warm_start_file'] = conf['files']['warm_start_file']
+        logging.info('    {:15s}: {}'.
+                     format('Warm start from', config['warm_start_file']))
+    except KeyError:
+        config['warm_start_file'] = ''
+
     # --- Time stepping ---
     logging.info('Configuration: Time Stepping')
     # Read time step and convert to seconds

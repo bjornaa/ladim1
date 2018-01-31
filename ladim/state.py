@@ -7,6 +7,8 @@ import logging
 from typing import Any, Dict, Sized     # mypy
 
 import numpy as np
+from netCDF4 import Dataset, num2date
+
 from .tracker import Tracker
 from .gridforce import Grid, Forcing
 
@@ -55,7 +57,10 @@ class State(Sized):
             self.ibm = None
 
         # self.num_particles = len(self.X)
-        self.nnew = 0
+        self.nnew = 0    # Modify with warm start?
+
+        if config['warm_start_file']:
+            self.warm_start(config['warm_start_file'])
 
     def __getitem__(self, name: str) -> None:
         return getattr(self, name)
@@ -110,3 +115,12 @@ class State(Sized):
         self.pid = self.pid[self.alive]
         for key in self.instance_variables:
             self[key] = self[key][self.alive]
+
+    def warm_start(self, warm_start_file):
+        """Perform a warm (re)start"""
+
+        try:
+            f = Dataset(warm_start_file)
+        except FileNotFoundError:
+            logging.error("Can not open warm start file: " + warm_start_file)
+            raise SystemExit(1)
