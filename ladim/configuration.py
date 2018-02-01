@@ -38,9 +38,19 @@ def configure(config_file: str) -> Config:
 
     # --- Time control ---
     logging.info('Configuration: Time Control')
-    for name in ['start_time', 'stop_time', 'reference_time']:
-        config[name] = np.datetime64(conf['time_control'][name])
+    for name in ['start_time', 'stop_time']:
+        config[name] = np.datetime64(
+            conf['time_control'][name]).astype('M8[s]')
         logging.info('    {:15s}: {}'.format(name, config[name]))
+    try:
+        config['reference_time'] = np.datetime64(
+            conf['time_control']['reference_time']).astype('M8[s]')
+    except KeyError:
+        config['reference_time'] = config['start_time']
+    logging.info('    {:15s}: {}'.format(
+        'reference_time', config['reference_time']))
+
+
 
     # --- Files ---
     logging.info('Configuration: Files')
@@ -165,8 +175,8 @@ def configure(config_file: str) -> Config:
         value = conf['output_variables'][name]
         if 'units' in value:
             if value['units'] == 'seconds since reference_time':
-                value['units'] = 'seconds since {:s}'.format(
-                    str(config['reference_time']))
+                timeref = str(config['reference_time']).replace('T', ' ')
+                value['units'] = f'seconds since {timeref}'
         config['nc_attributes'][name] = conf['output_variables'][name]
     logging.info('    particle variables')
     for name in config['output_particle']:
