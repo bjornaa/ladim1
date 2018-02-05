@@ -67,7 +67,10 @@ class OutPut:
         pstart = self.instance_count
 
         logging.debug("Writing {} particles".format(pcount))
-        self.nc.variables['time'][t] = float(state.timestep * self.dt)
+
+        tdelta = state.timestamp - self.config['reference_time']
+        seconds = tdelta.astype('m8[s]').astype('int')
+        self.nc.variables['time'][t] = float(seconds)
 
         self.nc.variables['particle_count'][t] = pcount
 
@@ -115,8 +118,8 @@ class OutPut:
         v = nc.createVariable('time', 'f8', ('time',))
         v.long_name = 'time'
         v.standard_name = 'time'
-        v.units = ('seconds since {:s}'.
-                   format(str(self.config['reference_time'])))
+        timeref = str(self.config['reference_time']).replace('T', ' ')
+        v.units = f'seconds since {timeref}'
 
         # instance_offset
         v = nc.createVariable('instance_offset', 'i', ())
@@ -133,7 +136,6 @@ class OutPut:
             if confname['ncformat'][0] == 'S':   # text
                 length = int(confname['ncformat'][1:])
                 lendimname = 'len_' + name
-                v = nc.createDimension(lendimname, length)
                 v = nc.createVariable(
                     varname=name,
                     datatype='S1',

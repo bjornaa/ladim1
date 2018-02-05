@@ -1,4 +1,4 @@
-Try LADIM
+Try LADiM
 =========
 
 With LADIM installed, it is time to test it out.

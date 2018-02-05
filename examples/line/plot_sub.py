@@ -71,7 +71,7 @@ ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2),
            colors='black', linestyles=':')
 
 # Plot particle distribution
-ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(pf.time(t))
 
 # Show the results
