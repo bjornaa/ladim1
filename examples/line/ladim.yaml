@@ -7,7 +7,8 @@
 time_control:
     # Start and stop of simulation
     # use an alias &t0 if used again
-    start_time: &time0 1989-05-24 12:00:00
+    start_time: &time0 1989-06-03 09
+    # start_time: &time0 1989-05-24 12:00:00
     # stop_time:  1989-06-15 12:00:00
     stop_time:  1989-06-05T12
     # Reference time for netcdf output

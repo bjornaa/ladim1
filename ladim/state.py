@@ -60,7 +60,7 @@ class State(Sized):
         self.nnew = 0    # Modify with warm start?
 
         if config['warm_start_file']:
-            self.warm_start(config['warm_start_file'])
+            self.warm_start(config)
 
     def __getitem__(self, name: str) -> None:
         return getattr(self, name)
@@ -116,11 +116,21 @@ class State(Sized):
         for key in self.instance_variables:
             self[key] = self[key][self.alive]
 
-    def warm_start(self, warm_start_file):
+    def warm_start(self, config):
         """Perform a warm (re)start"""
 
+        warm_start_file = config['warm_start_file']
         try:
             f = Dataset(warm_start_file)
         except FileNotFoundError:
             logging.error("Can not open warm start file: " + warm_start_file)
             raise SystemExit(1)
+
+        logging.info("Reading warm start file")
+        # Using last record in file
+        tvar = f.variables['time']
+        warm_start_time = np.datetime64(num2date(tvar[-1], tvar.units))
+        if warm_start_time != config['start_time']:
+            logging.error("Warm start time and start time differ")
+            raise SystemExit(1)
+

@@ -12,23 +12,24 @@ konfigurasjonsfiler.
 
 Innrykk er obligatorisk og angir strukturen. Filen skal ikke inneholde
 tab-karakterer, men gode editorer erstatter automatisk tab med blanke.
-Kommentarer begynner med skigard, #. Det er ikke nødvendig med hermetegn rundt
-tekststrenger.
+Kommentarer begynner med skigard, ``#``. Det er ikke nødvendig med hermetegn
+rundt tekststrenger.
 
 Bruk i LADiM
 ------------
 
-Default navn på konfigurasjonsfilen er ladim.yaml, men navnet kan være hva som
-helst. Bruk da ladim <navn på konfig-fil> fra kommandolinje.
+Default navn på konfigurasjonsfilen er ``ladim.yaml``, men navnet kan være hva
+som helst. Bruk da ``ladim <navn på konfig-fil>`` fra kommandolinje.
 
 Den definitive beskrivelsen av formatet er i leserutinen
-ladim/configuration.py. Ekstra linjer blir stille oversett. Rekkefølge spiller
-ingen rolle, bortsett fra at linjer må komme i den seksjonen de tilhører.
+``ladim/configuration.py``. Ekstra linjer blir stille oversett. Rekkefølge
+spiller ingen rolle, bortsett fra at linjer må komme i den seksjonen de
+tilhører.
 
 Tidskontroll
 ------------
 
-Seksjon heter time_control og har følgende obligatoriske felt::
+Seksjon heter ``time_control`` og har følgende obligatoriske felt::
 
   start_time
   stop_time
@@ -38,47 +39,53 @@ Tidspunkt angis i iso-format yyyy-mm-dd hh:mm:ss, hvor mindre signifikante ledd
 i klokkeslett kan utelates. td 2018-01-30 09. En "T" mellom dato og klokkeslett
 går greitt.
 
-reference_time er tiden som brukes som referanse i output-filene, time for
-units "seconds since reference_time".
+reference_time
+  er tiden som brukes som referanse i output-filene, time for
+  units "seconds since reference_time".
 
 I eksemplene brukes $time0 foran start_time. Dette tillater gjenbruk av samme
 tidspunkt som *time0 i reference_time.
 
-TODO: Dette vil bli forenklet ved at reference_time blir optional med
-start_time som default. (Gamle måten skal fortsette å virke). For mer
-operasjonelle kjøringer, med output i flere filer anbefales det å være
-eksplisitt, f.eks. reference_time: 2000-01-01 00
+KOMMENTAR
+  Dette vil bli forenklet ved at reference_time blir optional med
+  start_time som default. (Gamle måten skal fortsette å virke). For mer
+  operasjonelle kjøringer, med output i flere filer anbefales det å være
+  eksplisitt, f.eks. reference_time: 2000-01-01 00
 
 Filer
 -----
 
-Seksjonen heter files og styrer filnavnene.
+Seksjonen heter ``files`` og styrer filnavnene.
 
-Obligatoriske felt er:
+Obligatoriske felt er::
 
   grid_file
   input_file
   particle_release_file
   output_file
 
-grid_file må inneholde ROMS felter som h, mask_rho, pm, pn, lon_rho og lat_rho.
-Videre trengs vertikal informasjon. Dette finnes ikke i en ROMS gridfil, men
-f.eks. i godt utstyrte history/average-filer. Alternativt kan vertikal
-informasjon gis i gridforce seksjonen.  Et tomt filnavn, "", tilsier at griddet
-er definert analytisk.
+grid_file
+  må inneholde ROMS felter som h, mask_rho, pm, pn, lon_rho og lat_rho.
+  Videre trengs vertikal informasjon. Dette finnes ikke i en ROMS gridfil, men
+  f.eks. i godt utstyrte history/average-filer. Alternativt kan vertikal
+  informasjon gis i gridforce seksjonen.  Et tomt filnavn, "", tilsier at
+  griddet er definert analytisk.
 
-input_file er en eller flere filer med drivkrefter. Det vil si resultfil(er)
-fra en havmodellkjøring. For flere filer må leksikografisk og kronologisk
-rekkefølge falle sammen. Feltet for filnavn  inneholder da wildcards som '*' og
-'?'. Et tomt filnavn, "", tilsier analytiske
+input_file
+  er en eller flere filer med drivkrefter. Det vil si resultfil(er) fra en
+  havmodellkjøring. For flere filer må leksikografisk og kronologisk rekkefølge
+  falle sammen. Feltet for filnavn  inneholder da wildcards som '*' og '?'. Et
+  tomt filnavn, "", tilsier analytiske drivkrefter.
 
-particle_release_file inneholder tidspunkt, posisjon, m.m for partikkelslipp.
-Jeg har laget en vane med å ha et python-script make_release.py som lager denne
-utfra annen spesifikasjon.
+particle_release_file
+  inneholder tidspunkt, posisjon, m.m for partikkelslipp. Jeg har laget en vane
+  med å ha et python-script make_release.py som lager denne utfra annen
+  spesifikasjon.
 
-output_file er navnet på output netcdf-fil fra simuleringen. Multi-fil output
-er i ferd med å fases inn. I disse situasjonen vil navn.nc gi filnavn
-navn_0000.nc, navn_0001.nc, ...
+output_file
+  er navnet på output netcdf-fil fra simuleringen. Multi-fil output
+  er i ferd med å fases inn. I disse situasjonen vil ``navn.nc`` gi filnavn
+  ``navn_0000.nc``, ``navn_0001.nc``, ...
 
 KOMMENTAR:
 Greit å ha alle filnavnene samlet tidlig i YAML-filen. På den annen side er
