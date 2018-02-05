@@ -102,6 +102,7 @@ class OutPut:
         nc = Dataset(fname, mode='w',
                      format=self.config['output_format'])
         # --- Dimensions
+        print("total = ", self.release.total_particle_count)
         nc.createDimension('particle', self.release.total_particle_count)
         nc.createDimension('particle_instance', None)  # unlimited
         # Sett output-period i config (bruk naturlig enhet)

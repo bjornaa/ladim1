@@ -7,21 +7,21 @@
 time_control:
     # Start and stop of simulation
     # use an alias &t0 if used again
-    start_time: &time0 1989-06-03 09
-    # start_time: &time0 1989-05-24 12:00:00
+    # start_time: 1989-06-03 09
+    start_time: 1989-05-24 12:00:00
     # stop_time:  1989-06-15 12:00:00
     stop_time:  1989-06-05T12
     # Reference time for netcdf output
     # by default set to start_time
     # can be overridden explicitly
-    reference_time: *time0
+    reference_time: 1989-01-01 00
 
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_*.nc
     particle_release_file : line.rls
     output_file           : line.nc
-    warm_start_file       : line_0004.nc
+    # warm_start_file       : a4.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given

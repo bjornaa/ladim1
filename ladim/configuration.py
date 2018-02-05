@@ -36,11 +36,21 @@ def configure(config_file: str) -> Config:
               'Can not parse configuration file {}'.format(config_file))
         raise SystemExit(2)
 
-    # --- Time control ---
+    # ----------------
+    # Time control
+    # ----------------
     logging.info('Configuration: Time Control')
-    for name in ['start_time', 'stop_time', 'reference_time']:
-        config[name] = np.datetime64(conf['time_control'][name])
+    for name in ['start_time', 'stop_time']:
+        config[name] = np.datetime64(
+            conf['time_control'][name]).astype('M8[s]')
         logging.info('    {:15s}: {}'.format(name, config[name]))
+    try:
+        config['reference_time'] = np.datetime64(
+            conf['time_control']['reference_time']).astype('M8[s]')
+    except KeyError:
+        config['reference_time'] = config['start_time']
+    logging.info('    {:15s}: {}'.format(
+        'reference_time', config['reference_time']))
 
     # --- Files ---
     logging.info('Configuration: Files')
@@ -52,9 +62,11 @@ def configure(config_file: str) -> Config:
 
     try:
         config['warm_start_file'] = conf['files']['warm_start_file']
+        config['start'] = 'warm'
         logging.info('    {:15s}: {}'.
                      format('Warm start from', config['warm_start_file']))
     except KeyError:
+        config['start'] = 'cold'
         config['warm_start_file'] = ''
 
     # --- Time stepping ---

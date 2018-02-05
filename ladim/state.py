@@ -131,6 +131,8 @@ class State(Sized):
         tvar = f.variables['time']
         warm_start_time = np.datetime64(num2date(tvar[-1], tvar.units))
         if warm_start_time != config['start_time']:
+            print("warm start = ", warm_start_time)
+            print("start      = ", config['start_time'])
             logging.error("Warm start time and start time differ")
             raise SystemExit(1)
 

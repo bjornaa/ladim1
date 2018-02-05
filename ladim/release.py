@@ -16,6 +16,8 @@ import numpy as np
 import pandas as pd
 from typing import Iterator, List
 
+from netCDF4 import Dataset
+
 from .utilities import ingrid
 from .configuration import Config
 
@@ -127,8 +129,9 @@ class ParticleReleaser(Iterator):
             # A['release_time'] = np.maximum(A['release_time'], # tart_time)
 
         # If discrete, there is an error to have only early releases
+        # OK if warm start
         else:   # Discrete
-            if A.index[-1] < start_time:
+            if A.index[-1] < start_time and config['start'] == 'cold':
                 logging.error("All particles released before similation start")
                 raise SystemExit
 
@@ -175,7 +178,16 @@ class ParticleReleaser(Iterator):
                 else:
                     pvars[name] = np.concatenate((pvars[name], V[name]))
 
-        self.total_particle_count = self._particle_count
+        # Count from warm start
+        if config['start'] == 'warm':
+            f = Dataset(config['warm_start_file'], mode='r')
+            warm_particle_count = len(f.dimensions['particle'])
+            f.close()
+        else:
+            warm_particle_count = 0
+
+
+        self.total_particle_count = warm_particle_count + self._particle_count
         self.particle_variables = pvars
         logging.info("Total particle count = {}".format(
             self.total_particle_count))
@@ -188,7 +200,7 @@ class ParticleReleaser(Iterator):
 
         # Reset the counter after the particle counting
         self._index = 0    # Index of next release
-        self._particle_count = 0
+        self._particle_count = warm_particle_count
 
     def __next__(self) -> pd.DataFrame:
         """Perform the next particle release
