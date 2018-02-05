@@ -12,7 +12,7 @@ time_control:
     stop_time:  1989-06-05T12
     # Reference time for netcdf output
     # by default set to start_time
-    reference_time: 1989-01-01 00
+    reference_time: 1989-05-24
 
 
 files:
@@ -57,7 +57,7 @@ output_variables:
     outper: [3, h]
     # Variable names
     particle: [release_time]
-    instance: [pid, X, Y]
+    instance: [pid, X, Y, Z]
     # NetCDF arguments
     release_time:
         ncformat: f8

@@ -166,26 +166,27 @@ class ParticleReleaser(Iterator):
                 dtype = np.float64
             pvars[name] = np.array([], dtype=dtype)
 
+        # Get particle data from  warm start
+        if config['start'] == 'warm':
+            with Dataset(config['warm_start_file']) as f:
+                warm_particle_count = len(f.dimensions['particle'])
+                for name in config['particle_variables']:
+                    pvars[name] = f.variables[name][:]
+        else:
+            warm_particle_count = 0
+
         # Loop through the releases, collect particle variable data
         for t in self.times:
             V = next(self)
             for name in config['particle_variables']:
                 dtype = config['release_dtype'][name]
                 if dtype == np.datetime64:
-                    rtimes = V[name] - config['reference_time']
-                    rtimes = rtimes.astype('timedelta64[s]').astype(np.float64)
+                    g = np.array(V[name]).astype('M8[s]')
+                    rtimes = g - config['reference_time']
+                    rtimes = rtimes.astype(np.float64)
                     pvars[name] = np.concatenate((pvars[name], rtimes))
                 else:
                     pvars[name] = np.concatenate((pvars[name], V[name]))
-
-        # Count from warm start
-        if config['start'] == 'warm':
-            f = Dataset(config['warm_start_file'], mode='r')
-            warm_particle_count = len(f.dimensions['particle'])
-            f.close()
-        else:
-            warm_particle_count = 0
-
 
         self.total_particle_count = warm_particle_count + self._particle_count
         self.particle_variables = pvars

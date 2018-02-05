@@ -131,8 +131,16 @@ class State(Sized):
         tvar = f.variables['time']
         warm_start_time = np.datetime64(num2date(tvar[-1], tvar.units))
         if warm_start_time != config['start_time']:
-            print("warm start = ", warm_start_time)
-            print("start      = ", config['start_time'])
+            print("warm start time = ", warm_start_time)
+            print("start time      = ", config['start_time'])
             logging.error("Warm start time and start time differ")
             raise SystemExit(1)
+
+        pstart = f.variables['particle_count'][:-1].sum()
+        pcount = f.variables['particle_count'][-1]
+        self.pid = f.variables['pid'][pstart:pstart+pcount]
+        # Give error if variable not in restart file
+        for var in self.instance_variables:
+            logging.debug(f'Restoring {var} from warm start file')
+            self[var] = f.variables[var][pstart:pstart+pcount]
 

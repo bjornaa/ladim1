@@ -76,7 +76,7 @@ class OutPut:
 
         start = pstart - self.pstart0
         end = pstart + pcount - self.pstart0
-        print("start, end = ", start, end)
+        # print("start, end = ", start, end)
         for name in self.instance_variables:
             self.nc.variables[name][start:end] = state[name]
 
