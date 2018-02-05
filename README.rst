@@ -12,7 +12,7 @@ The model is written in python and requires python 3.6 and some scientific packa
 
 Download the code from github and install by python setup.py install.
 
-Get a small example data set by running the download script in ``examples/data``. The differnt examples can be run by the sequence of commands::
+Get a small example data set by running the download script in ``examples/data``. The different examples can be run by the sequence of commands::
 
   python make_release.py
   ladim

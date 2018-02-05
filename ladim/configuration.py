@@ -25,7 +25,7 @@ def configure(config_file: str) -> Config:
     # --- Read the configuration file ---
     # TODO: use logging.ERROR instead of print
     try:
-        with open(config_file, encoding='utf-8') as fp:
+        with open(config_file) as fp:
             conf = yaml.safe_load(fp)
     except FileNotFoundError:
         print('ERROR: ',
@@ -184,8 +184,8 @@ def configure(config_file: str) -> Config:
         value = conf['output_variables'][name]
         if 'units' in value:
             if value['units'] == 'seconds since reference_time':
-                value['units'] = 'seconds since {:s}'.format(
-                    str(config['reference_time']))
+                timeref = str(config['reference_time']).replace('T', ' ')
+                value['units'] = f'seconds since {timeref}'
         config['nc_attributes'][name] = conf['output_variables'][name]
     logging.info('    particle variables')
     for name in config['output_particle']:

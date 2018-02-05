@@ -115,8 +115,8 @@ class OutPut:
         v = nc.createVariable('time', 'f8', ('time',))
         v.long_name = 'time'
         v.standard_name = 'time'
-        v.units = ('seconds since {:s}'.
-                   format(str(self.config['reference_time'])))
+        timeref = str(self.config['reference_time']).replace('T', ' ')
+        v.units = f'seconds since {timeref}'
 
         # instance_offset
         v = nc.createVariable('instance_offset', 'i', ())
@@ -133,7 +133,6 @@ class OutPut:
             if confname['ncformat'][0] == 'S':   # text
                 length = int(confname['ncformat'][1:])
                 lendimname = 'len_' + name
-                v = nc.createDimension(lendimname, length)
                 v = nc.createVariable(
                     varname=name,
                     datatype='S1',
