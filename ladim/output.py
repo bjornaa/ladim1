@@ -67,7 +67,10 @@ class OutPut:
         pstart = self.instance_count
 
         logging.debug("Writing {} particles".format(pcount))
-        self.nc.variables['time'][t] = float(state.timestep * self.dt)
+
+        tdelta = state.timestamp - self.config['reference_time']
+        seconds = tdelta.astype('m8[s]').astype('int')
+        self.nc.variables['time'][t] = float(seconds)
 
         self.nc.variables['particle_count'][t] = pcount
 
