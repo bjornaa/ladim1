@@ -16,6 +16,8 @@ import numpy as np
 import pandas as pd
 from typing import Iterator, List
 
+from netCDF4 import Dataset
+
 from .utilities import ingrid
 from .configuration import Config
 
@@ -127,8 +129,9 @@ class ParticleReleaser(Iterator):
             # A['release_time'] = np.maximum(A['release_time'], # tart_time)
 
         # If discrete, there is an error to have only early releases
+        # OK if warm start
         else:   # Discrete
-            if A.index[-1] < start_time:
+            if A.index[-1] < start_time and config['start'] == 'cold':
                 logging.error("All particles released before similation start")
                 raise SystemExit
 
@@ -163,19 +166,29 @@ class ParticleReleaser(Iterator):
                 dtype = np.float64
             pvars[name] = np.array([], dtype=dtype)
 
+        # Get particle data from  warm start
+        if config['start'] == 'warm':
+            with Dataset(config['warm_start_file']) as f:
+                warm_particle_count = len(f.dimensions['particle'])
+                for name in config['particle_variables']:
+                    pvars[name] = f.variables[name][:]
+        else:
+            warm_particle_count = 0
+
         # Loop through the releases, collect particle variable data
         for t in self.times:
             V = next(self)
             for name in config['particle_variables']:
                 dtype = config['release_dtype'][name]
                 if dtype == np.datetime64:
-                    rtimes = V[name] - config['reference_time']
-                    rtimes = rtimes.astype('timedelta64[s]').astype(np.float64)
+                    g = np.array(V[name]).astype('M8[s]')
+                    rtimes = g - config['reference_time']
+                    rtimes = rtimes.astype(np.float64)
                     pvars[name] = np.concatenate((pvars[name], rtimes))
                 else:
                     pvars[name] = np.concatenate((pvars[name], V[name]))
 
-        self.total_particle_count = self._particle_count
+        self.total_particle_count = warm_particle_count + self._particle_count
         self.particle_variables = pvars
         logging.info("Total particle count = {}".format(
             self.total_particle_count))
@@ -188,7 +201,7 @@ class ParticleReleaser(Iterator):
 
         # Reset the counter after the particle counting
         self._index = 0    # Index of next release
-        self._particle_count = 0
+        self._particle_count = warm_particle_count
 
     def __next__(self) -> pd.DataFrame:
         """Perform the next particle release

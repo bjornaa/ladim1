@@ -93,4 +93,4 @@ now = datetime.datetime.now().replace(microsecond=0)
 logging.info(f'End of simulation, time={now}')
 
 forcing.close()
-out.close()
+# out.close()

@@ -36,11 +36,21 @@ def configure(config_file: str) -> Config:
               'Can not parse configuration file {}'.format(config_file))
         raise SystemExit(2)
 
-    # --- Time control ---
+    # ----------------
+    # Time control
+    # ----------------
     logging.info('Configuration: Time Control')
-    for name in ['start_time', 'stop_time', 'reference_time']:
-        config[name] = np.datetime64(conf['time_control'][name])
+    for name in ['start_time', 'stop_time']:
+        config[name] = np.datetime64(
+            conf['time_control'][name]).astype('M8[s]')
         logging.info('    {:15s}: {}'.format(name, config[name]))
+    try:
+        config['reference_time'] = np.datetime64(
+            conf['time_control']['reference_time']).astype('M8[s]')
+    except KeyError:
+        config['reference_time'] = config['start_time']
+    logging.info('    {:15s}: {}'.format(
+        'reference_time', config['reference_time']))
 
     # --- Files ---
     logging.info('Configuration: Files')
@@ -49,6 +59,15 @@ def configure(config_file: str) -> Config:
                  'particle_release_file', 'output_file']:
         config[name] = conf['files'][name]
         logging.info('    {:15s}: {}'.format(name, config[name]))
+
+    try:
+        config['warm_start_file'] = conf['files']['warm_start_file']
+        config['start'] = 'warm'
+        logging.info('    {:15s}: {}'.
+                     format('Warm start from', config['warm_start_file']))
+    except KeyError:
+        config['start'] = 'cold'
+        config['warm_start_file'] = ''
 
     # --- Time stepping ---
     logging.info('Configuration: Time Stepping')
@@ -131,13 +150,26 @@ def configure(config_file: str) -> Config:
         config['ibm_variables'] = []
     logging.info('    ibm_variables: {}'.format(config['ibm_variables']))
 
-    # --- Output control ---
+    # -----------------
+    # Output control
+    # -----------------
     logging.info('Configuration: Output Control')
     try:
         output_format = conf['output_variables']['format']
     except KeyError:
         output_format = 'NETCDF3_64BIT_OFFSET'
     config['output_format'] = output_format
+    logging.info('    {:15s}: {}'.format(
+        'output_format', config['output_format']))
+
+    try:
+        numrec = conf['output_variables']['numrec']
+    except KeyError:
+        numrec = 0
+    config['output_numrec'] = numrec
+    logging.info('    {:15s}: {}'.format(
+        'output_numrec', config['output_numrec']))
+
     outper = np.timedelta64(*tuple(conf['output_variables']['outper']))
     outper = outper.astype('m8[s]').astype('int') // config['dt']
     config['output_period'] = outper
@@ -152,8 +184,8 @@ def configure(config_file: str) -> Config:
         value = conf['output_variables'][name]
         if 'units' in value:
             if value['units'] == 'seconds since reference_time':
-                value['units'] = 'seconds since {:s}'.format(
-                    str(config['reference_time']))
+                timeref = str(config['reference_time']).replace('T', ' ')
+                value['units'] = f'seconds since {timeref}'
         config['nc_attributes'][name] = conf['output_variables'][name]
     logging.info('    particle variables')
     for name in config['output_particle']:
