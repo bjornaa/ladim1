@@ -116,7 +116,7 @@ class State(Sized):
         for key in self.instance_variables:
             self[key] = self[key][self.alive]
 
-    def warm_start(self, config):
+    def warm_start(self, config: Config) -> None:
         """Perform a warm (re)start"""
 
         warm_start_file = config['warm_start_file']
@@ -138,7 +138,9 @@ class State(Sized):
 
         pstart = f.variables['particle_count'][:-1].sum()
         pcount = f.variables['particle_count'][-1]
+        print('pstart, pcount = ', pstart, pcount)
         self.pid = f.variables['pid'][pstart:pstart+pcount]
+        print('pid = ', self.pid)
         # Give error if variable not in restart file
         for var in self.instance_variables:
             logging.debug(f'Restoring {var} from warm start file')

@@ -215,6 +215,13 @@ class ParticleReleaser(Iterator):
         if self._index >= len(self.times):
             raise StopIteration
 
+        # Skip first release if warm start (should be present in start file)
+        # Not always, make better test
+        # Moving test to state.py
+        #if self._index == 0 and self._particle_count > 0:  # Warm start
+        #    return
+
+
         # rel_time = self.times[self._index]
         # file_time = self._file_times[self._file_index]
 

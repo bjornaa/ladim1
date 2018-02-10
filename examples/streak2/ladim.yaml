@@ -1,0 +1,79 @@
+# Configuration file for ladim
+#
+# Continuous  release example
+#
+
+
+time_control:
+    # Start and stop of simulation
+    # use an alias &t0 if used again
+    # start_time: 1989-05-24 12:00:00
+    start_time: 1989-05-24 18:00:00
+    stop_time:  1989-05-25 12:00:00
+    # Reference time for netcdf output
+    # by default set to start_time
+    reference_time: 1989-01-01T00
+
+files:
+    grid_file             : ../data/ocean_avg_0014.nc
+    input_file            : ../data/ocean_avg_0014.nc
+    particle_release_file : streak.rls
+    output_file           : b.nc
+    warm_start_file       : streak_0001.nc
+
+state:
+    # pid, X, Y, Z are mandatory and should not be given
+    # Ingen, kan bruke [] eller kutte linjen
+    ibm_variables: []
+
+particle_release:
+    # type = continuous or discrete [default]
+    release_type: 'continuous'
+    release_frequency: [3600, s]
+    variables: [release_time, X, Y, Z]
+    # Data type [int, float, time], default = float
+    release_time: time
+    particle_variables: [release_time]
+
+gridforce:
+    module: ladim.gridforce.ROMS
+
+
+output_variables:
+    # Skip initial field
+    #skip_initial : True
+
+    # Output period, format [value, unit], unit = s, m, h, or d
+    outper: [3, h]
+    # Records per file
+    numrec: 3
+
+    particle: [release_time]
+    instance: [pid, X, Y, Z]
+    # NetCDF arguments
+    release_time:
+        ncformat: f8
+        long_name: particle release time
+        units: seconds since reference_time
+    # Få til template over
+    pid: {ncformat: i4, long_name: particle identifier}
+    X: {ncformat: f4, long_name: particle X-coordinate}
+    Y: {ncformat: f4, long_name: particle Y-coordinate}
+    Z:
+        ncformat: f4
+        long_name: particle depth
+        standard_name: depth_below_surface
+        units: m
+        positive: down
+
+
+numerics:
+    # Model time step, [value, unit]
+    dt: [1, h]
+    # Advection method: options =
+    #        EF = Euler-Forward,
+    #        RK2, RK4 = Runge-Kutta 2nd or 4th order
+    advection: RK2
+    # Horizontal diffusion coefficient [m2.s-1]
+    #         zero = no diffusion
+    diffusion: 0.0

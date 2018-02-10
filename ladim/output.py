@@ -29,6 +29,8 @@ class OutPut:
         self.instance_variables = config['output_instance']
         self.instance_count = 0
         self.outcount = -1    # No output yet
+        if config['skip_initial']:
+            self.outcount = -2
         self.numrec = config['output_numrec']
         if self.numrec == 0:
             self.multi_file = False
@@ -40,11 +42,14 @@ class OutPut:
         self.release = release
         self.file_counter = -1
         self.num_output = config['num_output']
+        self.nc = None   # No open netCDF file yet
 
     def write(self, state: State) -> None:
         """Write the model state to NetCDF"""
 
         self.outcount += 1
+        #if self.outcount < 0:  # skip_initial == True
+        #    return
         t = self.outcount % self.numrec   # in-file record counter
 
         logging.debug("Writing: timestep, timestamp = {} {}".
@@ -52,21 +57,20 @@ class OutPut:
 
         # Create new file?
         # start0 = 0
-        print("t = ", t)
+        # print("t = ", t)
         if t == 0:
             # Close old file and open a new
-            if self.file_counter > 0:
+            if self.nc:
                 self.nc.close()
             self.file_counter += 1
             self.pstart0 = self.instance_count      # Start of data in the file
             self.nc = self._define_netcdf()
-            logging.info("Opened output file: {}".
-                         format(self.nc.filepath()))
+            logging.info(f"Opened output file: {self.nc.filepath()}")
 
         pcount = len(state)            # Present number of particles
         pstart = self.instance_count
 
-        logging.debug("Writing {} particles".format(pcount))
+        logging.debug(f"Writing {pcount} particles")
 
         tdelta = state.timestamp - self.config['reference_time']
         seconds = tdelta.astype('m8[s]').astype('int')
@@ -101,7 +105,7 @@ class OutPut:
             fname0, ext = os.path.splitext(fname)
             fname = f'{fname0}_{1+self.file_counter:04d}{ext}'
 
-        logging.debug("Defining output netCDF file: {}".format(fname))
+        logging.debug(f"Defining output netCDF file: {fname}")
         nc = Dataset(fname, mode='w',
                      format=self.config['output_format'])
         # --- Dimensions
@@ -158,6 +162,7 @@ class OutPut:
                 datatype=self.config['nc_attributes'][name]['ncformat'],
                 dimensions=('particle_instance',),
                 zlib=True)
+                hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh  hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
             for attr, value in self.config['nc_attributes'][name].items():
                 if attr != 'ncformat':
                     setattr(v, attr, value)
