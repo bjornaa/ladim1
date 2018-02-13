@@ -48,8 +48,8 @@ class OutPut:
         """Write the model state to NetCDF"""
 
         self.outcount += 1
-        #if self.outcount < 0:  # skip_initial == True
-        #    return
+        if self.outcount < 0:  # skip_initial == True
+            return
         t = self.outcount % self.numrec   # in-file record counter
 
         logging.debug("Writing: timestep, timestamp = {} {}".
@@ -109,7 +109,6 @@ class OutPut:
         nc = Dataset(fname, mode='w',
                      format=self.config['output_format'])
         # --- Dimensions
-        print("total = ", self.release.total_particle_count)
         nc.createDimension('particle', self.release.total_particle_count)
         nc.createDimension('particle_instance', None)  # unlimited
         # Sett output-period i config (bruk naturlig enhet)
@@ -140,6 +139,7 @@ class OutPut:
             if confname['ncformat'][0] == 'S':   # text
                 length = int(confname['ncformat'][1:])
                 lendimname = 'len_' + name
+                nc.createDimension(lendimname, length)
                 v = nc.createVariable(
                     varname=name,
                     datatype='S1',
@@ -162,7 +162,7 @@ class OutPut:
                 datatype=self.config['nc_attributes'][name]['ncformat'],
                 dimensions=('particle_instance',),
                 zlib=True)
-                hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh  hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+
             for attr, value in self.config['nc_attributes'][name].items():
                 if attr != 'ncformat':
                     setattr(v, attr, value)

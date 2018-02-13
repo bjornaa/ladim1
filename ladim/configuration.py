@@ -51,7 +51,6 @@ def configure(config_file: str) -> Config:
         config['reference_time'] = config['start_time']
     logging.info(f'    {"reference_time":15s}: {config["reference_time"]}')
 
-
     # --- Files ---
     logging.info('Configuration: Files')
     logging.info(f'    {"config_file":15s}: {config_file}')

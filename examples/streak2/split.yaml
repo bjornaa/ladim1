@@ -6,8 +6,7 @@
 
 time_control:
     # Start and stop of simulation
-    # start_time: 1989-05-24 12:00:00
-    start_time: 1989-05-24 18:00:00
+    start_time: 1989-05-24 12:00:00
     stop_time:  1989-05-25 12:00:00
     # Reference time for netcdf output
     # by default set to start_time
@@ -17,9 +16,7 @@ files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_0014.nc
     particle_release_file : streak.rls
-    # output_file           : streak.nc
-    output_file           : b.nc
-    warm_start_file       : streak_0001.nc
+    output_file           : streak.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given
@@ -38,10 +35,9 @@ particle_release:
 gridforce:
     module: ladim.gridforce.ROMS
 
-
 output_variables:
     # Skip initial field
-    skip_initial : True
+    #skip_initial : True
 
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]

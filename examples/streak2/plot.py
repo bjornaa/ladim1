@@ -9,8 +9,8 @@ from postladim import ParticleFile
 # ---------------
 
 # Files
-particle_file1 = 'streak_0004.nc'
-particle_file2 = 'streak2_0001.nc'
+particle_file1 = 'streak_0002.nc'
+particle_file2 = 'b_0001.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
@@ -18,7 +18,7 @@ i0, i1 = 100, 130
 j0, j1 = 90, 115
 
 # timestamp
-t = 7
+t = 0
 
 
 # ----------------
@@ -51,8 +51,8 @@ ax.contour(g.X, g.Y, g.lon_rho, levels=range(-4, 10, 2),
 X, Y = pf1.position(t)
 X2, Y2 = pf2.position(t)
 
-ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
-ax.plot(X2, Y2, '.', color='blue', markeredgewidth=0, lw=0.5)
+ax.plot(X, Y, 'o', color='red', markeredgewidth=0, lw=0.5)
+ax.plot(X2, Y2, 'o', color='blue', markeredgewidth=0, lw=0.5)
 
 # Show the results
 plt.axis('image')

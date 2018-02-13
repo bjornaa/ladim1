@@ -307,27 +307,40 @@ class Forcing:
         # requires at least one input before start
         # to get Runge-Kutta going
         # --------------
-        # Last step < 0
+        # prestep = last forcing step < 0
         #
         V = [step for step in steps if step < 0]
         if V:
             prestep = max(V)
+            stepdiff = self.stepdiff[steps.index(prestep)]
+            nextstep = prestep + stepdiff
+            self.U, self.V = self._read_velocity(prestep)
+            self.Unew, self.Vnew = self._read_velocity(nextstep)
+            self.dU = (self.Unew - self.U) / stepdiff
+            self.dV = (self.Vnew - self.V) / stepdiff
+            # Interpolate to time step = -1
+            self.U = self.U - (prestep+1)*self.dU
+            self.V = self.V - (prestep+1)*self.dV
         elif steps[0] == 0:
-            prestep = 0
+            self.U, self.V = self._read_velocity(0)
+            self.Unew, self.Vnew = self._read_velocity(steps[1])
+            self.dU = (self.Unew - self.U) / steps[1]
+            self.dV = (self.Vnew - self.V) / steps[1]
+            # Syncronize
+            self.Unew = self.U
+            self.Vnew = self.V
+            # Extrapolate to time step = -1
+            self.U = self.U - self.dU
+            self.V = self.V - self.dV
+
         else:
-            # No forcing at start, should alreadu be
+            # No forcing at start, should already be excluded
             raise SystemExit(3)
 
-        self.U, self.V = self._read_velocity(prestep)
-        stepdiff = self.stepdiff[steps.index(prestep)]
-        nextstep = prestep + stepdiff
-        self.Unew, self.Vnew = self._read_velocity(nextstep)
-        self.dU = (self.Unew - self.U) / stepdiff
-        self.dV = (self.Vnew - self.V) / stepdiff
-        if prestep == 0:
+        # if prestep == 0:
             # Hold back to be in phase
-            self.U = self.Unew
-            self.V = self.Vnew
+            # self.U = self.Unew
+            # self.V = self.Vnew
 
         # Do more elegant
         for name in self.ibm_forcing:
@@ -345,7 +358,7 @@ class Forcing:
     def update(self, t):
         """Update the fields to time step t"""
 
-        # Read from config
+        # Read from config?
         interpolate_velocity_in_time = True
         interpolate_ibm_forcing_in_time = False
 
@@ -420,7 +433,6 @@ class Forcing:
 
     def _read_field(self, name, n):
         """Read a 3D field"""
-        # print("IBM-forcing:", name)
         frame = self.frame_idx[n]
         F = self._nc.variables[name][frame, :, self._grid.J, self._grid.I]
         if self.scaled[name]:
