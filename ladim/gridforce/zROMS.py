@@ -293,33 +293,45 @@ class Forcing:
         # requires at least one input before start
         # to get Runge-Kutta going
         # --------------
-        # Last step < 0
+        # prestep = last forcing step < 0
         #
         V = [step for step in steps if step < 0]
-        if V:
+        if V:  # Forcing available before start time
             prestep = max(V)
+            stepdiff = self.stepdiff[steps.index(prestep)]
+            nextstep = prestep + stepdiff
+            self.U, self.V = self._read_velocity(prestep)
+            self.Unew, self.Vnew = self._read_velocity(nextstep)
+            self.dU = (self.Unew - self.U) / stepdiff
+            self.dV = (self.Vnew - self.V) / stepdiff
+            # Interpolate to time step = -1
+            self.U = self.U - (prestep+1)*self.dU
+            self.V = self.V - (prestep+1)*self.dV
+             # Other forcing
+            for name in self.ibm_forcing:
+                self[name] = self._read_field(name, prestep)
+                self[name+'new'] = self._read_field(name, nexstep)
+                self['d'+name] = (self[name+'new'] - self[name]) / prestep
+                self[name] = self[name] - (prestep+1)*self['d'+name]
+
         elif steps[0] == 0:
-            prestep = 0
-        else:
-            # No forcing at start, should already be
-            raise SystemExit(3)
-
-        self.U, self.V = self._read_velocity(prestep)
-        stepdiff = self.stepdiff[steps.index(prestep)]
-        nextstep = prestep + stepdiff
-        self.Unew, self.Vnew = self._read_velocity(nextstep)
-        self.dU = (self.Unew - self.U) / stepdiff
-        self.dV = (self.Vnew - self.V) / stepdiff
-        if prestep == 0:
-            # Hold back to be in phase
-            self.U = self.Unew
-            self.V = self.Vnew
-
-        # Do more elegant
-        for name in self.ibm_forcing:
-            self[name] = self._read_field(name, prestep)
-            self[name + 'new'] = self._read_field(name, 0)
-            self['d' + name] = (self[name] - self[name + 'new']) / stepdiff
+            # Simulation start at first forcing time
+            self.U, self.V = self._read_velocity(0)
+            self.Unew, self.Vnew = self._read_velocity(steps[1])
+            self.dU = (self.Unew - self.U) / steps[1]
+            self.dV = (self.Vnew - self.V) / steps[1]
+            # Syncronize
+            self.Unew = self.U
+            self.Vnew = self.V
+            # Extrapolate to time step = -1
+            self.U = self.U - self.dU
+            self.V = self.V - self.dV
+            # Other forcing:
+            for name in self.ibm_forcing:
+                self[name] = self._read_field(name,0)
+                self[name+'new'] = self._read_field(name, steps[1])
+                self['d'+name] = (self[name+'new'] - self[name]) / steps[1]
+                self[name] = self[name] - self['d'+name]
 
         self.steps = steps
         self._files = files

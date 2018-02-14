@@ -1,60 +1,53 @@
-
 # Configuration file for ladim
 #
-# Line source example
+# Continuous  release example
 #
+
 
 time_control:
     # Start and stop of simulation
-    # start_time: 1989-06-03 09
-    start_time: 1989-05-24 12:00:00
-    # stop_time:  1989-06-15 12:00:00
-    stop_time:  1989-06-05T12
+    # start_time: 1989-05-24 12:00:00
+    start_time: 1989-05-24 18:00:00
+    stop_time:  1989-05-25 12:00:00
     # Reference time for netcdf output
     # by default set to start_time
-    reference_time: 1970-01-01 00
+    reference_time: 1989-05-24T12
 
 files:
     grid_file             : ../data/ocean_avg_0014.nc
-    input_file            : ../data/ocean_avg_*.nc
-    particle_release_file : line.rls
-    output_file           : line.nc
-    # warm_start_file       : a4.nc
+    input_file            : ../data/ocean_avg_0014.nc
+    particle_release_file : streak.rls
+    # output_file           : streak.nc
+    output_file           : b.nc
+    warm_start_file       : streak_0001.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
-    # [lon, lat]
-    # ibm_variables: []
+    ibm_variables: []
 
 particle_release:
+    # type = continuous or discrete [default]
+    release_type: 'continuous'
+    release_frequency: [3600, s]
     variables: [release_time, X, Y, Z]
-    # Converters (if not float)
-    # mult: int
+    # Data type [int, float, time], default = float
     release_time: time
-    # farmid: int
     particle_variables: [release_time]
 
 gridforce:
-    # Gridforce module
     module: ladim.gridforce.ROMS
 
-    # mapping: model name -> name in input file
-    # velocity: {U: u, V: v}
-    # ibm_forcing: {}
 
 output_variables:
-    # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET
-    # format: NETCDF3_64BIT_DATA
-    format: NETCDF3_CLASSIC
-
-    # Records per file
-    # Default = 0 meaning unlimited i.e. only one (unnumbered) output file
-    # numrec: 20
+    # Skip initial field
+    skip_initial : True
 
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
-    # Variable names
+    # Records per file
+    numrec: 3
+
     particle: [release_time]
     instance: [pid, X, Y, Z]
     # NetCDF arguments
@@ -72,8 +65,7 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
-    # lon: {ncformat: f4, long_name: particle longitude, units: degrees_east}
-    # lat: {ncformat: f4, long_name: particle latitude, units: degrees_north}
+
 
 numerics:
     # Model time step, [value, unit]
@@ -81,7 +73,7 @@ numerics:
     # Advection method: options =
     #        EF = Euler-Forward,
     #        RK2, RK4 = Runge-Kutta 2nd or 4th order
-    advection: EF
+    advection: RK2
     # Horizontal diffusion coefficient [m2.s-1]
     #         zero = no diffusion
     diffusion: 0.0

@@ -29,36 +29,43 @@ def configure(config_file: str) -> Config:
             conf = yaml.safe_load(fp)
     except FileNotFoundError:
         print('ERROR: ',
-              'Configuration file {} not found'.format(config_file))
+              f'Configuration file {config_file} not found')
         raise SystemExit(1)
     except yaml.parser.ParserError:
         print('ERROR: ',
-              'Can not parse configuration file {}'.format(config_file))
+              f'Can not parse configuration file {config_file}')
         raise SystemExit(2)
 
-    # --- Time control ---
+    # ----------------
+    # Time control
+    # ----------------
     logging.info('Configuration: Time Control')
     for name in ['start_time', 'stop_time']:
         config[name] = np.datetime64(
             conf['time_control'][name]).astype('M8[s]')
-        logging.info('    {:15s}: {}'.format(name, config[name]))
+        logging.info(f'    {name:15s}: {config[name]}')
     try:
         config['reference_time'] = np.datetime64(
             conf['time_control']['reference_time']).astype('M8[s]')
     except KeyError:
         config['reference_time'] = config['start_time']
-    logging.info('    {:15s}: {}'.format(
-        'reference_time', config['reference_time']))
-
-
+    logging.info(f'    {"reference_time":15s}: {config["reference_time"]}')
 
     # --- Files ---
     logging.info('Configuration: Files')
-    logging.info('    {:15s}: {}'.format('config_file', config_file))
+    logging.info(f'    {"config_file":15s}: {config_file}')
     for name in ['grid_file', 'input_file',
                  'particle_release_file', 'output_file']:
         config[name] = conf['files'][name]
-        logging.info('    {:15s}: {}'.format(name, config[name]))
+        logging.info(f'    {name:15s}: {config[name]}')
+
+    try:
+        config['warm_start_file'] = conf['files']['warm_start_file']
+        config['start'] = 'warm'
+        logging.info(f'    {"Warm start from":15s}: {config["warm_start_file"]}')
+    except KeyError:
+        config['start'] = 'cold'
+        config['warm_start_file'] = ''
 
     # --- Time stepping ---
     logging.info('Configuration: Time Stepping')
@@ -68,25 +75,22 @@ def configure(config_file: str) -> Config:
     config['simulation_time'] = np.timedelta64(
         config['stop_time'] - config['start_time'], 's').astype('int')
     config['numsteps'] = config['simulation_time'] // config['dt']
-    logging.info('    {:15s}: {} seconds'.format('dt', config['dt']))
+    logging.info(f'    {"dt":15s}: {config["dt"]} seconds')
     logging.info(
-        '    {:15s}: {} hours'.format(
-            'simulation time', config['simulation_time'] // 3600))
-    logging.info(
-        '    {:15s}: {}'.format('number of time steps', config['numsteps']))
+        f'    {"simulation time":15s}: {config["simulation_time"] // 3600} hours')
+    logging.info(f'    {"number of time steps":15s}: {config["numsteps"]}')
 
     #  --- Grid ---
     logging.info('Configuration: gridforce')
     config['gridforce_module'] = conf['gridforce']['module']
-    logging.info('    {:15s}: {}'.format('module', config['gridforce_module']))
+    logging.info(f'    {"module":15s}: {config["gridforce_module"]}')
     # Grid arguments
     try:
         config['grid_args'] = conf['gridforce']['grid']
     except KeyError:
         config['grid_args'] = dict()
     logging.info(
-        '    {:15s}: {}'.format(
-            'grid arguments', config['grid_args']))
+        f'    {"grid arguments":15s}: {config["grid_args"]}')
     config['Vinfo'] = dict()
 
     # --- Forcing ---
@@ -94,14 +98,13 @@ def configure(config_file: str) -> Config:
         config['ibm_forcing'] = conf['gridforce']['ibm_forcing']
     except (KeyError, TypeError):
         config['ibm_forcing'] = []
-    logging.info('    {:15s}: {}'.format('ibm_forcing', config['ibm_forcing']))
+    logging.info(f'    {"ibm_forcing":15s}: {config["ibm_forcing"]}')
 
     # --- IBM ---
     try:
         config['ibm_module'] = conf['ibm']['ibm_module']
         logging.info('Configuration: IBM')
-        logging.info(
-            '    {:15s}: {}'.format('ibm_module', config['ibm_module']))
+        logging.info(f'    {"ibm_module":15s}: {config["ibm_module"]}')
     # Skille på om ikke gitt, eller om navnet er feil
     except KeyError:
         config['ibm_module'] = ''
@@ -114,13 +117,11 @@ def configure(config_file: str) -> Config:
     except KeyError:
         config['release_type'] = 'discrete'
     logging.info(
-        '    {:15s}: {}'.format(
-            'release_type', config['release_type']))
+        f'    {"release_type":15s}: {config["release_type"]}')
     if config['release_type'] == 'continuous':
         config['release_frequency'] = np.timedelta64(
             *tuple(prelease['release_frequency']))
-        logging.info('        {:11s}: {}'.format(
-            'release_frequency', str(config['release_frequency'])))
+        logging.info(f'        {"release_frequency":11s}: {str(config["release_frequency"])}')
     config['release_format'] = conf['particle_release']['variables']
     config['release_dtype'] = dict()
     # Map from str to converter
@@ -129,7 +130,7 @@ def configure(config_file: str) -> Config:
         config['release_dtype'][name] = type_mapping[
             conf['particle_release'].get(name, 'float')]
         logging.info(
-            '    {:15s}: {}'.format(name, config['release_dtype'][name]))
+            f'    {name:15s}: {config["release_dtype"][name]}')
     config['particle_variables'] = prelease['particle_variables']
 
     # --- Model state ---
@@ -139,7 +140,7 @@ def configure(config_file: str) -> Config:
         config['ibm_variables'] = state['ibm_variables']
     else:
         config['ibm_variables'] = []
-    logging.info('    ibm_variables: {}'.format(config['ibm_variables']))
+    logging.info(f'    ibm_variables: {config["ibm_variables"]}')
 
     # -----------------
     # Output control
@@ -150,24 +151,29 @@ def configure(config_file: str) -> Config:
     except KeyError:
         output_format = 'NETCDF3_64BIT_OFFSET'
     config['output_format'] = output_format
-    logging.info('    {:15s}: {}'.format(
-        'output_format', config['output_format']))
+    logging.info(f'    {"output_format":15s}: {config["output_format"]}')
+
+    # Skip output of initial state, useful for restart
+    try:
+        skip_initial = conf['output_variables']['skip_initial']
+    except KeyError:
+        skip_initial = False
+    config['skip_initial'] = skip_initial
+    logging.info(f"    {'skip_inital':15s}: {skip_initial}")
 
     try:
         numrec = conf['output_variables']['numrec']
     except KeyError:
         numrec = 0
     config['output_numrec'] = numrec
-    logging.info('    {:15s}: {}'.format(
-        'output_numrec', config['output_numrec']))
+    logging.info(f'    {"output_numrec":15s}: {config["output_numrec"]}')
 
     outper = np.timedelta64(*tuple(conf['output_variables']['outper']))
     outper = outper.astype('m8[s]').astype('int') // config['dt']
     config['output_period'] = outper
-    logging.info('    {:15s}: {} timesteps'.format(
-        'output_period', config['output_period']))
+    logging.info(f'    {"output_period":15s}: {config["output_period"]} timesteps')
     config['num_output'] = 1 + config['numsteps'] // config['output_period']
-    logging.info('    {:15s}: {}'.format('numsteps', config['numsteps']))
+    logging.info(f'    {"numsteps":15s}: {config["numsteps"]}')
     config['output_particle'] = conf['output_variables']['particle']
     config['output_instance'] = conf['output_variables']['instance']
     config['nc_attributes'] = dict()
@@ -190,13 +196,14 @@ def configure(config_file: str) -> Config:
             logging.info(12 * ' ' + '{:11s}: {:s}'.format(*item))
 
     # --- Numerics ---
+
     # dt belongs here, but is already read
     logging.info('Configuration: Numerics')
     try:
         config['advection'] = conf['numerics']['advection']
     except KeyError:
         config['advection'] = 'RK4'
-    logging.info('    {:15s}: {}'.format('advection', config['advection']))
+    logging.info(f'    {"advection":15s}: {config["advection"]}')
     try:
         diffusion = conf['numerics']['diffusion']
     except KeyError:
@@ -204,9 +211,7 @@ def configure(config_file: str) -> Config:
     if diffusion > 0:
         config['diffusion'] = True
         config['diffusion_coefficient'] = diffusion
-        logging.info('    {:15s}: {}'.format(
-            'diffusion coefficient',
-            config['diffusion_coefficient']))
+        logging.info(f'    {"diffusion coefficient":15s}: {config["diffusion_coefficient"]}')
     else:
         config['diffusion'] = False
         logging.info('    no diffusion')

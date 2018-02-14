@@ -38,4 +38,5 @@ doc/build
 # pytest?
 .cache
 
+# mypy
 .mypy_cache

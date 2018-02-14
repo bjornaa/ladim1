@@ -10,12 +10,12 @@ from postladim import ParticleFile
 # ---------------
 
 # Files
-particle_file = 'logo.nc'
+particle_file = 'streak2_0001.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 58, 150
-j0, j1 = 60, 140
+i0, i1 = 100, 130
+j0, j1 = 90, 115
 
 # ----------------
 
@@ -70,13 +70,8 @@ def animate(t):
     timestamp.set_text(pf.time(t))
     return particle_dist, timestamp
 
-
 # Do the animation
-anim = FuncAnimation(fig, animate, frames=num_times, interval=2,
+anim = FuncAnimation(fig, animate, frames=num_times, interval=20,
                      repeat=True, repeat_delay=500, blit=True)
-
-
-# anim.save('logo.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
-# anim.save('logo.gif',  writer='imagemagick')
 
 plt.show()

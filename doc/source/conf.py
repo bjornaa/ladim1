@@ -39,7 +39,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'LADIM'
+project = 'LADiM'
 copyright = '2017, Institute of Marine Research'
 
 # The version info for the project you're documenting, acts as replacement for

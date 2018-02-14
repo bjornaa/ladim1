@@ -16,6 +16,8 @@ import numpy as np
 import pandas as pd
 from typing import Iterator, List
 
+from netCDF4 import Dataset
+
 from .utilities import ingrid
 from .configuration import Config
 
@@ -75,6 +77,7 @@ class ParticleReleaser(Iterator):
 
         # file_times = A['release_time'].unique()
 
+        # TODO: Make a function of continuous -> discrete
         # Fill out if continuous release
         if config['release_type'] == 'continuous':
 
@@ -127,14 +130,19 @@ class ParticleReleaser(Iterator):
             # A['release_time'] = np.maximum(A['release_time'], # tart_time)
 
         # If discrete, there is an error to have only early releases
+        # OK if warm start
         else:   # Discrete
-            if A.index[-1] < start_time:
+            if A.index[-1] < start_time and config['start'] == 'cold':
                 logging.error("All particles released before similation start")
                 raise SystemExit
 
         # We are now discrete,
         # remove everything before start time
         A = A[A.index >= start_time]
+
+        # If warm start, no new release at start time (already accounted for)
+        if config['start'] == 'warm':
+            A = A[A.index > start_time]
 
         # Release times
         self.times = A['release_time'].unique()
@@ -163,22 +171,41 @@ class ParticleReleaser(Iterator):
                 dtype = np.float64
             pvars[name] = np.array([], dtype=dtype)
 
+        # Get particle data from  warm start
+        if config['start'] == 'warm':
+            with Dataset(config['warm_start_file']) as f:
+                # warm_particle_count = len(f.dimensions['particle'])
+                warm_particle_count = np.max(f.variables['pid'][:]) + 1
+                for name in config['particle_variables']:
+                    pvars[name] = f.variables[name][:warm_particle_count]
+        else:
+            warm_particle_count = 0
+
+        # initital number of particles
+        if config['start'] == 'warm':
+            particles_released = [warm_particle_count]
+        else:
+            particles_released = [0]
+
         # Loop through the releases, collect particle variable data
         for t in self.times:
             V = next(self)
+            particles_released.append(particles_released[-1] + len(V))
             for name in config['particle_variables']:
                 dtype = config['release_dtype'][name]
                 if dtype == np.datetime64:
-                    rtimes = V[name] - config['reference_time']
-                    rtimes = rtimes.astype('timedelta64[s]').astype(np.float64)
+                    g = np.array(V[name]).astype('M8[s]')
+                    rtimes = g - config['reference_time']
+                    rtimes = rtimes.astype(np.float64)
                     pvars[name] = np.concatenate((pvars[name], rtimes))
                 else:
                     pvars[name] = np.concatenate((pvars[name], V[name]))
 
-        self.total_particle_count = self._particle_count
+        self.total_particle_count = warm_particle_count + self._particle_count
         self.particle_variables = pvars
         logging.info("Total particle count = {}".format(
             self.total_particle_count))
+        self.particles_released = particles_released
 
         # Export total particle count
         # Ugly to write back to config
@@ -188,7 +215,7 @@ class ParticleReleaser(Iterator):
 
         # Reset the counter after the particle counting
         self._index = 0    # Index of next release
-        self._particle_count = 0
+        self._particle_count = warm_particle_count
 
     def __next__(self) -> pd.DataFrame:
         """Perform the next particle release
@@ -201,6 +228,12 @@ class ParticleReleaser(Iterator):
         # This should not happen
         if self._index >= len(self.times):
             raise StopIteration
+
+        # Skip first release if warm start (should be present in start file)
+        # Not always, make better test
+        # Moving test to state.py
+        # if self._index == 0 and self._particle_count > 0:  # Warm start
+        #    return
 
         # rel_time = self.times[self._index]
         # file_time = self._file_times[self._file_index]
@@ -219,6 +252,7 @@ class ParticleReleaser(Iterator):
 
         # Add the new pids
         nnew = len(V)
+
         pids = pd.Series(range(self._particle_count,
                          self._particle_count + nnew),
                          name='pid')
