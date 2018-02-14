@@ -262,7 +262,6 @@ class Forcing:
         # Make a list steps of the forcing time steps
         # --------------------------------------------
         steps = []  # Model time step of forcing
-        print("time_units = ", time_units)
         for t in times:
             # print(num2date(t, time_units), t)
             otime = np.datetime64(str(num2date(t, time_units)))
@@ -310,7 +309,7 @@ class Forcing:
              # Other forcing
             for name in self.ibm_forcing:
                 self[name] = self._read_field(name, prestep)
-                self[name+'new'] = self._read_field(name, nexstep)
+                self[name+'new'] = self._read_field(name, nextstep)
                 self['d'+name] = (self[name+'new'] - self[name]) / prestep
                 self[name] = self[name] - (prestep+1)*self['d'+name]
 

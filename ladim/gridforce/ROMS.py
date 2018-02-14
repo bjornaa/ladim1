@@ -324,7 +324,7 @@ class Forcing:
             # Other forcing
             for name in self.ibm_forcing:
                 self[name] = self._read_field(name, prestep)
-                self[name+'new'] = self._read_field(name, nexstep)
+                self[name+'new'] = self._read_field(name, nextstep)
                 self['d'+name] = (self[name+'new'] - self[name]) / prestep
                 self[name] = self[name] - (prestep+1)*self['d'+name]
 

@@ -138,9 +138,7 @@ class State(Sized):
 
         pstart = f.variables['particle_count'][:-1].sum()
         pcount = f.variables['particle_count'][-1]
-        print('pstart, pcount = ', pstart, pcount)
         self.pid = f.variables['pid'][pstart:pstart+pcount]
-        print('pid = ', self.pid)
         # Give error if variable not in restart file
         for var in self.instance_variables:
             logging.debug(f'Restoring {var} from warm start file')
