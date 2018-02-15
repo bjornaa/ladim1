@@ -131,7 +131,7 @@ class Grid:
     def sample_metric(self, X, Y):
         """Sample the metric coefficients
 
-        Changes slowly, so using neareast neighbour
+        Changes slowly, so using nearest neighbour
         """
         I = X.round().astype(int) - self.i0
         J = Y.round().astype(int) - self.j0
@@ -343,7 +343,7 @@ class Forcing:
             self.V = self.V - self.dV
             # Other forcing:
             for name in self.ibm_forcing:
-                self[name] = self._read_field(name,0)
+                self[name] = self._read_field(name, 0)
                 self[name+'new'] = self._read_field(name, steps[1])
                 self['d'+name] = (self[name+'new'] - self[name]) / steps[1]
                 self[name] = self[name] - self['d'+name]
@@ -631,7 +631,7 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
     F = 3D field
     S = depth structure matrix
     X, Y = 1D arrays of horizontal grid coordinates
-    Z = 1D arryay of depth [m, positive downwards]
+    Z = 1D array of depth [m, positive downwards]
 
     Everything in rho-points
 

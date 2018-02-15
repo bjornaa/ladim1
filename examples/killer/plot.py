@@ -37,7 +37,7 @@ ax = fig.add_subplot(1, 1, 1)
 
 # Make background map
 cmap = plt.get_cmap('Blues')
-h = ax.contourf(g.X, g.Y, g.h, cmap=cmap, alpha=0.3)
+ax.contourf(g.X, g.Y, g.h, cmap=cmap, alpha=0.3)
 roppy.mpl_util.landmask(g, (0.6, 0.8, 0.0))
 ax.contour(g.X, g.Y, g.lat_rho, levels=range(57, 64),
            colors='black', linestyles=':')
@@ -49,7 +49,7 @@ ax.contour(g.X, g.Y, g.lon_rho, levels=range(-4, 10, 2),
 X, Y = pf.position(t)
 timestring = pf.time(t)
 
-h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(timestring)
 
 # Show the results

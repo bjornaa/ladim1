@@ -79,7 +79,7 @@ def sample2DV(F: np.ndarray, X, Y) -> np.ndarray:
 
 
 def sample2D_masked(F, M, X, Y):
-    """Bilienar sample of a 2D field
+    """Bilinear sample of a 2D field
 
     F = 2D array, M = mask (=1 on sea, = 0 on land)
     X, Y = position in grid coordinates, scalars or compatible arrays
@@ -199,7 +199,7 @@ def sample2D(F, X, Y, mask=None, undef_value=0.0, outside_value=None):
     W01 = (1-P)*Q
     W10 = P*(1-Q)
     W11 = P*Q
-    SW = 1.0   # Sum of weigths
+    SW = 1.0   # Sum of weights
 
     if mask is not None:
         W00 = mask[J, I] * W00

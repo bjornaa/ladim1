@@ -29,8 +29,8 @@ with Dataset(grid_file) as f0:
 # Cell centers and boundaries
 Xcell = np.arange(i0, i1)
 Ycell = np.arange(j0, j1)
-Xb = np.arange(i0-0.5, i1)
-Yb = np.arange(j0-0.5, j1)
+Xb = np.arange(i0 - 0.5, i1)
+Yb = np.arange(j0 - 0.5, j1)
 
 # particle_file
 pf = ParticleFile(particle_file)
@@ -38,7 +38,7 @@ num_times = pf.num_times
 
 # Set up the plot area
 fig = plt.figure(figsize=(12, 10))
-ax = plt.axes(xlim=(i0+1, i1-1), ylim=(j0+1, j1-1), aspect='equal')
+ax = plt.axes(xlim=(i0 + 1, i1 - 1), ylim=(j0 + 1, j1 - 1), aspect='equal')
 
 # Background bathymetry
 cmap = plt.get_cmap('Blues')
@@ -69,6 +69,7 @@ def animate(t):
     particle_dist.set_data(X, Y)
     timestamp.set_text(pf.time(t))
     return particle_dist, timestamp
+
 
 # Do the animation
 anim = FuncAnimation(fig, animate, frames=num_times, interval=20,

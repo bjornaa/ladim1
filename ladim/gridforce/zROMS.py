@@ -306,7 +306,7 @@ class Forcing:
             # Interpolate to time step = -1
             self.U = self.U - (prestep+1)*self.dU
             self.V = self.V - (prestep+1)*self.dV
-             # Other forcing
+            # Other forcing
             for name in self.ibm_forcing:
                 self[name] = self._read_field(name, prestep)
                 self[name+'new'] = self._read_field(name, nextstep)
@@ -327,7 +327,7 @@ class Forcing:
             self.V = self.V - self.dV
             # Other forcing:
             for name in self.ibm_forcing:
-                self[name] = self._read_field(name,0)
+                self[name] = self._read_field(name, 0)
                 self[name+'new'] = self._read_field(name, steps[1])
                 self['d'+name] = (self[name+'new'] - self[name]) / steps[1]
                 self[name] = self[name] - self['d'+name]

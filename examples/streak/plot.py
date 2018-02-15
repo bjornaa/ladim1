@@ -49,7 +49,7 @@ ax.contour(g.X, g.Y, g.lon_rho, levels=range(-4, 10, 2),
 X, Y = pf.position(t)
 timestring = pf.time(t)
 
-h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(timestring)
 
 # Show the results

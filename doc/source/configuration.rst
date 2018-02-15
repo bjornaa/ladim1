@@ -19,7 +19,9 @@ The configuration file format is a subset of :abbr:`yaml
 necessary. The example configuration files are self-describing and can
 easily be modified.
 
-Note that the indentation in a yaml file is mandatory, it i spart of the syntax. The indentation has to be done by spaces, not tabs. Reasonable editors will recognize yaml-files by the extension and will automatically produce spaces when you hit the tab key.
+Note that the indentation in a yaml file is mandatory, it is part of the syntax.
+The indentation has to be done by spaces, not tabs. Reasonable editors will recognize
+yaml-files by the extension and will automatically produce spaces when you hit the tab key.
 
 .. seealso::
   Module :mod:`configuration`
