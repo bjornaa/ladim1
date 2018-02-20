@@ -25,7 +25,7 @@ def configure(config_file: str) -> Config:
     # --- Read the configuration file ---
     # TODO: use logging.ERROR instead of print
     try:
-        with open(config_file) as fp:
+        with open(config_file, encoding='utf8') as fp:
             conf = yaml.safe_load(fp)
     except FileNotFoundError:
         print('ERROR: ',
