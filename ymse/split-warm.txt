@@ -1,0 +1,54 @@
+Splittet output, varmstart og restart
+=====================================
+
+Utput
+-----
+
+Jevne mellomrom. Skal få med eventuelle partikler som slippes på
+utskrifstidspunkt (med initielle posisjon)
+
+Ha bryter for å slå av initiell output (step=0)
+for å unngå dublisering ved restart
+
+
+Splittet output
+---------------
+
+Ha konfigureringsvariabel - numrec (vedre navn)
+Lager fil x_0000.nc, ... x_000n.nc
+der alle har numrec records (siste kan ha færre)
+
+Partikkeldimensjonen to muligheter:
+1) Har alle partikler i hele simuleringen.
+Fordel: kan etterpå lett konkatenere filene med NCO
+Fordel: enklere å implementere
+
+2) Har bare partikler så langt, lengde = 1 + max(pid)
+Fordel: a_0000 blir identisk med simulering med like kort simuleringstid.
+
+Nå: implementert 1) ønsker å gå til 2)
+
+varmstart
+---------
+
+Start fra output-fil. Må ha med alle ønskede variable (ellers feil)
+Alternativ: Ha egen restart-fil som skrives over ved jevne mellomrom.
+Kan være aktuelt med IBM med mange interne variable som ikke skrives ut.
+
+Normalt: start fra siste record (kunne overstyres?)
+
+Starte fra fil og kjøre like lagt eller kortere en varigheten på filen.
+Ønsker at resultatet = fil nummer to i en splittet kjøring.
+Det skal være likeverdig å kjøre splittet som å stoppe og restarte fra forige
+fil.
+
+Ved stopp så er partikkeldimensjonen satt av kjøretiden.
+Kan ha splitt type i) eller at kjøring stoppes/kræsjer før ferdig,
+har da lengre partikkeldim enn antall partikler.
+1) partikkeldimensjon vokser underveis (mulig?)
+2) Ved restart brukes reelt antall partikler når ny partikkeldimensjon lages
+
+Dersom utslipp i starttidspunkt, så sløyfes det (allerede med i varm start)
+Dersom utskrift ved starttidspunkt (alltid dersom ikke frekvens er endret),
+så sløyfes (evt ved bryter). Slik at fordelingen ikke kommer med dobbelt i de
+to filene.

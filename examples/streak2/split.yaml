@@ -6,13 +6,11 @@
 
 time_control:
     # Start and stop of simulation
-    # use an alias &t0 if used again
-    start_time: &time0 1989-05-24 12:00:00
-    stop_time:  1989-06-15 12:00:00
+    start_time: 1989-05-24 12:00:00
+    stop_time:  1989-05-25 12:00:00
     # Reference time for netcdf output
     # by default set to start_time
-    # can be overridden explicitly
-    reference_time: *time0
+    reference_time: 1989-05-24T12
 
 files:
     grid_file             : ../data/ocean_avg_0014.nc
@@ -28,7 +26,7 @@ state:
 particle_release:
     # type = continuous or discrete [default]
     release_type: 'continuous'
-    release_frequency: [1800, s]
+    release_frequency: [3600, s]
     variables: [release_time, X, Y, Z]
     # Data type [int, float, time], default = float
     release_time: time
@@ -37,16 +35,17 @@ particle_release:
 gridforce:
     module: ladim.gridforce.ROMS
 
-
 output_variables:
+    # Skip initial field
+    #skip_initial : True
+
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Records per file
-    # numrec: 20
+    numrec: 3
 
-    # Variable names
     particle: [release_time]
-    instance: [pid, X, Y]
+    instance: [pid, X, Y, Z]
     # NetCDF arguments
     release_time:
         ncformat: f8

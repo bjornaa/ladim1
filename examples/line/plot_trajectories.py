@@ -17,6 +17,7 @@ i0, i1 = 58, 150
 j0, j1 = 60, 130
 
 # Particle identifiers for trajectories
+# Here every 5th
 pids = range(5, 1000, 10)
 
 # ----------------

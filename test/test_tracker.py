@@ -12,7 +12,7 @@ class Grid:
     def sample_metric(self, X, Y):
         return 100*np.ones_like(X), 100*np.ones_like(Y)
 
-    def sample_depth(sel, X, Y):
+    def sample_depth(self, X, Y):
         return 50.0*np.ones_like(X)
 
     def ingrid(self, X, Y):

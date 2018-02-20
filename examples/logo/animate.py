@@ -77,6 +77,6 @@ anim = FuncAnimation(fig, animate, frames=num_times, interval=2,
 
 
 # anim.save('logo.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
-anim.save('logo.gif',  writer='imagemagick')
+# anim.save('logo.gif',  writer='imagemagick')
 
-#plt.show()
+plt.show()

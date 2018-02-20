@@ -7,6 +7,8 @@ import logging
 from typing import Any, Dict, Sized     # mypy
 
 import numpy as np
+from netCDF4 import Dataset, num2date
+
 from .tracker import Tracker
 from .gridforce import Grid, Forcing
 
@@ -55,7 +57,10 @@ class State(Sized):
             self.ibm = None
 
         # self.num_particles = len(self.X)
-        self.nnew = 0
+        self.nnew = 0    # Modify with warm start?
+
+        if config['warm_start_file']:
+            self.warm_start(config)
 
     def __getitem__(self, name: str) -> None:
         return getattr(self, name)
@@ -110,3 +115,32 @@ class State(Sized):
         self.pid = self.pid[self.alive]
         for key in self.instance_variables:
             self[key] = self[key][self.alive]
+
+    def warm_start(self, config: Config) -> None:
+        """Perform a warm (re)start"""
+
+        warm_start_file = config['warm_start_file']
+        try:
+            f = Dataset(warm_start_file)
+        except FileNotFoundError:
+            logging.error("Can not open warm start file: " + warm_start_file)
+            raise SystemExit(1)
+
+        logging.info("Reading warm start file")
+        # Using last record in file
+        tvar = f.variables['time']
+        warm_start_time = np.datetime64(num2date(tvar[-1], tvar.units))
+        if warm_start_time != config['start_time']:
+            print("warm start time = ", warm_start_time)
+            print("start time      = ", config['start_time'])
+            logging.error("Warm start time and start time differ")
+            raise SystemExit(1)
+
+        pstart = f.variables['particle_count'][:-1].sum()
+        pcount = f.variables['particle_count'][-1]
+        self.pid = f.variables['pid'][pstart:pstart+pcount]
+        # Give error if variable not in restart file
+        for var in self.instance_variables:
+            logging.debug(f'Restoring {var} from warm start file')
+            self[var] = f.variables[var][pstart:pstart+pcount]
+

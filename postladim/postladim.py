@@ -1,8 +1,5 @@
 """Main class ParticleFile for reading LADiM output
 
-   Inspired by the general netcdf4 package, but
-   adapted for ragged array indexing.
-
 """
 
 # ---------------------------------
@@ -10,76 +7,74 @@
 # Institute of Marine Research
 # ---------------------------------
 
+from typing import Any, List, Dict, Union, Tuple
 import numpy as np
 from netCDF4 import Dataset, num2date
 
 
 class InstanceVariable:
-    """Particle instance variable
-
-    parameters
-    ----------
-    particlefile : ParticleFile instance
-    name : Variable name
-
-    Example
-    -------
-    temp = pf.variables['temp'][n]
-        Here pf is a ParticleFile instance
-        Get array of particle temperatures at time frame n in the file
-
+    """Particle instance variable, depending on particle and time
     """
-    def __init__(self, particlefile, name):
-        self._pf = particlefile
-        self._name = name
-        nc = particlefile.nc
-        for v in nc.variables[name].ncattrs():
-            setattr(self, v, getattr(nc.variables[name], v))
 
-    def __getitem__(self, n):
-        return self._pf._get_variable(self._name, n)
+    def __init__(self, particlefile: 'ParticleFile', varname: str) -> None:
+        self._pf = particlefile
+        self._name = varname
+        # Copy the netcdf attributes
+        nc = particlefile.nc
+        for v in nc.variables[varname].ncattrs():
+            setattr(self, v, getattr(nc.variables[varname], v))
+
+    def __getitem__(self, n: int) -> np.ndarray:
+        """Get the array of values at time step = n
+        """
+        start = self._pf._start[n]
+        end = self._pf._end[n]
+        return self._pf.nc.variables[self._name][start:end]
 
 
 class ParticleVariable:
-    """Particle variable
-
-    parameters
-    ----------
-    particlefile : ParticleFile instance
-    name : Variable name
-
-    Example
-    -------
-    rtime = pf.variables['release_time'][pid]
-        Here pf is a ParticleFile instance
-        Get release time of particle with identifier = pid
-
+    """Particle variable, time-independent
     """
-    def __init__(self, particlefile, name):
-        self._pf = particlefile
-        self._name = name
-        nc = particlefile.nc
-        for v in nc.variables[name].ncattrs():
-            setattr(self, v, getattr(nc.variables[name], v))
-        # self.__getitem__ = nc.variables[name].__getitem__
 
-    def __getitem__(self, pid):
-        return self._pf.nc.variables[self._name][pid]
+    def __init__(self, particlefile: 'ParticleFile', varname: str) -> None:
+        self._pf = particlefile
+        self._name = varname
+        # Copy the netcdf attributes
+        nc = particlefile.nc
+        for v in nc.variables[varname].ncattrs():
+            setattr(self, v, getattr(nc.variables[varname], v))
+
+    def __getitem__(self, p: int) -> Any:
+        """Get the value of particle with pid = p
+        """
+
+        return self._pf.nc.variables[self._name][p]
+
+
+# Variable type, for type hinting
+Variable = Union[InstanceVariable, ParticleVariable]
 
 
 class ParticleFile:
-    """Dataset from a LADiM output file
-
-    parameters
-    ----------
-    filename : Name of particle file
-
+    """Dataset from a LADiM output fil
     """
-    def __init__(self, filename):
+
+    # Add reasonable exception if file not exist
+    # or file is not a particle file
+    def __init__(self, filename: str) -> None:
         self.nc = Dataset(filename, mode='r')
+        # Number of particles per time
+        self._count = self.nc.variables['particle_count'][:]
+        # End and start of segment with particles at a given time
+        self._end = np.cumsum(self._count)
+        self._start = np.concatenate(([0], self._end[:-1]))
+
         self.num_times = len(self.nc.dimensions['time'])
-        self.variables = dict()
-        self.instance_variables, self.particle_variables = [], []
+
+        # Extract instance and particle variables from the netCDF file
+        self.instance_variables: List[InstanceVariable] = []
+        self.particle_variables: List[ParticleVariable] = []
+        self.variables: Dict[str, Variable] = {}
         for key, var in self.nc.variables.items():
             if 'particle_instance' in var.dimensions:
                 self.instance_variables.append(key)
@@ -87,38 +82,29 @@ class ParticleFile:
             elif 'particle' in var.dimensions:
                 self.particle_variables.append(key)
                 self.variables[key] = ParticleVariable(self, key)
-        self._count = self.nc.variables['particle_count'][:]
-        self._start = np.concatenate(([0], np.cumsum(self._count[:-1])))
 
-    def _get_variable(self, name, n):
-        """Read an instance variable at given time"""
-        # Må ha test, om name er variabel
-        if isinstance(n, slice):
-            start = self._start[n.start]
-            count = sum(self._count[n])
-        else:   # Integer
-            start = self._start[n]
-            count = self._count[n]
-        return self.nc.variables[name][start:start+count]
-
-    def time(self, n):
+    def time(self, n: int) -> str:
         """Get timestamp from a time frame"""
         tvar = self.nc.variables['time']
         return num2date(tvar[n], tvar.units)
 
-    def particle_count(self, n):
+    def particle_count(self, n: int) -> int:
         """Return number of particles at a time frame"""
         return self._count[n]
 
-    def position(self, n):
+    def position(self, n: int) -> Tuple[np.ndarray, np.ndarray]:
         """Get particle positions at n-th time frame"""
         start = self._start[n]
-        count = self._count[n]
-        X = self.nc.variables['X'][start:start+count]
-        Y = self.nc.variables['Y'][start:start+count]
+        end = self._end[n]
+        X = self.nc.variables['X'][start:end]
+        Y = self.nc.variables['Y'][start:end]
         return X, Y
 
-    def trajectory(self, p):
+    # Allow simpler pf['X'] notation for pf.variables['X']
+    def __getitem__(self, varname: str) -> Variable:
+        return self.variables[varname]
+
+    def trajectory(self, p: int) -> 'Trajectory':
         """Get particle positions along a single track"""
 
         f = self.nc
@@ -152,14 +138,15 @@ class ParticleFile:
 
         return Trajectory(range(first_time, last_time), X, Y)
 
-    def close(self):
+    def close(self) -> None:
         self.nc.close()
 
 
 class Trajectory:
     """Single particle trajectory"""
 
-    def __init__(self, times, X, Y):
+    # def __init__(self, times: List[int], X: np.ndarray, Y: np.ndarray) -> None:
+    def __init__(self, times, X, Y) -> None:
         self.times = times
         self.X = X
         self.Y = Y

@@ -4,11 +4,11 @@ Konfigurering av LADiM
 Litt om YAML-formatet
 ---------------------
 
-Akronymet YAML står for (YAML Ain't Markup Language). Hjemmesiden er
-`yaml.org`. og det er en god og ikke for lang beskrivelse på
-wikipedia. Formatet er valgt i LADiM fordi i motsetning til XML og JSON så er
-formatet beregnet for å leses/skrives av mennesker. Formatet er ganske vanlig
-for konfigurasjonsfiler.
+Akronymet YAML står for (YAML Ain't Markup Language). Hjemmesiden er yaml.org
+og det er en god og ikke for lang beskrivelse på wikipedia. Formatet er valgt i
+LADiM fordi i motsetning til XML og JSON så er formatet beregnet for å
+leses/skrives av mennesker. Formatet er ganske vanlig for
+konfigurasjonsfiler.
 
 Innrykk er obligatorisk og angir strukturen. Filen skal ikke inneholde
 tab-karakterer, men gode editorer erstatter automatisk tab med blanke.
@@ -26,35 +26,36 @@ Den definitive beskrivelsen av formatet er i leserutinen
 spiller ingen rolle, bortsett fra at linjer må komme i den seksjonen de
 tilhører.
 
-Time_control
+Tidskontroll
 ------------
 
-Seksjon for tidskontroll med følgende felt::
+Seksjon heter ``time_control`` og har følgende obligatoriske felt::
 
-  start_time : obligatorisk
-  stop_time : obligatorisk
-  reference_time : optional, default verdi = start_time
+  start_time
+  stop_time
+  reference_time
 
 Tidspunkt angis i iso-format yyyy-mm-dd hh:mm:ss, hvor mindre signifikante ledd
 i klokkeslett kan utelates. td 2018-01-30 09. En "T" mellom dato og klokkeslett
 går greitt.
 
 reference_time
-  Tiden som brukes som referanse i output-filene, time for
+  er tiden som brukes som referanse i output-filene, time for
   units "seconds since reference_time".
 
-KOMMENTAR:
-  Den gamle løsningen med ``$time0`` foran ``start_time`` og ``*time0`` som
-  ``reference_time`` virker fremdeles. For mer operasjonelle kjøringer, med
-  output i flere filer anbefales det å være eksplisitt, f.eks. reference_time:
-  2000-01-01 00.
+I eksemplene brukes $time0 foran start_time. Dette tillater gjenbruk av samme
+tidspunkt som *time0 i reference_time.
 
+KOMMENTAR
+  Dette vil bli forenklet ved at reference_time blir optional med
+  start_time som default. (Gamle måten skal fortsette å virke). For mer
+  operasjonelle kjøringer, med output i flere filer anbefales det å være
+  eksplisitt, f.eks. reference_time: 2000-01-01 00
 
-
-Files
+Filer
 -----
 
-Denne seksjonen holder styr på filnavnene.
+Seksjonen heter ``files`` og styrer filnavnene.
 
 Obligatoriske felt er::
 
@@ -78,7 +79,7 @@ input_file
 
 particle_release_file
   inneholder tidspunkt, posisjon, m.m for partikkelslipp. Jeg har laget en vane
-  med å ha et python-script ``make_release.py`` som lager denne utfra annen
+  med å ha et python-script make_release.py som lager denne utfra annen
   spesifikasjon.
 
 output_file
@@ -87,15 +88,10 @@ output_file
   ``navn_0000.nc``, ``navn_0001.nc``, ...
 
 KOMMENTAR:
-  Greit å ha alle filnavnene samlet tidlig i YAML-filen. På den annen side er
-  dette nå litt ROMS-spesifikt. Kunne ha en gridforce-seksjon hvor filnavn var
-  en del av spesifikasjonen av griddet og drivkreftene. Ulike modeller kan ha
-  ulike krav om hva som skal spesifiseres. Dette må tenkes på litt nærmere.
-
-KOMMENTAR2:
-  Kommer et nytt optionalt felt ``warm_start_file``. Dersom dette feltet finnes
-  og ikke er en tom tekststreng så foretar LADiM en varm start, basert på siste tidsteg i filen. Start_time må matche dette tidspunktet. Bare implementert i eksperimentell versjon.
-
+Greit å ha alle filnavnene samlet tidlig i YAML-filen. På den annen side er
+dette nå litt ROMS-spesifikt. Kunne ha en gridforce-seksjon hvor filnavn var en
+del av spesifikasjonen av griddet og drivkreftene. Ulike modeller kan ha ulike
+krav om hva som skal spesifiseres. Dette må tenkes på litt nærmere.
 
 state
 -----
@@ -104,11 +100,11 @@ Her spesifiseres hvilke variable som skal brukes utover pid, X, Y, Z som alltid
 er med. Har også optionalt felt ibm_variables som brukes av en eventuell IBM.
 
 KOMMENTAR:
-  Bedre å ha underseksjon, eller egen seksjon, IBM. Den kan sendes i sin helhet
-  til en IBM-modul. Det gjør at ulike IBM-er selv kan bestemme hvilken
-  informasjon som trengs fra konfigurasjonsfilen. Alternativ: Kan ha en egen IBM
-  konfigurasjonsfil. Foretrekker å ha alt i en fil, slik at simuleringen er
-  enklere dokumentert.
+Bedre å ha underseksjon, eller egen seksjon, IBM. Den kan sendes i sin helhet
+til en IBM-modul. Det gjør at ulike IBM-er selv kan bestemme hvilken
+informasjon som trengs fra konfigurasjonsfilen. Alternativ: Kan ha en egen IBM
+konfigurasjonsfil. Foretrekker å ha alt i en fil, slik at simuleringen er
+enklere dokumentert.
 
 particle_release
 ----------------
@@ -123,40 +119,36 @@ Felter::
   converters:  null eller flere
   particle_variables:  obligatorisk
 
-release_type
-  er continuous eller discrete. Ved discrete tolkes filen bokstavelig, hver
-  linje gir en utslippshendelse. Ved continuous så kan hver linje gi flere
-  utslipp til den overstyres av nye linjer ved seinere tidspunkt. Default =
-  discrete.
+release_type er continuous eller discrete. Ved discrete tolkes filen
+bokstavelig, hver linje gir en utslippshendelse. Ved continuous så kan hver
+linje gi flere utslipp til den overstyres av nye linjer ved seinere tidspunkt.
+Default = discrete.
 
-release_frequency
-  styrer hvor ofte det skjer utslipp ved continuous utslipp.
-  Feltet neglisjeres hvis discrete utslipp. Må gis som en liste [verdi, enhet].
-  F.eks. hver time kan gis som [1, h] eller [3600, s].
+release_frequency styrer hvor ofte det skjer utslipp ved continuous utslipp.
+Feltet neglisjeres hvis discrete utslipp. Må gis som en liste [verdi, enhet].
+F.eks. hver time kan gis som [1, h] eller [3600, s].
 
-variables
-  er en liste over variablene i release-filen. Rekkefølgen er viktig.
+variables er en liste over variablene i release-filen. Rekkefølgen er viktig.
 
-converters
-  brukes til å tolke variablene. Uten konverter blir den tolket som
-  float. Mulige verdier er int for heltall, str for tekststreng, time for tid.
-  Eksempler: release_time: time, farmid: int, ...
+converters brukes til å tolke variablene. Uten konverter blir den tolket som
+float. Mulige verdier er int for heltall, str for tekststreng, time for tid.
+Eksempler: release_time: time, farmid: int, ...
 
-particle_variables
-  en underliste av variables som er partikkel-variable, m.a.o. variable (utenom
-  pid) som ikke endres over tid. Utslippstidspunktet er en slik og skal alltid
-  være med. Andre ting kan være utslippsposisjon, farmid eller lignende.
+particle_variables en underliste av variables som er partikkel-variable, m.a.o.
+variable (utenom pid) som ikke endres over tid. Utslippstidspunktet er en slik
+og skal alltid være med. Andre ting kan være utslippsposisjon, farmid eller
+lignende.
 
 KOMMENTAR:
-  Her kan ryddes litt opp. Listen med variable kan være første linje i release-filen. Det gjør denne mer selvforklarende og forenkler yaml-filen.
+Her kan ryddes litt opp. Listen med variable kan være første linje i release-filen. Det gjør denne mer selvforklarende og forenkler yaml-filen.
 
-  Kvasivariabelen ``mult`` er alltid int og burde ikke kreve et converter-felt.
-  Kunne kanskje også standardisert konvertering for release_time, X, Y, Z som alltid må være med.
+Kvasivariabelen mult er alltid int og burde ikke kreve et converter-felt.
+Kunne kanskje også standardisert konvertering for release_time, X, Y, Z som alltid må være med.
 
 gridforce
 ---------
 
-Denne seksjonen styrer grid og drivkrefter.
+Denns seksjonen styrer grid og drivkrefter.
 
 Felt::
 
@@ -164,24 +156,21 @@ Felt::
   ibm_forcing:   optional
   grid:     optional
 
-module
-  gir python-modulen for grid-forcing. Kan bruke dot-notasjon
-  ladim.gridforce.ROMS for moduler i "standard" LADiM. Kan bruke navn for
-  python modul navn.py i arbeidskatalogen.
+module gir python-modulen for grid-forcing. Kan bruke dot-notasjon
+ladim.gridforce.ROMS for moduler i "standard" LADiM. Kan bruke navn for python
+modul navn.py i arbeidskatalogen.
 
-ibm_forcing
-  er variable som skal leses inn for IBM. F.eks. temperatur og salt. Python
-  dictionary med navn i IBM-modul: navn på fil. Eksempel::
+ibm_forcing er variable som skal leses inn for IBM. F.eks. temperatur og salt.
+Python dictionary med navn i IBM-modul: navn på fil. Eksempel::
 
-    ibm_forcing: {temperature: temp, salinity: salt}
+  ibm_forcing: {temperature: temp, salinity: salt}
 
-grid
-  er et mulig subseksjon med grid info som overføres til gridforce-modulen.
-  F.eks. ROMS gridforce kan definere et subgrid.
+grid er et mulig subseksjon med grid info som overføres til gridforce-modulen.
+F.eks. ROMS gridforce kan definere et subgrid.
 
 KOMMENTAR:
-  Dictionary delen er ufiks og unødvendig. Bare bruk navnene i IBM-en og la
-  ``gridforce`` ta hånd om eventuelle andre variabel-navn i filen.
+Dictionary delen er ufiks og unødvendig. Bare bruk navnene i IBM-en og la
+gridforce ta hånd om eventuelle andre variabel-navn i filen.
 
 ibm
 ---
@@ -190,12 +179,12 @@ Denne seksjonen er opional og har bare et felt::
 
   ibm_module: optional
 
-Enten dot-navn som ``ladim.ibms.ibm_salmon_lice`` for ferdig installert IBM.
-For lokal IBM i arbeidskatalog bare bruk navn for navn.py
+Enten dot-navn som ladim.ibms.ibm_salmon_lice for ferdig installert IBM. For
+lokal IBM i arbeidskatalog bare bruk navn for navn.py
 
 KOMMENTAR:
-  Her kan legges inn flere elementer som tolkes av IBM-modulen selv. Skifte
-  navn til IBM med store bokstaver?
+Her kan legges inn flere elementer som tolkes av IBM-modulen selv.
+Skifte navn til IBM med store bokstaver?
 
 output_variables
 ----------------
@@ -208,64 +197,55 @@ Styrer utskriften. Felt::
   instance: obligatorisk
   netcdf_argument:  obligatorisk
 
-format
-  er netcdf-format. Default er NETCDF3_64BIT. Kan og bruke
-  NETCDF3_CLASSIC, NETCDF3_64BIT_DATA, NETCDF4_CLASSIC.
+format er netcdf-format. Default er NETCDF3_64BIT. Kan og bruke
+NETCDF3_CLASSIC, NETCDF3_64BIT_DATA, NETCDF4_CLASSIC.
 
-outper
-  er tid mellom output. Format [verdi, enhet] f.eks. [3, h] for hver
-  tredje time.
+outper er tid mellom output. Format [verdi, enhet] f.eks. [3, h] for hver
+tredje time.
 
-particle
-  Navn på partikkel-variable som skal skrives ut.
+particle: Navn på partikkel-variable som skal skrives ut.
 
-instance
-  Navn på instans-variable som skal skrives ut. Skal alltid ha med pid.
+instance: Navn på instans-variable som skal skrives ut. Skal alltid ha med pid.
 
 Hver variabel har et netcdf_argument. Navnet definerer underseksjon og ulike
-netCDF attributter som felt. Et ekstra obligatorisk felt, ``ncformat`` som gir
+netCDF attributter som felt. Et ekstra obliigatorisk felt, ncformat som gir
 datatypen. Eksempel::
 
-      pid: {ncformat: i4, long_name: particle identifier}
-      X:
-        ncformat: f4
-        long_name: particle X-coordinate
+      pid: {ncformat: i4, long_name: particle identifier} X:
+          ncformat: f4 long_name: particle X-coordinate
 
 Format i krølleparentes og på flere linjer med innrykk er likeverdig.
 
 KOMMENTAR:
-  Ekstra optional felt, ``numrec``, er i utviklingsversjon. Angir antall
-  records før output-filen splittes.
+Ekstra optional felt, numrec, er i utviklingsversjon. Angir antall
+records før output-filen splittes.
 
-  Seksjonen vil skifte navn til ``output``. Det gamle navnet skal fortsatt
-  virke.
-
+Har foreløpig ikke særlig nytte av netcdf4. Har ikke knagg for å velge
+komprimering og chunking. Få litt bedre måte å oppgi den slags, skille
+netcdf-tekniske ting fra det som skal ut som attributter.
 
 
 numerics
 --------
 
-Styrer numerikken som brukes. Felt::
+Styrer numerikken. Felt::
 
   dt:   obligatorisk
   advection:  obligatorisk
   diffusion:  optional
 
-dt
-  er modellens tidskritt. Format [verdi, enhet]
+dt er modellens tidskritt. Format [verdi, enhet]
 
-advection
-  angir adveksjonsalgoritme. EF, RK2 eller RK4 for Euler-Forward,
-  Runge-Kutta av ulik orden.
+advection er adveksjonsalgoritme. EF, RK2 eller RK4 for Euler-Forward,
+Runge-Kutta av ulik orden.
 
-diffusion
-  angir et konstand diffusjonsnivå. Verdi = 0 eller at feltet mangler skrur av
-  diffusjonen.
+diffusion angir et konstand diffusjonsnivå. Verdi = 0 eller at feltet mangler
+skrur av diffusjonen.
 
 KOMMENTAR:
-  Ønske om å kunne ha inn variabel diffusivitet i rom og tid. Kan
-  f.eks. ha inn et filnavn for å hente. Evt. beregne utfra turbulensverdier i
-  havmodellen. Litt vanskelig å finne noe generelt å ha her.
+Ønske om å kunne ha inn variabel diffusivitet i rom og tid. Kan
+f.eks. ha inn et filnavn for å hente. Evt. beregne utfra turbulensverdier i
+havmodellen. Litt vanskelig å finne noe generelt å ha her.
 
 
 

@@ -6,18 +6,20 @@
 
 time_control:
     # Start and stop of simulation
+    # start_time: 1989-06-03 09
     start_time: 1989-05-24 12:00:00
     # stop_time:  1989-06-15 12:00:00
-    stop_time:  1989-06-05 12:00:00
+    stop_time:  1989-06-05T12
     # Reference time for netcdf output
     # by default set to start_time
-    # reference_time 1989-01-01
+    reference_time: 1970-01-01 00
 
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_*.nc
     particle_release_file : line.rls
     output_file           : line.nc
+    # warm_start_file       : a4.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given
@@ -44,13 +46,17 @@ gridforce:
 output_variables:
     # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET
     # format: NETCDF3_64BIT_DATA
-    format: NETCDF4_CLASSIC
+    format: NETCDF3_CLASSIC
+
+    # Records per file
+    # Default = 0 meaning unlimited i.e. only one (unnumbered) output file
+    # numrec: 20
 
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Variable names
     particle: [release_time]
-    instance: [pid, X, Y]
+    instance: [pid, X, Y, Z]
     # NetCDF arguments
     release_time:
         ncformat: f8

@@ -1,3 +1,7 @@
+# Only plot a subset of the particles
+# Here, the western half
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
@@ -37,6 +41,16 @@ Yb = np.arange(j0-0.5, j1)
 # particle_file
 pf = ParticleFile(particle_file)
 
+# Implement the condition, here pid < 500
+pids = pf.variables['pid'][t]
+# I = pids < 500      # The western half of the particles
+# I = pids % 5 == 0   # Alternative condition, every 5th particle
+I = np.in1d(pids, [10, 100, 300])  # Explisit subset of pids
+
+# Get the particle positions
+X, Y = pf.position(t)
+X, Y = X[I], Y[I]
+
 fig = plt.figure(figsize=(12, 10))
 ax = fig.add_subplot(1, 1, 1)
 
@@ -57,7 +71,6 @@ ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2),
            colors='black', linestyles=':')
 
 # Plot particle distribution
-X, Y = pf.position(t)
 ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 ax.set_title(pf.time(t))
 
