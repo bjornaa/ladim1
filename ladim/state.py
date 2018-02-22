@@ -130,6 +130,7 @@ class State(Sized):
         # Using last record in file
         tvar = f.variables['time']
         warm_start_time = np.datetime64(num2date(tvar[-1], tvar.units))
+        # Not needed anymore, explicitly set in configuration
         if warm_start_time != config['start_time']:
             print("warm start time = ", warm_start_time)
             print("start time      = ", config['start_time'])
@@ -143,4 +144,3 @@ class State(Sized):
         for var in self.instance_variables:
             logging.debug(f'Restoring {var} from warm start file')
             self[var] = f.variables[var][pstart:pstart+pcount]
-

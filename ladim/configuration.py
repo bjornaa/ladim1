@@ -14,6 +14,7 @@ from typing import Dict, Any
 import numpy as np
 import yaml
 import yaml.parser
+from netCDF4 import Dataset, num2date
 
 Config = Dict[str, Any]   # type of the config dictionary
 
@@ -67,14 +68,21 @@ def configure(config_file: str) -> Config:
         config['start'] = 'cold'
         config['warm_start_file'] = ''
 
-    try:
-        config['warm_start_file'] = conf['files']['warm_start_file']
-        config['start'] = 'warm'
-        logging.info('    {:15s}: {}'.
-                     format('Warm start from', config['warm_start_file']))
-    except KeyError:
-        config['start'] = 'cold'
-        config['warm_start_file'] = ''
+    # Override start time for warm start
+    if config['start'] == 'warm':
+        try:
+            nc = Dataset(config['warm_start_file'])
+        except (FileNotFoundError, OSError):
+            logging.error(
+                f"Could not open warm start file,{config['warm_start_file']}")
+            raise SystemExit(1)
+        tvar = nc.variables['time']
+        # Using last record in file
+        warm_start_time = np.datetime64(
+        num2date(tvar[-1], tvar.units))
+        warm_start_time = warm_start_time.astype('M8[s]')
+        config['start_time'] = warm_start_time
+        logging.info(f'warm start at {warm_start_time}')
 
     # --- Time stepping ---
     logging.info('Configuration: Time Stepping')
