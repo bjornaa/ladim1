@@ -7,16 +7,16 @@
 time_control:
     # Start and stop of simulation
     start_time: 1989-05-24 12:00:00
-    stop_time:  1989-05-25 12:00:00
+    stop_time:  1989-05-28 12:00:00
     # Reference time for netcdf output
     # by default set to start_time
-    reference_time: 1989-05-24T12
+    reference_time: 1989-01-01
 
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_0014.nc
     particle_release_file : streak.rls
-    output_file           : streak.nc
+    output_file           : split.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given
@@ -42,7 +42,7 @@ output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Records per file
-    numrec: 3
+    numrec: 4
 
     particle: [release_time]
     instance: [pid, X, Y, Z]

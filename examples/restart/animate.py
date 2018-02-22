@@ -10,7 +10,9 @@ from postladim import ParticleFile
 # ---------------
 
 # Files
-particle_file = 'streak2_0001.nc'
+particle_file = 'unsplit.nc'
+# particle_file = 'split_0001.nc'
+# particle_file = 'restart_0002.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition

@@ -22,6 +22,10 @@ examples/data/*
 build/
 doc/build
 
+# Figures
+*.png
+*.gif
+
 # Latex-stuff
 *.tex
 *.aux
