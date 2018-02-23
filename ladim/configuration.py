@@ -52,7 +52,9 @@ def configure(config_file: str) -> Config:
         config['reference_time'] = config['start_time']
     logging.info(f'    {"reference_time":15s}: {config["reference_time"]}')
 
+    # -------------
     # --- Files ---
+    # -------------
     logging.info('Configuration: Files')
     logging.info(f'    {"config_file":15s}: {config_file}')
     for name in ['grid_file', 'input_file',
@@ -77,12 +79,19 @@ def configure(config_file: str) -> Config:
                 f"Could not open warm start file,{config['warm_start_file']}")
             raise SystemExit(1)
         tvar = nc.variables['time']
-        # Using last record in file
-        warm_start_time = np.datetime64(
-        num2date(tvar[-1], tvar.units))
+        # Use last record in restart file
+        warm_start_time = np.datetime64(num2date(tvar[-1], tvar.units))
         warm_start_time = warm_start_time.astype('M8[s]')
         config['start_time'] = warm_start_time
         logging.info(f'warm start at {warm_start_time}')
+
+        # Variables needed by restart, might be changed
+        # default should be instance variables among release variables
+        try:
+            warm_start_variables = conf['warm_start_variables']
+        except KeyError:
+            warm_start_variables = ['X', 'Y', 'Z']
+        config['warm_start_variables'] = warm_start_variables
 
     # --- Time stepping ---
     logging.info('Configuration: Time Stepping')
@@ -171,10 +180,15 @@ def configure(config_file: str) -> Config:
     logging.info(f'    {"output_format":15s}: {config["output_format"]}')
 
     # Skip output of initial state, useful for restart
+    # with cold start the default is False
+    # with warm start, the default is true
     try:
         skip_initial = conf['output_variables']['skip_initial']
     except KeyError:
-        skip_initial = False
+        if config['start'] == 'warm':
+            skip_initial = True
+        else:
+            skip_initial = False
     config['skip_initial'] = skip_initial
     logging.info(f"    {'skip_inital':15s}: {skip_initial}")
 
