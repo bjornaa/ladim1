@@ -24,12 +24,10 @@ class InstanceVariable:
         for v in nc.variables[varname].ncattrs():
             setattr(self, v, getattr(nc.variables[varname], v))
 
-    def __getitem__(self, n: int) -> np.ndarray:
-        """Get the array of values at time step = n
+    def __getitem__(self, p: int) -> Any:
+        """Get value of particle with pid = p
         """
-        start = self._pf._start[n]
-        end = self._pf._end[n]
-        return self._pf.nc.variables[self._name][start:end]
+        return self._pf.nc.variables[self._name][p]
 
 
 class ParticleVariable:
