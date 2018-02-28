@@ -12,7 +12,7 @@ dist/*
 
 # Data files
 examples/data/*
-!examples/data/README
+!examples/data/README.rst
 *.nc
 
 # Release files

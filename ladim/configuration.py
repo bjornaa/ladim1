@@ -53,7 +53,7 @@ def configure(config_file: str) -> Config:
     logging.info(f'    {"reference_time":15s}: {config["reference_time"]}')
 
     # -------------
-    # --- Files ---
+    # Files
     # -------------
     logging.info('Configuration: Files')
     logging.info(f'    {"config_file":15s}: {config_file}')
@@ -83,7 +83,7 @@ def configure(config_file: str) -> Config:
         warm_start_time = np.datetime64(num2date(tvar[-1], tvar.units))
         warm_start_time = warm_start_time.astype('M8[s]')
         config['start_time'] = warm_start_time
-        logging.info(f'warm start at {warm_start_time}')
+        logging.info(f'    Warm start at {warm_start_time}')
 
         # Variables needed by restart, might be changed
         # default should be instance variables among release variables
@@ -147,7 +147,7 @@ def configure(config_file: str) -> Config:
     if config['release_type'] == 'continuous':
         config['release_frequency'] = np.timedelta64(
             *tuple(prelease['release_frequency']))
-        logging.info(f'        {"release_frequency":11s}: {str(config["release_frequency"])}')
+        logging.info(f'    {"release_frequency":11s}: {str(config["release_frequency"])}')
     config['release_format'] = conf['particle_release']['variables']
     config['release_dtype'] = dict()
     # Map from str to converter
@@ -183,14 +183,14 @@ def configure(config_file: str) -> Config:
     # with cold start the default is False
     # with warm start, the default is true
     try:
-        skip_initial = conf['output_variables']['skip_initial']
+        skip_initial = conf['output_variables']['skip_initial_output']
     except KeyError:
         if config['start'] == 'warm':
             skip_initial = True
         else:
             skip_initial = False
     config['skip_initial'] = skip_initial
-    logging.info(f"    {'skip_inital':15s}: {skip_initial}")
+    logging.info(f"    {'Skip inital output':15s}: {skip_initial}")
 
     try:
         numrec = conf['output_variables']['numrec']

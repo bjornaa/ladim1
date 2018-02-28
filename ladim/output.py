@@ -56,8 +56,6 @@ class OutPut:
                       format(state.timestep, state.timestamp))
 
         # Create new file?
-        # start0 = 0
-        # print("t = ", t)
         if t == 0:
             # Close old file and open a new
             if self.nc:
@@ -103,7 +101,7 @@ class OutPut:
         if self.multi_file:
             # fname = fname0.nc -> fname0_xxxx.nc
             fname0, ext = os.path.splitext(fname)
-            fname = f'{fname0}_{1+self.file_counter:04d}{ext}'
+            fname = f'{fname0}_{self.file_counter:04d}{ext}'
 
         logging.debug(f"Defining output netCDF file: {fname}")
         nc = Dataset(fname, mode='w',
