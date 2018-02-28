@@ -13,6 +13,7 @@ from typing import Any, Dict
 import numpy as np
 from netCDF4 import Dataset
 
+from .gridforce import Grid               # For mypy
 from .state import State                  # For mypy
 from .release import ParticleReleaser     # For mypy
 
@@ -43,8 +44,13 @@ class OutPut:
         self.file_counter = -1
         self.num_output = config['num_output']
         self.nc = None   # No open netCDF file yet
+         # Indicator for lon/lat output
+        self.lonlat = ('lat' in self.instance_variables or
+                       'lon' in self.instance_variables)
 
-    def write(self, state: State) -> None:
+
+    # ----------------------------------------------
+    def write(self, state: State,  grid: Grid) -> None:
         """Write the model state to NetCDF"""
 
         self.outcount += 1
@@ -76,11 +82,21 @@ class OutPut:
 
         self.nc.variables['particle_count'][t] = pcount
 
+        # Compute lon, lat if needed
+        if self.lonlat:
+            lon, lat = grid.lonlat(state.X, state.Y)
+
         start = pstart - self.pstart0
         end = pstart + pcount - self.pstart0
         # print("start, end = ", start, end)
         for name in self.instance_variables:
-            self.nc.variables[name][start:end] = state[name]
+            if name == 'lon':
+                self.nc.variables['lon'][start:end] = lon
+            elif name == 'lat':
+                self.nc.variables['lat'][start:end] = lat
+            else:
+                self.nc.variables[name][start:end] = state[name]
+
 
         # Update counters
         # self.outcount += 1
@@ -93,6 +109,7 @@ class OutPut:
         if self.outcount == self.num_output - 1:
             self.nc.close()
 
+    # -----------------------------------------------
     def _define_netcdf(self) -> Dataset:
         """Define a NetCDF output file"""
 

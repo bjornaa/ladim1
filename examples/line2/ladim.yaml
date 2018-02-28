@@ -6,14 +6,12 @@
 
 time_control:
     # Start and stop of simulation
-    # use an alias &t0 if used again
-    start_time: &time0 1989-05-24 12:00:00
+    start_time: 1989-05-24 12:00:00
     # stop_time:  1989-06-15 12:00:00
     stop_time:  1989-06-05 12:00:00
     # Reference time for netcdf output
     # by default set to start_time
     # can be overridden explicitly
-    reference_time: *time0
 
 files:
     grid_file             : ../data/ocean_avg_0014.nc
@@ -52,7 +50,7 @@ output_variables:
     outper: [3, h]
     # Variable names
     particle: [release_time, nation]
-    instance: [pid, X, Y]
+    instance: [pid, X, Y, lon, lat]
     # NetCDF arguments
     release_time:
         ncformat: f8
@@ -71,6 +69,9 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
+    lon: {ncformat: f4, long_name: longitude}
+    lat: {ncformat: f4, long_name: latitude}
+
 
 numerics:
     # Model time step, [value, unit]

@@ -79,7 +79,7 @@ for step in range(config['numsteps']+1):
     # Output before update???
     # Have an optional initial output
     if step % config['output_period'] == 0:
-        out.write(state)
+        out.write(state, grid)
 
     # --- Update the model state ---
     state.update(grid, forcing)
