@@ -22,11 +22,8 @@ examples/data/*
 build/
 doc/build
 
-# Figures
-*.png
-*.gif
-
 # Latex-stuff
+*.pdf
 *.tex
 *.aux
 *.log
@@ -38,9 +35,7 @@ doc/build
 # visual studio code stuff
 .vscode
 
-
-# pytest?
+# Cache
 .cache
-
-# mypy
+.pytest_cache
 .mypy_cache

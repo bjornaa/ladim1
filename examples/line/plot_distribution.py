@@ -34,13 +34,20 @@ Ycell = np.arange(j0, j1)
 Xb = np.arange(i0-0.5, i1)
 Yb = np.arange(j0-0.5, j1)
 
-# particle_file
-pf = ParticleFile(particle_file)
+# Read particle_file
+with ParticleFile(particle_file) as pf:
+    X, Y = pf.position(t)
+    timestamp = pf.time(t)
+
+# ---------------------
+# Plotting
+# ---------------------
 
 fig = plt.figure(figsize=(12, 10))
 ax = fig.add_subplot(1, 1, 1)
 
 # Make background map
+# -------------------
 #   Bathymetry
 cmap = plt.get_cmap('Blues')
 h = ax.contourf(Xcell, Ycell, H, cmap=cmap, alpha=0.3)
@@ -57,11 +64,12 @@ ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2),
            colors='black', linestyles=':')
 
 # Plot particle distribution
-X, Y = pf.position(t)
-ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
-ax.set_title(pf.time(t))
+# --------------------------
+h = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+ax.set_title(timestamp)
 
 # Show the results
+# ----------------
 plt.axis('image')
 plt.axis((i0+1, i1-1, j0+1, j1-1))
 plt.show()

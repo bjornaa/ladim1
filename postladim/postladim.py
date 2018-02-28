@@ -17,8 +17,8 @@ class InstanceVariable:
     """
 
     def __init__(self, particlefile: 'ParticleFile', varname: str) -> None:
-        self._pf = particlefile
-        self._name = varname
+        self.pf = particlefile
+        self.name = varname
         # Copy the netcdf attributes
         nc = particlefile.nc
         for v in nc.variables[varname].ncattrs():
@@ -27,9 +27,9 @@ class InstanceVariable:
     def __getitem__(self, n: int) -> Any:
         """Get values at time step = n
         """
-        start = self._pf._start[n]
-        end = self._pf._end[n]
-        return self._pf.nc.variables[self._name][start:end]
+        start = self.pf.start[n]
+        end = self.pf.end[n]
+        return self.pf.nc.variables[self.name][start:end]
 
 
 class ParticleVariable:
@@ -37,8 +37,8 @@ class ParticleVariable:
     """
 
     def __init__(self, particlefile: 'ParticleFile', varname: str) -> None:
-        self._pf = particlefile
-        self._name = varname
+        self.pf = particlefile
+        self.name = varname
         # Copy the netcdf attributes
         nc = particlefile.nc
         for v in nc.variables[varname].ncattrs():
@@ -48,7 +48,7 @@ class ParticleVariable:
         """Get the value of particle with pid = p
         """
 
-        return self._pf.nc.variables[self._name][p]
+        return self.pf.nc.variables[self.name][p]
 
 
 # Variable type, for type hinting
@@ -64,10 +64,10 @@ class ParticleFile:
     def __init__(self, filename: str) -> None:
         self.nc = Dataset(filename, mode='r')
         # Number of particles per time
-        self._count = self.nc.variables['particle_count'][:]
+        self.count = self.nc.variables['particle_count'][:]
         # End and start of segment with particles at a given time
-        self._end = np.cumsum(self._count)
-        self._start = np.concatenate(([0], self._end[:-1]))
+        self.end = np.cumsum(self.count)
+        self.start = np.concatenate(([0], self.end[:-1]))
 
         self.num_times = len(self.nc.dimensions['time'])
 
@@ -90,12 +90,12 @@ class ParticleFile:
 
     def particle_count(self, n: int) -> int:
         """Return number of particles at a time frame"""
-        return self._count[n]
+        return self.count[n]
 
     def position(self, n: int) -> Tuple[np.ndarray, np.ndarray]:
         """Get particle positions at n-th time frame"""
-        start = self._start[n]
-        end = self._end[n]
+        start = self.start[n]
+        end = self.end[n]
         X = self.nc.variables['X'][start:end]
         Y = self.nc.variables['Y'][start:end]
         return X, Y
@@ -117,9 +117,9 @@ class ParticleFile:
         # or to the end if last_time == 0
 
         for n in range(self.num_times):
-            start = self._start[n]
-            count = self._count[n]
-            pid = f.variables['pid'][start:start+count]
+            start = self.start[n]
+            end = self.end[n]
+            pid = f.variables['pid'][start:end]
 
             if pid[-1] < p:  # particle not released yet
                 continue
@@ -140,6 +140,13 @@ class ParticleFile:
 
     def close(self) -> None:
         self.nc.close()
+
+    # Make ParticleFile a context manager
+    def __enter__(self):
+        return self
+
+    def __exit__(self, atype, value, traceback):
+        self.close()
 
 
 class Trajectory:
