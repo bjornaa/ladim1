@@ -17,6 +17,7 @@ examples/data/*
 
 # Release files
 *.rls
+!examples/latlon/latlon.rls
 
 # Build directories
 build/

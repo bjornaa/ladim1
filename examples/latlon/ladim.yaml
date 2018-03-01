@@ -16,8 +16,8 @@ time_control:
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_*.nc
-    particle_release_file : line.rls
-    output_file           : line.nc
+    particle_release_file : latlon.rls
+    output_file           : latlon.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given
@@ -49,8 +49,8 @@ output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Variable names
-    particle: [release_time, nation]
-    instance: [pid, X, Y, lon, lat]
+    particle: []
+    instance: [pid, lon, lat]
     # NetCDF arguments
     release_time:
         ncformat: f8
@@ -69,8 +69,8 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
-    lon: {ncformat: f4, long_name: longitude}
-    lat: {ncformat: f4, long_name: latitude}
+    lon: {ncformat: f4, long_name: longitude, units: degree_east}
+    lat: {ncformat: f4, long_name: latitude, units: degree_north}
 
 
 numerics:
