@@ -14,10 +14,10 @@ dist/*
 examples/data/*
 !examples/data/README.rst
 *.nc
+*.npy
 
 # Release files
 *.rls
-!examples/latlon/latlon.rls
 
 # Build directories
 build/

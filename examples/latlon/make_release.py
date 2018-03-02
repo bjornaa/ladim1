@@ -1,11 +1,11 @@
 # Make a release file for instantaneous release along 59 degN
 
-# Uses the roppy package from conversion from lon/lat to grid coordinates.
-# Roppy is available from https://github.com/bjornaa/roppy
+# Uses the ll2xy method of the Grid class in the gridforce module
+# to convert from lon/lat to grid coordinates
 
 import numpy as np
 from netCDF4 import Dataset
-from roppy import SGrid
+from ladim.gridforce.ROMS import Grid
 
 # Grid file
 grid_file = '../data/ocean_avg_0014.nc'
@@ -25,7 +25,8 @@ lon = np.linspace(lon0, lon1, Npart)
 lat = np.linspace(lat0, lat1, Npart)
 
 # Compute grid coordinates
-grd = SGrid(Dataset(grid_file))
+config = dict(grid_file=grid_file, grid_args=[])
+grd = Grid(config)
 X, Y = grd.ll2xy(lon, lat)
 
 # Write to release file
