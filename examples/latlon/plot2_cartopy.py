@@ -4,8 +4,6 @@ from matplotlib.path import Path
 from netCDF4 import Dataset
 
 import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-from roppy.mpl_util import  LevelColormap
 
 from postladim import ParticleFile
 
@@ -50,10 +48,11 @@ boundary = np.vstack((north[:, :2], south[:, :2]))
 ax.set_boundary(Path(boundary), transform=proj)
 
 
-# Plot coast
+# Plot coast manually
 polys = np.load(coast_file)
 for p in polys:
     ax.fill(p[0], p[1], facecolor='Khaki', edgecolor='black', transform=lonlat)
+
 # --- Add graticule
 ax.gridlines(xlocs=range(lon0, lon1+2, 2), ylocs=range(lat0, lat1+1))
 

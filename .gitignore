@@ -15,6 +15,7 @@ examples/data/*
 !examples/data/README.rst
 *.nc
 *.npy
+*.wkb
 
 # Release files
 *.rls

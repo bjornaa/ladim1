@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from netCDF4 import Dataset
 
+from shapely.wkb import loads
+from cartopy.feature import ShapelyFeature
 import cartopy.crs as ccrs
-import cartopy.feature as cfeature
 
 from postladim import ParticleFile
 
@@ -14,6 +15,7 @@ from postladim import ParticleFile
 
 # Files
 particle_file = 'latlon.nc'
+coast_file = 'coast.wkb'      # Made by coast2wkb.py
 
 # time step to plot
 t = 90
@@ -47,8 +49,11 @@ north = proj.transform_points(
 boundary = np.vstack((north[:, :2], south[:, :2]))
 ax.set_boundary(Path(boundary), transform=proj)
 
-# --- Add coast feature from GSHHS
-ax.add_feature(cfeature.GSHHSFeature(scale='i'), facecolor='Khaki')
+# Read a wkb coast file into shapely and make a cartopy feature
+with open('coast.wkb', mode='rb') as f:
+    V = loads(f.read())
+ax.add_feature(ShapelyFeature(
+    V, lonlat, facecolor='Khaki', edgecolor='black'))
 
 # --- Add graticule
 ax.gridlines(xlocs=range(lon0, lon1+2, 2), ylocs=range(lat0, lat1+1))
