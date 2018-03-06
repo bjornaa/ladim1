@@ -132,10 +132,8 @@ class Grid:
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
-        # return ((self.i0-0.5 <= X) & (X <= self.i1-0.5) &
-        #         (self.j0-0.5 <= Y) & (Y <= self.j1-0.5))
-        return ((self.i0 < X) & (X < self.i1 - 1) &
-                (self.j0 < Y) & (Y < self.j1 - 1))
+        return ((self.i0 -1.5 < X) & (X < self.i1 - 1.5) &
+                (self.j0 -1.5 < Y) & (Y < self.j1 - 1.5))
 
     def onland(self, X, Y):
         """Returns True for points on land"""
