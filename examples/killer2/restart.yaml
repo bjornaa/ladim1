@@ -6,22 +6,25 @@
 
 time_control:
     # Start and stop of simulation
-    # use an alias &t0 if used again
     start_time: 1989-05-24 12:00:00
     stop_time:  1989-06-15 12:00:00
     # Reference time for netcdf output
     # by default set to start_time
+    # can be overridden explicitly
+    reference_time: 1989-01-01
 
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_0014.nc
     particle_release_file : killer.rls
-    output_file           : killer.nc
+    output_file           : restart.nc
+    warm_start_file       : killer_0000.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
     ibm_variables: [age]
+    warm_start_variables: [X, Y, Z, age]
 
 ibm:
     ibm_module: killer_ibm
@@ -46,11 +49,11 @@ output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Number of records per file
-    # numrec: 20
+    numrec: 28
 
     # Variable names
     particle: [release_time]
-    instance: [pid, X, Y]
+    instance: [pid, X, Y, Z, age]
     # NetCDF arguments
     release_time:
         ncformat: f8
@@ -66,6 +69,7 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
+    age: {ncformat: f4, long_name: particle age}
 
 numerics:
     # Model time step, [value, unit]

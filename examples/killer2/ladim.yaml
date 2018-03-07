@@ -11,6 +11,8 @@ time_control:
     stop_time:  1989-06-15 12:00:00
     # Reference time for netcdf output
     # by default set to start_time
+    # can be overridden explicitly
+    reference_time: 1989-01-01
 
 files:
     grid_file             : ../data/ocean_avg_0014.nc
@@ -46,11 +48,11 @@ output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Number of records per file
-    # numrec: 20
+    numrec: 21
 
     # Variable names
     particle: [release_time]
-    instance: [pid, X, Y]
+    instance: [pid, X, Y, Z, age]
     # NetCDF arguments
     release_time:
         ncformat: f8
@@ -66,6 +68,7 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
+    age: {ncformat: f4, long_name: particle age}
 
 numerics:
     # Model time step, [value, unit]
