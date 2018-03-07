@@ -85,10 +85,10 @@ def configure(config_file: str) -> Config:
         config['start_time'] = warm_start_time
         logging.info(f'    Warm start at {warm_start_time}')
 
-        # Variables needed by restart, might be changed
+        # Variables needed by restart, mightwarm_ be changed
         # default should be instance variables among release variables
         try:
-            warm_start_variables = conf['warm_start_variables']
+            warm_start_variables = conf['state']['warm_start_variables']
         except KeyError:
             warm_start_variables = ['X', 'Y', 'Z']
         config['warm_start_variables'] = warm_start_variables
