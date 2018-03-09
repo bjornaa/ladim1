@@ -62,6 +62,12 @@ class Grid:
         # print('Grid : imax, jmax, size = ',
         #      self.imax, self.jmax, self.imax*self.jmax)
 
+        # Limits for where velocities are defined
+        self.xmin = float(self.i0)
+        self.xmax = float(self.i1-1)
+        self.ymin = float(self.j0)
+        self.ymax = float(self.j0-1)
+
         # Slices
         #   rho-points
         self.I = slice(self.i0, self.i1)
@@ -153,8 +159,8 @@ class Grid:
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
-        return ((self.i0 + 1.5 < X) & (X < self.i1-1.5) &
-                (self.j0 + 1.5 < Y) & (Y < self.j1-1.5))
+        return ((self.xmin < X) & (X < self.xmax) &
+                (self.ymin < Y) & (Y < self.ymax))
 
     def onland(self, X, Y):
         """Returns True for points on land"""
@@ -456,17 +462,19 @@ class Forcing:
 
         self._nc.close()
 
+
     def velocity(self, X, Y, Z, tstep=0, method='bilinear'):
 
         i0 = self._grid.i0
         j0 = self._grid.j0
         K, A = z2s(self._grid.z_r, X - i0, Y - j0, Z)
         if tstep < 0.001:
-            return sample3DUV(self.U, self.V,
-                              X-i0+0.5, Y-j0, K, A, method=method)
+            Ug, Vg = self.U, self.V
         else:
-            return sample3DUV(self.U + tstep*self.dU, self.V + tstep*self.dV,
-                              X-i0, Y-j0+0.5, K, A, method=method)
+            Ug, Vg = self.U + tstep*self.dU, self.V + tstep*self.dV
+        return sample3DUV(Ug, Vg, X-i0+0.5, Y-j0, K, A, method=method)
+
+    velocity = velocity
 
     # Simplify to grid cell
     def field(self, X, Y, Z, name):
