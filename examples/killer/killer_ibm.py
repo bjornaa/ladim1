@@ -1,6 +1,6 @@
 # Minimal IBM to kill old particles
 
-DAY = 12*60*60   # Number of seconds in a day
+DAY = 24*60*60   # Number of seconds in a day
 
 
 class IBM:

@@ -66,7 +66,7 @@ class Grid:
         self.xmin = float(self.i0)
         self.xmax = float(self.i1-1)
         self.ymin = float(self.j0)
-        self.ymax = float(self.j0-1)
+        self.ymax = float(self.j1-1)
 
         # Slices
         #   rho-points
@@ -462,19 +462,17 @@ class Forcing:
 
         self._nc.close()
 
-
     def velocity(self, X, Y, Z, tstep=0, method='bilinear'):
 
         i0 = self._grid.i0
         j0 = self._grid.j0
         K, A = z2s(self._grid.z_r, X - i0, Y - j0, Z)
         if tstep < 0.001:
-            Ug, Vg = self.U, self.V
+            return sample3DUV(self.U, self.V,
+                              X-i0+0.5, Y-j0, K, A, method=method)
         else:
-            Ug, Vg = self.U + tstep*self.dU, self.V + tstep*self.dV
-        return sample3DUV(Ug, Vg, X-i0+0.5, Y-j0, K, A, method=method)
-
-    velocity = velocity
+            return sample3DUV(self.U + tstep*self.dU, self.V + tstep*self.dV,
+                              X-i0, Y-j0+0.5, K, A, method=method)
 
     # Simplify to grid cell
     def field(self, X, Y, Z, name):
@@ -484,7 +482,6 @@ class Forcing:
         K, A = z2s(self._grid.z_r, X-i0, Y-j0, Z)
         F = self[name]
         return sample3D(F, X-i0, Y-j0, K, A, method='nearest')
-
 
 # ---------------------------------------------
 #      Low-level vertical functions
