@@ -62,6 +62,12 @@ class Grid:
         # print('Grid : imax, jmax, size = ',
         #      self.imax, self.jmax, self.imax*self.jmax)
 
+        # Limits for where velocities are defined
+        self.xmin = float(self.i0)
+        self.xmax = float(self.i1-1)
+        self.ymin = float(self.j0)
+        self.ymax = float(self.j1-1)
+
         # Slices
         #   rho-points
         self.I = slice(self.i0, self.i1)
@@ -153,8 +159,8 @@ class Grid:
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
-        return ((self.i0 + 1.5 < X) & (X < self.i1-1.5) &
-                (self.j0 + 1.5 < Y) & (Y < self.j1-1.5))
+        return ((self.xmin < X) & (X < self.xmax) &
+                (self.ymin < Y) & (Y < self.ymax))
 
     def onland(self, X, Y):
         """Returns True for points on land"""
@@ -476,7 +482,6 @@ class Forcing:
         K, A = z2s(self._grid.z_r, X-i0, Y-j0, Z)
         F = self[name]
         return sample3D(F, X-i0, Y-j0, K, A, method='nearest')
-
 
 # ---------------------------------------------
 #      Low-level vertical functions

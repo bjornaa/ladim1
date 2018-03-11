@@ -46,6 +46,12 @@ class Tracker:
         self.dx, self.dy = dx, dy
         dt = self.dt
         self.num_particles = len(X)
+        # Make more elegant, need not do every time
+        # Works for C-grid
+        self.xmin = grid.grid.xmin + 0.01
+        self.xmax = grid.grid.xmax - 0.01
+        self.ymin = grid.grid.ymin + 0.01
+        self.ymax = grid.grid.ymax - 0.01
 
         U = np.zeros(self.num_particles, dtype=float)
         V = np.zeros(self.num_particles, dtype=float)
@@ -99,7 +105,7 @@ class Tracker:
 
         return U, V
 
-    def RK2(self,
+    def RK2a(self,
             forcing: Forcing,
             state: State) -> Velocity:
         """Runge-Kutta second order = Heun scheme"""
@@ -114,7 +120,29 @@ class Tracker:
         U, V = forcing.velocity(X1, Y1, Z, tstep=0.5)
         return U, V
 
-    def RK4(self,
+    def RK2b(self,
+            forcing: Forcing,
+            state: State) -> Velocity:
+        """Runge-Kutta second order = Heun scheme
+
+        This version does not sample velocities outside the grid
+        """
+
+        X, Y, Z = state['X'], state['Y'], state['Z']
+        dt = self.dt
+
+        U, V = forcing.velocity(X, Y, Z)
+        X1 = X + 0.5 * U * dt / self.dx
+        Y1 = Y + 0.5 * V * dt / self.dy
+        X1.clip(self.xmin, self.xmax, out=X1)
+        Y1.clip(self.ymin, self.ymax, out=Y1)
+
+        U, V = forcing.velocity(X1, Y1, Z, tstep=0.5)
+        return U, V
+
+    RK2 = RK2b
+
+    def RK4a(self,
             forcing: Forcing,
             state: State) -> Velocity:
         """Runge-Kutta fourth order advection"""
@@ -141,6 +169,48 @@ class Tracker:
         V = (V1 + 2*V2 + 2*V3 + V4) / 6.0
 
         return U, V
+
+    def RK4b(self,
+             forcing: Forcing,
+             state: State) -> Velocity:
+        """Runge-Kutta fourth order advection
+
+        This version does not sample velocities outside the grid
+
+        """
+
+        X, Y, Z = state['X'], state['Y'], state['Z']
+        dt = self.dt
+        dx, dy = self.dx, self.dy
+        xmin, xmax, ymin, ymax = self.xmin, self.xmax, self.ymin, self.ymax
+
+        U1, V1 = forcing.velocity(X, Y, Z, tstep=0.0)
+        X1 = X + 0.5 * U1 * dt / dx
+        Y1 = Y + 0.5 * V1 * dt / dy
+        X1.clip(xmin, xmax, out=X1)
+        Y1.clip(ymin, ymax, out=Y1)
+
+        U2, V2 = forcing.velocity(X1, Y1, Z, tstep=0.5)
+        X2 = X + 0.5 * U2 * dt / dx
+        Y2 = Y + 0.5 * V2 * dt / dy
+        X2.clip(xmin, xmax, out=X2)
+        Y2.clip(ymin, ymax, out=Y2)
+
+        U3, V3 = forcing.velocity(X2, Y2, Z, tstep=0.5)
+        X3 = X + U3 * dt / dx
+        Y3 = Y + V3 * dt / dy
+        X3.clip(xmin, xmax, out=X3)
+        Y3.clip(ymin, ymax, out=Y3)
+
+        U4, V4 = forcing.velocity(X3, Y3, Z, tstep=1.0)
+
+        U = (U1 + 2*U2 + 2*U3 + U4) / 6.0
+        V = (V1 + 2*V2 + 2*V3 + V4) / 6.0
+
+        return U, V
+
+    RK4 = RK4b
+
 
     def diffuse(self) -> Velocity:
         """Random walk diffusion"""
