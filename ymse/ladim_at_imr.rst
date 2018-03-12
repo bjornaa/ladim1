@@ -114,3 +114,4 @@ Here is an example ``sbatch`` run script::
 
   # Run LADiM
   aprun $LADIM
+

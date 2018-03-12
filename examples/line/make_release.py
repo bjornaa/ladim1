@@ -3,10 +3,6 @@
 import numpy as np
 
 # End points of line in grid coordinates
-x0, x1 = 68, 123
-x0, x1 = 67.55, 123.45
-x0, x1 = 66.55, 123.45
-y0, y1 = 95, 90
 y0, y1 = 93.4, 90
 
 # Number of particles along the line
