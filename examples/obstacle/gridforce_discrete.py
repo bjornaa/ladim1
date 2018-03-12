@@ -21,10 +21,14 @@ class Grid:
         self.U0 = 1         # Undisturbed along-channel velocity [m/s]
 
         # Convert to grid coordinates
-        self.imax = self.L / self.dx
-        self.jmax = self.W / self.dy
+        self.imax = self.L // self.dx
+        self.jmax = self.W // self.dy
         self.X0 = X0 / self.dx
         self.R = R / self.dy
+
+        self.xmin, self.ymin = 0.0, 0.0
+        self.xmax, self.ymax = self.imax-1.0, self.jmax-1.0
+
 
         # Make the sea mask
         self.II, self.JJ = np.meshgrid(
@@ -47,6 +51,10 @@ class Grid:
         i = np.round(X).astype(int)
         j = np.round(Y).astype(int)
         return self.M[j, i] == 1
+
+    def ingrid(self, X, Y):
+        return ((self.xmin < X) & (X < self.xmax) &
+                (self.ymin < Y) & (Y < self.ymax))
 
 
 class Forcing:

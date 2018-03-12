@@ -4,7 +4,7 @@ import numpy as np
 
 # End points of line in grid coordinates
 x0, x1 = 68, 145
-y0, y1 = 188, 188
+y0, y1 = 187, 187
 Npart = 1000
 
 # Fixed particle depth
