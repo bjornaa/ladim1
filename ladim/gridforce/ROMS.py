@@ -468,11 +468,12 @@ class Forcing:
         j0 = self._grid.j0
         K, A = z2s(self._grid.z_r, X - i0, Y - j0, Z)
         if tstep < 0.001:
-            return sample3DUV(self.U, self.V,
-                              X-i0+0.5, Y-j0, K, A, method=method)
+            U = self.U
+            V = self.V
         else:
-            return sample3DUV(self.U + tstep*self.dU, self.V + tstep*self.dV,
-                              X-i0, Y-j0+0.5, K, A, method=method)
+            U = self.U + tstep*self.dU
+            V = self.V + tstep*self.dV
+        return sample3DUV(U, V, X-i0, Y-j0, K, A, method=method)
 
     # Simplify to grid cell
     def field(self, X, Y, Z, name):
@@ -676,5 +677,5 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
 
 
 def sample3DUV(U, V, X, Y, K, A, method='nearest'):
-    return (sample3D(U, X, Y, K, A, method=method),
-            sample3D(V, X, Y, K, A, method=method))
+    return (sample3D(U, X+0.5, Y, K, A, method=method),
+            sample3D(V, X, Y+0.5, K, A, method=method))

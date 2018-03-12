@@ -15,10 +15,18 @@ class Grid:
         self.U0 = 1         # Undisturbed along-channel velocity [m/s]
 
         # Convert to grid coordinates
-        self.imax = self.L / self.dx
-        self.jmax = self.W / self.dy
+        self.imax = self.L // self.dx
+        self.jmax = self.W // self.dy
         self.X0 = X0 / self.dx
         self.R = R / self.dy
+
+        print(self.imax, self.jmax)
+
+
+        self.xmin = 0.0
+        self.ymin = 0.0
+        self.xmax = float(self.imax) - 1.0
+        self.ymax = float(self.jmax) - 1.0
 
     def sample_metric(self, X, Y):
         return self.dx + np.zeros_like(X), self.dy + np.zeros_like(Y)

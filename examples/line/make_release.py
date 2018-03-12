@@ -3,7 +3,8 @@
 import numpy as np
 
 # End points of line in grid coordinates
-y0, y1 = 93.4, 90
+x0, x1 = 63.55, 123.45
+y0, y1 = 90.0, 90
 
 # Number of particles along the line
 Npart = 1000
