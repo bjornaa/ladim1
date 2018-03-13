@@ -3,8 +3,10 @@
 import numpy as np
 
 # End points of line in grid coordinates
-x0, x1 = 68, 145
-y0, y1 = 187, 187
+x0, x1 = 63.55, 123.45
+y0, y1 = 90.0, 90
+
+# Number of particles along the line
 Npart = 1000
 
 # Fixed particle depth
