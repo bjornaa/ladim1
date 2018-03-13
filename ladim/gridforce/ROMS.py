@@ -676,6 +676,6 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
         return F[K, J, I]
 
 
-def sample3DUV(U, V, X, Y, K, A, method='nearest'):
+def sample3DUV(U, V, X, Y, K, A, method='bilinear'):
     return (sample3D(U, X+0.5, Y, K, A, method=method),
             sample3D(V, X, Y+0.5, K, A, method=method))

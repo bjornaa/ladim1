@@ -436,7 +436,7 @@ class Forcing:
         self._nc.close()
 
     # def sample_velocity(self, X, Y, Z, tstep=0, method='bilinear'):
-    def velocity(self, X, Y, Z, tstep=0, method='nearest'):
+    def velocity(self, X, Y, Z, tstep=0, method='bilinear'):
 
         i0 = self._grid.i0
         j0 = self._grid.j0
@@ -652,5 +652,5 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
 
 
 def sample3DUV(U, V, X, Y, K, A, method='bilinear'):
-    return (sample3D(U, X - 0.5, Y, K, A, method=method),
-            sample3D(V, X, Y - 0.5, K, A, method=method))
+    return (sample3D(U, X + 0.5, Y, K, A, method=method),
+            sample3D(V, X, Y + 0.5, K, A, method=method))
