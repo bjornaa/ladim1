@@ -61,6 +61,12 @@ class Grid:
         # print('Grid : imax, jmax, size = ',
         #      self.imax, self.jmax, self.imax*self.jmax)
 
+        # Limits for where velocities are defined
+        self.xmin = float(self.i0)
+        self.xmax = float(self.i1-1)
+        self.ymin = float(self.j0)
+        self.ymax = float(self.j1-1)
+
         # Slices
         #   rho-points
         self.I = slice(self.i0, self.i1)
@@ -132,8 +138,8 @@ class Grid:
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
-        return ((self.i0 -1.5 < X) & (X < self.i1 - 1.5) &
-                (self.j0 -1.5 < Y) & (Y < self.j1 - 1.5))
+        return ((self.xmin < X) & (X < self.xmax) &
+                (self.ymin < Y) & (Y < self.ymax))
 
     def onland(self, X, Y):
         """Returns True for points on land"""
@@ -148,6 +154,13 @@ class Grid:
         J = Y.round().astype(int) - self.j0
         return self.M[J, I] > 0
 
+    def xy2ll(self, X, Y):
+        return (sample2D(self.lon, X-self.i0, Y-self.j0),
+                sample2D(self.lat, X-self.i0, Y-self.j0))
+
+    def ll2xy(self, lon, lat):
+        Y, X = bilin_inv(lon, lat, self.lon, self.lat)
+        return X + self.i0, Y + self.j0
 
 # -----------------------------------------------
 # The Forcing class from the old forcing module
@@ -162,7 +175,6 @@ class Forcing:
 
     def __init__(self, config, grid):
 
-        logging.basicConfig(level=logging.INFO)
         logging.info("Initiating forcing")
 
         self._grid = grid  # Get the grid object, make private?
@@ -652,5 +664,5 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
 
 
 def sample3DUV(U, V, X, Y, K, A, method='bilinear'):
-    return (sample3D(U, X + 0.5, Y, K, A, method=method),
-            sample3D(V, X, Y + 0.5, K, A, method=method))
+    return (sample3D(U, X+0.5, Y, K, A, method=method),
+            sample3D(V, X, Y+0.5, K, A, method=method))
