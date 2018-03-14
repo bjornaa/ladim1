@@ -7,14 +7,8 @@
 
 time_control:
     # Start and stop of simulation
-    # use an alias &t0 if used again
-    start_time: &time0 1989-05-24 12:00:00
-    # stop_time:  1989-06-15 12:00:00
+    start_time: 1989-05-24 12:00:00
     stop_time:  1989-06-12 12:00:00
-    # Reference time for netcdf output
-    # by default set to start_time
-    # can be overridden explicitly
-    reference_time: *time0
 
 files:
     grid_file             : forcing_northsea.nc
