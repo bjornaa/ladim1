@@ -3,13 +3,9 @@
 
 time_control:
     # Start and stop of simulation
-    # use an alias &time0 if used again
-    start_time: &time0 2015-04-01 00:00:00
-    stop_time:  2015-04-01 12:00:00
-    # Reference time for netcdf output
-    # by default set to start_time
-    # can be overridden explicitly
-    reference_time: *time0
+    start_time     : 2015-04-01 00:00:00
+    stop_time      : 2015-04-01 12:00:00
+    reference_time : 2015-01-01
 
 files:
     grid_file             : /scratch/Data/NK800/file_0000.nc

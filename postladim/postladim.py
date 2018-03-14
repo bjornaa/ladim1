@@ -27,8 +27,15 @@ class InstanceVariable:
     def __getitem__(self, n: int) -> Any:
         """Get values at time step = n
         """
-        start = self.pf.start[n]
-        end = self.pf.end[n]
+        print("type =", type(n))
+        if isinstance(n, slice):
+            print("slice")
+            start = self.pf.start[n.start]
+            end = start + sum(self.pf.count[n])
+            print(start, end)
+        else:   # Integer
+            start = self.pf.start[n]
+            end = self.pf.end[n]
         return self.pf.nc.variables[self.name][start:end]
 
 
