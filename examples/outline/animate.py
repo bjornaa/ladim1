@@ -15,8 +15,8 @@ particle_file = 'outline.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 58, 150
-j0, j1 = 130, 191
+i0, i1 = 50, 180
+j0, j1 = 60, 110
 
 # ----------------
 
@@ -50,6 +50,9 @@ ax.contour(Xcell, Ycell, lat, levels=range(57, 64),
            colors='black', linestyles=':')
 ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2),
            colors='black', linestyles=':')
+
+# Draw the northern border
+ax.axhline(100, color='blue', lw=2)
 
 # Landmask
 constmap = plt.matplotlib.colors.ListedColormap([0.2, 0.6, 0.4])

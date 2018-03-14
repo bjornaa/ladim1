@@ -21,8 +21,10 @@ Horizontal sampling
 # 2010-09-30
 # -----------------------------------
 
-# import datetime
+from typing import Tuple
 import numpy as np
+
+
 
 # ---------------------
 
@@ -66,14 +68,8 @@ def sample2D2(F: np.ndarray, X, Y) -> np.ndarray:
 # --------------------------------------------------
 
 
-def sample2DU(F: np.ndarray, X, Y) -> np.ndarray:
-    return sample2D(F, X-0.5, Y)
-
-# --------------------------------------------------
-
-
-def sample2DV(F: np.ndarray, X, Y) -> np.ndarray:
-    return sample2D(F, X, Y-0.5)
+def sample2DUV(U, V, X, Y) -> Tuple[np.ndarray, np.ndarray]:
+    return sample2D(U, X+0.5, Y), sample2D(V, X, Y+0.5)
 
 # -------------------------------------------------
 

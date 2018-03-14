@@ -38,10 +38,8 @@ particle_release:
 gridforce:
     # Gridforce module
     module: ladim.gridforce.ROMS
-
-    # mapping: model name -> name in input file
-    # velocity: {U: u, V: v}
-    # ibm_forcing: {}
+    grid:
+        subgrid: [50, 150, 50, 100]
 
 output_variables:
     # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET
@@ -81,7 +79,7 @@ numerics:
     # Advection method: options =
     #        EF = Euler-Forward,
     #        RK2, RK4 = Runge-Kutta 2nd or 4th order
-    advection: RK2
+    advection: RK4
     # Horizontal diffusion coefficient [m2.s-1]
     #         zero = no diffusion
     diffusion: 0.0
