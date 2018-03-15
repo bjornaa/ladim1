@@ -51,7 +51,7 @@ grid = Grid(config)
 forcing = Forcing(config, grid)
 
 # --- Initiate particle releaser ---
-releaser = ParticleReleaser(config)
+releaser = ParticleReleaser(config, grid)
 
 #  --- Initiate the model state ---
 state = State(config)
