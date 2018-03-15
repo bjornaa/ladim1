@@ -6,10 +6,9 @@ This is example demonstrates the use of geographical coordinates with
 ``LADiM``. A line of particles is released along the 59° parallel from Scotland
 to Norway.
 
-Presently particle release positions are only accepted in grid coordinates. As
-the release file is typically made by a ``make_release`` script, this script
-can handle the conversion. This is done here, using a method ``ll2xy`` of the
-``Grid`` class in the ``gridforce`` module.
+To accept geographical coordinates in the release file, the configuration file
+should use the reserved terms "lon" and "lat" instead of "X" and "Y" in the
+variables list under the particle_release handle.
 
 For output, the ``ladim.yaml`` file shows how to write longitude and latitude.
 Basically, add "lon" and "lat" to the list of output instance variables and

@@ -58,10 +58,11 @@ class ParticleReleaser(Iterator):
         A.index = A['release_time']
 
         # Conversion from longitude, latitude to grid coordinates
-        if 'lon' in A.columns:
+        if 'lon' and 'lat' in A.columns:
             X, Y = grid.ll2xy(A['lon'], A['lat'])
-            print(X)
-
+            A['lon'] = X
+            A['lat'] = Y
+            A.rename(columns={'lon': 'X', 'lat': 'Y'}, inplace=True)
 
         # Remove everything after simulation stop time
         # A = A[A['release_time'] <= stop_time]   # Use < ?
