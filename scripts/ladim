@@ -3,7 +3,7 @@
 import argparse
 import logging
 import datetime
-import os.path
+from pathlib import Path
 
 #from .ladim import main
 
@@ -27,4 +27,29 @@ parser.add_argument(
 parser.add_argument('config_file', nargs='?', default='ladim.yaml')
 args = parser.parse_args()
 
-main(args.config_file, args.loglevel)
+# =============
+# Sanity check
+# =============
+
+if not Path(args.config_file).exists:
+    raise SystemExit('ERROR: Configuration file not found')
+
+# =========
+# Logging
+# =========
+
+logging.basicConfig(
+    level=args.loglevel,
+    format='%(levelname)s:%(module)s - %(message)s')
+
+# ===================
+# Run the simulation
+# ===================
+
+now = datetime.datetime.now().replace(microsecond=0)
+logging.info(f'LADiM simulation starting, wall time={now}')
+
+main(config_file=args.config_file, loglevel=args.loglevel)
+
+now = datetime.datetime.now().replace(microsecond=0)
+logging.info(f'LADiM simulation finished, wall time={now}')
