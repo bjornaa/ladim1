@@ -20,7 +20,7 @@ from netCDF4 import Dataset
 
 from .utilities import ingrid
 from .configuration import Config
-
+# from .gridforce import Grid
 
 def mylen(df: pd.DataFrame) -> int:
     """Number of rows in a DataFrame,
@@ -37,7 +37,7 @@ def mylen(df: pd.DataFrame) -> int:
 class ParticleReleaser(Iterator):
     """Particle Release Class"""
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, grid) -> None:
 
         start_time = pd.to_datetime(config['start_time'])
         stop_time = pd.to_datetime(config['stop_time'])
@@ -56,6 +56,12 @@ class ParticleReleaser(Iterator):
 
         # Use release_time as index
         A.index = A['release_time']
+
+        # Conversion from longitude, latitude to grid coordinates
+        if 'lon' in A.columns:
+            X, Y = grid.ll2xy(A['lon'], A['lat'])
+            print(X)
+
 
         # Remove everything after simulation stop time
         # A = A[A['release_time'] <= stop_time]   # Use < ?

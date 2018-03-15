@@ -43,6 +43,12 @@ class Grid:
         """Returns True for points at sea"""
         return self.grid.atsea(X, Y)
 
+    def ll2xy(self, lon, lat):
+        return self.grid.ll2xy(lon, lat)
+
+    def xy2ll(self, X, Y):
+        return self.grid.ll2xy(X, Y)
+
 
 class Forcing:
 

@@ -24,13 +24,13 @@ state:
     # ibm_variables: []
 
 particle_release:
-    variables: [release_time, X, Y, Z, nation]
+    variables: [release_time, lon, lat, Z]
     # Converters (if not float)
     # mult: int
     release_time: time
     # farmid: int
     nation: str
-    particle_variables: [release_time, nation]
+    particle_variables: [release_time]
 
 gridforce:
     # Gridforce module

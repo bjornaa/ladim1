@@ -21,15 +21,10 @@ Npart = 500
 Z = 5
 
 # Geographical positions along line
-lon = np.linspace(lon0, lon1, Npart)
-lat = np.linspace(lat0, lat1, Npart)
-
-# Compute grid coordinates
-config = dict(grid_file=grid_file, grid_args=[])
-grd = Grid(config)
-X, Y = grd.ll2xy(lon, lat)
+lons = np.linspace(lon0, lon1, Npart)
+lats = np.linspace(lat0, lat1, Npart)
 
 # Write to release file
 with open('latlon.rls', mode='w') as f:
-    for (x, y) in zip(X, Y):
-        f.write(f'1989-05-24T12 {x:7.3f} {y:7.3f} {Z:6.1f}\n')
+    for (lon, lat) in zip(lons, lats):
+        f.write(f'1989-05-24T12 {lon:8.5f} {lat:8.5f} {Z:4.1f}\n')
