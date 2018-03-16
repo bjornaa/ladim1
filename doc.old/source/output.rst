@@ -9,10 +9,10 @@ Different formats may be available in the future
 (in particular ROMS float format)
 
 
-LADIM format
+LADiM format
 ------------
 
-This is a modfication of the LADIM 2 format.
+This is a modfication of the LADiM 2 format.
 It is not backwards compatible, but scripts should be
 easy to modify. The change is done to follow the CF-standard
 as far as possible, and to increase flexibility.
@@ -28,7 +28,7 @@ individual trajectories.
 The dimensions are ``time`` and ``particle_dim``. NetCDF 3 format allows only
 one unlimited dimension. As the duration and output frequency are
 known at the start of a ladim simulation, the particle dimension may
-be unlimited. 
+be unlimited.
 
 An example of the structure of the output file `pyladim_out.nc` is
 shown below, in NetCDF CFL format::
@@ -93,7 +93,7 @@ The particles identifiers at a given time frame `n` can be found from the
 output file as ``pid_n = pid[pstart[n]:pstart[n]+pcount[n]]``. It has
 the following properties::
 
-  - pid_n is a sorted integer array 
+  - pid_n is a sorted integer array
   - pid_n[p] = pid[pstart[n]+p] >= p+1 with equality
      if all earlier particles are active at time frame n.
 
@@ -125,4 +125,3 @@ Example CDL
   // global attributes:
                 :history = "2013-05-10: created by LARMOD" ;
   }
-

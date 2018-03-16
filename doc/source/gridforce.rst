@@ -2,18 +2,18 @@
 ======================================================
 
 .. module:: gridforce
-   :synopsis: LADIM module for grid and forcing
+   :synopsis: LADiM module for grid and forcing
 
 .. default-domain:: py
 
 This module describes the grid used for particle tracking and interfaces the
-forcing from the ocean model. This is the only module in LADIM that depends
+forcing from the ocean model. This is the only module in LADiM that depends
 on the model. Interfacing other models is done by adding an alternative
 gridforce module. The module :mod:`gridforce_ROMS` implements a ROMS interface.
 The obstacle example shows how to make a simple gridforce module in idealized
 cases.
 
-Coordinate system in LADIM
+Coordinate system in LADiM
 --------------------------
 
 The coordinate system should be curvilinear orthogonal. Grids as used by

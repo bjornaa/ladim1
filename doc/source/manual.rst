@@ -11,4 +11,4 @@ User Manual
   workflow
   postprocessing
 
-How to use LADIM.
+How to use LADiM.

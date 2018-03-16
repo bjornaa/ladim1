@@ -1,4 +1,4 @@
-Variables in LADIM
+Variables in LADiM
 ==================
 
 To obtain the necessary flexibility of different IBMs and different

@@ -6,7 +6,7 @@ LADiM is the acronym of the Lagrangian Advection and DIffusion Model.
 It is an offline ocean particle tracking model. Presently it takes
 input from the `ROMS <http://www.myroms.org>`_ ocean model.
 
-This is the third incarnation of the LADIM model, also called LADIM3, at the
+This is the third incarnation of the LADiM model, also called LADIM3, at the
 `Institute of Marine Research <http://www.imr.no>`_. The first worked with a
 version of the ``Feltfile`` format used with the Princeton Ocean Model. The
 second version targeted NetCDF output from the ROMS model. Both these versions

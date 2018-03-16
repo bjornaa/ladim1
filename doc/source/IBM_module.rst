@@ -5,7 +5,7 @@
    :synopsis: Individual Based Module for particle behaviour
 
 An IBM (Individual Based Model) for biological behaviour or similar
-can be added to LADIM. As they may be very different, it is difficult to
+can be added to LADiM. As they may be very different, it is difficult to
 be general enough.
 
 The IBM variables are named by the configuration, and some get initial

@@ -1,8 +1,8 @@
 Post processing
 ===============
 
-LADIM comes with a simple python package postladim that can be used
-for visualisation and analysis of LADIM output.
+LADiM comes with a simple python package postladim that can be used
+for visualisation and analysis of LADiM output.
 
 The basic class is postladim.ParticleFile it is initiated
 by the following lines::
@@ -58,4 +58,3 @@ by the following lines::
 - name = particle variable
 
   - pf.variables[name][pid] returns the particle variable value
-

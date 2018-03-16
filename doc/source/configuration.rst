@@ -1,6 +1,6 @@
 .. .. author:: Bjørn Ådlandsvik <bjorn@imr.no>
 
-LADIM configuration
+LADiM configuration
 ===================
 
 The LADiM model system is highly configurable using a separate configuration file. The goal is that a user should not have to touch the code, every

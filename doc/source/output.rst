@@ -5,7 +5,7 @@ The particle distributions are written to NetCDF files. The frequency of
 output, the variables included and their attributes are determined by the
 configuration file.
 
-This is a not backwards compatible modification of the old LADIM format. The
+This is a not backwards compatible modification of the old LADiM format. The
 fundamental data structure is the same, so scripts should be easy to modify.
 The change is done to follow the CF-standard as far as possible, and to
 increase flexibility.
@@ -16,7 +16,7 @@ since we are more interested in the geographical distribution of particles at a
 given time that the individual trajectories. Chris Baker at NOAA has an
 interesting discussion on this topic and a suggestion at `github
 <https://github.com/NOAA-ORR-ERD/nc_particles/blob/master/
-nc_particle_standard.md>`_. The new LADIM format is closely related to this
+nc_particle_standard.md>`_. The new LADiM format is closely related to this
 suggestion.
 
 The format uses an indexed ragged array representation, suitable for both
@@ -115,4 +115,3 @@ Example CDL
 		  Advection and Diffusion Model, python version" ; :history = "Created
 		  by pyladim" ; :date = "2017-02-15" ;
   }
-
