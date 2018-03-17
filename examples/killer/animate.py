@@ -14,8 +14,8 @@ particle_file = 'killer.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 112, 118
-j0, j1 = 97, 103
+i0, i1 = 112, 120
+j0, j1 = 97, 105
 
 # ----------------
 

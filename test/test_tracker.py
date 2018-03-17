@@ -8,6 +8,10 @@ class Grid:
     def __init__(self):
         self.imax = 100
         self.jmax = 100
+        self.xmin = 0.0
+        self.xmax = self.imax-1.0
+        self.ymin = 0.0
+        self.ymax = self.jmax-1.0
 
     def sample_metric(self, X, Y):
         return 100*np.ones_like(X), 100*np.ones_like(Y)
@@ -46,6 +50,7 @@ def test_out_of_area():
     """
 
     config = dict(
+        warm_start_file='',
         start_time=np.datetime64('2017-02-10 20'),
         dt=600,
         particle_variables=[],

@@ -25,7 +25,7 @@ TODO: Make a plot of the different areas.
 
 Four simulations are possible::
 
-git status  ladim original.yaml    # The full original standard example grid
+  ladim original.yaml    # The full original standard example grid
   ladim fine.yaml        # Fine grid only
   ladim coarse.yaml      # Coarse grid only
   ladim nested.yaml      # Nesting the fine grid into the coarse
