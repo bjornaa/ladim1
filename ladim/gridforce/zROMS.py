@@ -1,5 +1,5 @@
 """
-Grid and Forcing for LADIM for the Regional Ocean Model System (ROMS)
+Grid and Forcing for LADiM for the Regional Ocean Model System (ROMS)
 
 """
 

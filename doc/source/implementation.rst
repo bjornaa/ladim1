@@ -1,4 +1,4 @@
-LADIM implementation
+LADiM implementation
 ====================
 
 .. toctree::

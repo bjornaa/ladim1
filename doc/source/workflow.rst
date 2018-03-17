@@ -1,9 +1,9 @@
 Workflow
 ========
 
-This chapter describes various possible workflows with LADIM, from simple usage
-to developing. Some terminology may be useful. An *installed* LADIM, has been
-installed by ``python setup.py install`` in the LADIM root directory, either
+This chapter describes various possible workflows with LADiM, from simple usage
+to developing. Some terminology may be useful. An *installed* LADiM, has been
+installed by ``python setup.py install`` in the LADiM root directory, either
 *system-wide* by sudo or personal by using the ``--prefix``-option,
 see :ref:`installation`. This is typical a working *stable* version in a
 usable state.
@@ -11,13 +11,13 @@ usable state.
 Unmodified use
 --------------
 
-The simplest workflow is to simply use the installed LADIM. Use a work
+The simplest workflow is to simply use the installed LADiM. Use a work
 directory, copy and modify a ``ladim.yaml`` file to point to your input files
 and adjust the simulation time and other settings. Run the simulation by the
 command ladim.
 
 The configuration file can be renamed and saved to make the model simulation
-reproducible. To run LADIM with a named configuration file, give the
+reproducible. To run LADiM with a named configuration file, give the
 file name as a command line argument to the ladim command.
 
 Possible complication: if you are in a python2 environment ,,,
@@ -56,7 +56,7 @@ with output from different ocean models or idealized settings. The
 methods for the :class:`Grid`  and :class:`Forcing` classes.
 The logo example, ``examples/logo``
 has a minimal idealized :mod:`gridforce`-module.
-In future, the LADIM distribution may contain a collection of different
+In future, the LADiM distribution may contain a collection of different
 gridforce modules and the choice be available by the configure mechanism
 in the same manner as for the :mod:`IBM`.
 
@@ -66,7 +66,7 @@ of as well.
 Maintenance and further development
 -----------------------------------
 
-For develop work on LADIM it is important to not mess up the stable installed
+For develop work on LADiM it is important to not mess up the stable installed
 version. This can be done by virtualization. Use a separate ``git`` branch for
 the development and a separate ``conda`` or ``virtualenv`` environment.
 The conda solution is described below.
@@ -86,7 +86,7 @@ Use ``conda env list`` to find the environments, find one with python 3, say
   python setup.py install
 
 This installs the developing version in the ``myenv``-environment.
-Do a ``python setup install`` after every change before running LADIM.
+Do a ``python setup install`` after every change before running LADiM.
 To get back to the stable environment do::
 
   git add ...
@@ -101,5 +101,5 @@ The next time, it is easier. It is enough to write::
   source activate $HOME/myenv
 
 If the development is a general improvement or important addition to the
-standard LADIM a pull request should be sent to github so that it can be
+standard LADiM a pull request should be sent to github so that it can be
 included in the stable version.

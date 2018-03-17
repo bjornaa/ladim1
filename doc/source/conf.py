@@ -102,7 +102,7 @@ html_theme = 'sphinxdoc'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = "LADIM Documentation"
+html_title = "LADiM Documentation"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -184,7 +184,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'ladim.tex', u'LADIM Documentation',
+  ('index', 'ladim.tex', u'LADiM Documentation',
    r'Bjørn Ådlandsvik\\Institute of Marine Research', 'manual'),
 ]
 
@@ -214,7 +214,7 @@ latex_logo = 'logo.png'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'ladim', 'LADIM Documentation',
+    ('index', 'ladim', 'LADiM Documentation',
      ['Bjørn Ådlandsvik'], 1)
 ]
 
@@ -228,7 +228,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'ladim', 'LADIM Documentation',
+  ('index', 'ladim', 'LADiM Documentation',
    'Bjørn Ådlandsvik', 'ladim', 'One line description of project.',
    'Miscellaneous'),
 ]

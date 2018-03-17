@@ -1,7 +1,7 @@
 Try LADiM
 =========
 
-With LADIM installed, it is time to test it out.
+With LADiM installed, it is time to test it out.
 
 Go to the examples directory, first examples/data and
 follow the instructions in the README file to download

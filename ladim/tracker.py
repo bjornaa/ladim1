@@ -1,6 +1,6 @@
 # ------------------------------------
 # tracker.py
-# Part of the LADIM Model
+# Part of the LADiM Model
 #
 # Bjørn Ådlandsvik, <bjorn@imr.no>
 # Institute of Marine Research

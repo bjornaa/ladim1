@@ -1,12 +1,12 @@
 .. configuration:
 
-:mod:`configuration` --- LADIM Configuration
+:mod:`configuration` --- LADiM Configuration
 ============================================
 
 .. module:: configuration
-   :synopsis: LADIM configuration
+   :synopsis: LADiM configuration
 
-LADIM's configuration system uses the :mod:`pyyaml` package to read the
+LADiM's configuration system uses the :mod:`pyyaml` package to read the
 configuration file. This allows comments, nested keywords,
 and flexibility in the sequence of keywords, missing or extra keyword,
 

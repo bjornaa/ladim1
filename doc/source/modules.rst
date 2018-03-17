@@ -1,8 +1,8 @@
-LADIM Modules
+LADiM Modules
 =============
 
 This chapter describes briefly the present implementation
-of LADIM. The code is modular and flexible with classes
+of LADiM. The code is modular and flexible with classes
 that can be modified or replaced for different purposes.
 
 The descriptions tries the requirements of the classes
@@ -16,7 +16,7 @@ be written separately.
 .. figure:: ladim_ecosystem.png
    :width: 500
 
-   The LADIM "eco"-system; the connections between the
+   The LADiM "eco"-system; the connections between the
    modules.
 
 .. toctree::
