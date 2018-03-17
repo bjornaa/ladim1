@@ -14,8 +14,8 @@ particle_file = 'station.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 100, 125
-j0, j1 = 84, 108
+i0, i1 = 100, 140
+j0, j1 = 84, 133
 
 # ----------------
 
@@ -63,7 +63,7 @@ particle_dist = ax.scatter(X, Y, c=Z, cmap=plt.get_cmap('plasma_r'))
 # title = ax.set_title(pf.time(0))
 cb = plt.colorbar(particle_dist)
 cb.ax.invert_yaxis()
-cb.set_label('Depth', fontsize=14)
+cb.set_label('Particle depth', fontsize=14)
 
 
 timestamp = ax.text(0.01, 0.96, pf.time(0), fontsize=15,

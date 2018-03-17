@@ -48,10 +48,10 @@ class Tracker:
         self.num_particles = len(X)
         # Make more elegant, need not do every time
         # Works for C-grid
-        self.xmin = grid.grid.xmin + 0.01
-        self.xmax = grid.grid.xmax - 0.01
-        self.ymin = grid.grid.ymin + 0.01
-        self.ymax = grid.grid.ymax - 0.01
+        self.xmin = grid.xmin + 0.01
+        self.xmax = grid.xmax - 0.01
+        self.ymin = grid.ymin + 0.01
+        self.ymax = grid.ymax - 0.01
 
         U = np.zeros(self.num_particles, dtype=float)
         V = np.zeros(self.num_particles, dtype=float)

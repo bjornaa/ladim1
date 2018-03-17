@@ -16,7 +16,10 @@ class Grid:
         # Import correct gridforce_module
         gridforce_module = importlib.import_module(config['gridforce_module'])
         self.grid = gridforce_module.Grid(config)
-        # Make it a proxy
+        self.xmin = self.grid.xmin
+        self.xmax = self.grid.xmax
+        self.ymin = self.grid.ymin
+        self.ymax = self.grid.ymax
 
     def sample_metric(self, X, Y):
         """Sample the metric coefficients"""

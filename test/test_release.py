@@ -9,6 +9,7 @@ def test_discrete() -> None:
 
     # Make a minimal config object
     config = {
+        'start': 'cold',
         'start_time': np.datetime64('2015-03-31 12'),
         'stop_time': np.datetime64('2015-04-04'),
         'dt': 3600,
@@ -17,7 +18,7 @@ def test_discrete() -> None:
         'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
         'release_type': 'discrete',
         'particle_variables': [],
-        }
+    }
 
     # Make a release file
     with open('release.rls', mode='w') as f:
@@ -25,7 +26,7 @@ def test_discrete() -> None:
         f.write('1 2015-04-01T00 111\n')
         f.write('3 "2015-04-03 12" 200\n')
     # Make the ParticleReleaser object
-    release = ParticleReleaser(config)
+    release = ParticleReleaser(config, grid=None)
     # Clean up the release file
     os.remove('release.rls')
 
@@ -55,6 +56,7 @@ def test_discrete() -> None:
 def test_continuous() -> None:
 
     config = {
+        'start': 'cold',
         'start_time': np.datetime64('2015-03-31 12'),
         'stop_time': np.datetime64('2015-04-04'),
         'dt': 3600,
@@ -64,7 +66,7 @@ def test_continuous() -> None:
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
-        }
+    }
 
     # Make a release file
     with open('release.rls', mode='w') as f:
@@ -73,7 +75,7 @@ def test_continuous() -> None:
         f.write('3 "2015-04-02" 200\n')
 
     # Make the ParticleReleaser object
-    release = ParticleReleaser(config)
+    release = ParticleReleaser(config, grid=None)
     # Clean out the release file
     os.remove('release.rls')
 
@@ -99,6 +101,7 @@ def test_late_start() -> None:
     """Model start after first release in file"""
 
     config = {
+        'start': 'cold',
         'start_time': np.datetime64('2015-04-03 00'),
         'stop_time': np.datetime64('2015-04-05 13'),
         'dt': 3600,
@@ -108,7 +111,7 @@ def test_late_start() -> None:
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
-        }
+    }
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
@@ -124,7 +127,7 @@ def test_late_start() -> None:
         f.write('2 2015-04-05 550\n')
         f.write('3 2015-04-06 600\n')
         f.write('2 2015-04-06 650\n')
-    release = ParticleReleaser(config)
+    release = ParticleReleaser(config, grid=None)
     os.remove('release.rls')
 
     # Correct release times
@@ -155,6 +158,7 @@ def test_too_late_start() -> None:
     """Model start after last release in file"""
 
     config = {
+        'start': 'cold',
         'start_time': np.datetime64('2015-05-02 12'),
         'stop_time': np.datetime64('2015-05-03 12'),
         'particle_release_file': 'release.rls',
@@ -163,7 +167,7 @@ def test_too_late_start() -> None:
         'release_type': 'discrete',
         'dt': 3600,
         'particle_variables': []
-        }
+    }
 
     # Make a release file
     with open('release.rls', mode='w') as f:
@@ -171,7 +175,7 @@ def test_too_late_start() -> None:
 
     # Release should quit with SystemExit
     with pytest.raises(SystemExit):
-        ParticleReleaser(config)
+        ParticleReleaser(config, grid=None)
 
     # Clean up
     os.remove('release.rls')
@@ -181,6 +185,7 @@ def test_early_stop() -> None:
     """Model stop before last release in release file"""
 
     config = {
+        'start': 'cold',
         'start_time': np.datetime64('2015-04-02'),
         'stop_time': np.datetime64('2015-04-05'),
         'dt': 3600,
@@ -190,14 +195,14 @@ def test_early_stop() -> None:
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
-        }
+    }
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
         f.write('2 2015-04-01 100\n')
         f.write('3 2015-04-03 200\n')
         f.write('1 2015-04-08 300\n')
-    release = ParticleReleaser(config)
+    release = ParticleReleaser(config, grid=None)
     os.remove('release.rls')
 
     # Correct release times
@@ -225,6 +230,7 @@ def test_too_early_stop() -> None:
     """Model stop before first release in release file"""
 
     config = {
+        'start': 'cold',
         'start_time': np.datetime64('2015-03-02'),
         'stop_time': np.datetime64('2015-03-05'),
         'dt': 3600,
@@ -234,7 +240,7 @@ def test_too_early_stop() -> None:
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
-        }
+    }
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
@@ -243,7 +249,7 @@ def test_too_early_stop() -> None:
 
     # Should exit
     with pytest.raises(SystemExit):
-        ParticleReleaser(config)
+        ParticleReleaser(config, grid=None)
 
     # Clean up
     os.remove('release.rls')
@@ -253,6 +259,7 @@ def test_subgrid() -> None:
     """Particle release outside subgrid should be ignored"""
 
     config = {
+        'start': 'cold',
         'start_time': np.datetime64('2015-03-01'),
         'stop_time': np.datetime64('2015-03-03'),
         'dt': 3600,
@@ -263,7 +270,7 @@ def test_subgrid() -> None:
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
         'grid_args': dict(subgrid=[100, 120, 10, 20])
-        }
+    }
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
@@ -271,7 +278,7 @@ def test_subgrid() -> None:
         f.write('3 2015-03-01 200 30\n')   # Outside
 
     # Make the ParticleReleaser object
-    release = ParticleReleaser(config)
+    release = ParticleReleaser(config, grid=None)
     # Clean out the release file
     os.remove('release.rls')
 

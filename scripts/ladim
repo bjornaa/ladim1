@@ -3,13 +3,11 @@
 import argparse
 import logging
 import datetime
-import os.path
+from pathlib import Path
 
-from ladim.configuration import configure
-from ladim.gridforce import Grid, Forcing
-from ladim.release import ParticleReleaser
-from ladim.state import State
-from ladim.output import OutPut
+#from .ladim import main
+
+from ladim import main
 
 # ====================
 # Parse command line
@@ -29,67 +27,29 @@ parser.add_argument(
 parser.add_argument('config_file', nargs='?', default='ladim.yaml')
 args = parser.parse_args()
 
-# ==================
-# Initiate the model
-# ==================
+# =============
+# Sanity check
+# =============
 
-# --- Logging ---
+if not Path(args.config_file).exists:
+    raise SystemExit('ERROR: Configuration file not found')
+
+# =========
+# Logging
+# =========
+
 logging.basicConfig(
     level=args.loglevel,
     format='%(levelname)s:%(module)s - %(message)s')
 
-# --- Configuration ---
-if os.path.isfile(args.config_file):
-    now = datetime.datetime.now().replace(microsecond=0)
-    logging.info(f'LADiM simulation starting: {now}')
-else:
-    raise SystemExit('ERROR: Configuration file not found')
-config = configure(args.config_file)
-
-# --- Initiate the grid and the forcing ---
-grid = Grid(config)
-forcing = Forcing(config, grid)
-
-# --- Initiate particle releaser ---
-releaser = ParticleReleaser(config, grid)
-
-#  --- Initiate the model state ---
-state = State(config)
-
-# --- Initiate the output ---
-out = OutPut(config, releaser)
-# out.write_particle_variables(releaser)
-
-# ==============
-# Main time loop
-# ==============
-
-logging.info("Starting time loop")
-for step in range(config['numsteps']+1):
-
-    # --- Update forcing ---
-    forcing.update(step)
-
-    # --- Particle release ---
-    if step in releaser.steps:
-        V = next(releaser)
-        state.append(V)
-
-    # --- Save to file ---
-    # Output before update???
-    # Have an optional initial output
-    if step % config['output_period'] == 0:
-        out.write(state, grid)
-
-    # --- Update the model state ---
-    state.update(grid, forcing)
-
-# ========
-# Clean up
-# ========
+# ===================
+# Run the simulation
+# ===================
 
 now = datetime.datetime.now().replace(microsecond=0)
-logging.info(f'End of simulation, time={now}')
+logging.info(f'LADiM simulation starting, wall time={now}')
 
-forcing.close()
-# out.close()
+main(config_file=args.config_file, loglevel=args.loglevel)
+
+now = datetime.datetime.now().replace(microsecond=0)
+logging.info(f'LADiM simulation finished, wall time={now}')

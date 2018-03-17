@@ -18,6 +18,11 @@ class Grid(object):
         self.imax = i1 - i0
         self.jmax = j1 - j0
 
+        self.xmin = float(i0)
+        self.xmax = i1 - 1.0
+        self.ymin = float(j0)
+        self.ymax = j1 - 1.0
+
         print(f"Virtual grid: {self.imax} x {self.jmax}")
 
         # Geographic coordinates
