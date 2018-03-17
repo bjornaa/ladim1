@@ -63,7 +63,6 @@ particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15,
                     transform=ax.transAxes)
 
-
 # Update function
 def animate(t):
     X, Y = pf.position(t)
@@ -73,7 +72,6 @@ def animate(t):
 
 
 anim_running = True
-
 
 def onClick(event):
     global anim_running
