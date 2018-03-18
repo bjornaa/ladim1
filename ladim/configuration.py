@@ -19,22 +19,18 @@ from netCDF4 import Dataset, num2date
 Config = Dict[str, Any]   # type of the config dictionary
 
 
-def configure(config_file: str) -> Config:
+def configure(config_stream) -> Config:
 
     config: Config = dict()
 
     # --- Read the configuration file ---
     # TODO: use logging.ERROR instead of print
+
     try:
-        with open(config_file, encoding='utf8') as fp:
-            conf = yaml.safe_load(fp)
-    except FileNotFoundError:
-        print('ERROR: ',
-              f'Configuration file {config_file} not found')
-        raise SystemExit(1)
+        conf = yaml.safe_load(config_stream)
     except yaml.parser.ParserError:
         print('ERROR: ',
-              f'Can not parse configuration file {config_file}')
+              f'Can not parse configuration')
         raise SystemExit(2)
 
     # ----------------
@@ -56,7 +52,7 @@ def configure(config_file: str) -> Config:
     # Files
     # -------------
     logging.info('Configuration: Files')
-    logging.info(f'    {"config_file":15s}: {config_file}')
+    logging.info(f'    {"config_stream":15s}: {config_stream}')
     for name in ['grid_file', 'input_file',
                  'particle_release_file', 'output_file']:
         config[name] = conf['files'][name]

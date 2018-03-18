@@ -12,7 +12,7 @@ from .release import ParticleReleaser
 from .state import State
 from .output import OutPut
 
-def main(config_file='ladim.yaml', loglevel=logging.INFO):
+def main(config_stream, loglevel=logging.INFO):
 
     # ==================
     # Initiate the model
@@ -25,7 +25,7 @@ def main(config_file='ladim.yaml', loglevel=logging.INFO):
 
     # --- Configuration ---
 
-    config = configure(config_file)
+    config = configure(config_stream)
 
     # --- Initiate the grid and the forcing ---
     grid = Grid(config)

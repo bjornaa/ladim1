@@ -47,9 +47,15 @@ logging.basicConfig(
 # ===================
 
 now = datetime.datetime.now().replace(microsecond=0)
-logging.info(f'LADiM simulation starting, wall time={now}')
+logging.info(f'LADiM simulation starting, wafll time={now}')
 
-main(config_file=args.config_file, loglevel=args.loglevel)
+try:
+    fp = open(args.config_file, encoding='utf8')
+except FileNotFoundError:
+    print('ERROR: ', f'Configuration file {config_file} not found')
+    raise SystemExit(1)
+
+main(config_stream=fp, loglevel=args.loglevel)
 
 now = datetime.datetime.now().replace(microsecond=0)
 logging.info(f'LADiM simulation finished, wall time={now}')
