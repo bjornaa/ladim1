@@ -14,8 +14,8 @@ particle_file = 'streak.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
-i0, i1 = 100, 130
-j0, j1 = 90, 115
+i0, i1 = 100, 140
+j0, j1 = 85, 130
 
 # ----------------
 
@@ -55,10 +55,15 @@ constmap = plt.matplotlib.colors.ListedColormap([0.2, 0.6, 0.4])
 M = np.ma.masked_where(M > 0, M)
 plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 
-# Plot initial particle distribution
+# Scatter plot, colour = particle age
 X, Y = pf.position(0)
-particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
-# title = ax.set_title(pf.time(0))
+pids = pf['pid'][0]
+C = pf['release_time'][pids]/86400  # release time, reverse to get age
+vmax = pf.num_times / 24   # Maximun particle age in days
+pdistr = ax.scatter(
+    X, Y, c=C[::-1], vmin=0, vmax=vmax, cmap=plt.get_cmap('plasma_r'))
+cb = plt.colorbar(pdistr)
+cb.set_label('Particle age [days]', fontsize=14)
 timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15,
                     transform=ax.transAxes)
 
@@ -66,9 +71,11 @@ timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15,
 # Update function
 def animate(t):
     X, Y = pf.position(t)
-    particle_dist.set_data(X, Y)
+    pdistr.set_offsets(np.vstack((X,Y)).T)
+    C = pf['release_time'][pf['pid'][t]] / 86400.0
+    pdistr.set_array(C[::-1])
     timestamp.set_text(pf.time(t))
-    return particle_dist, timestamp
+    return pdistr, timestamp
 
 
 # Do the animation

@@ -68,4 +68,4 @@ numerics:
     advection: RK2
     # Horizontal diffusion coefficient [m2.s-1]
     #         zero = no diffusion
-    diffusion: 0.0
+    diffusion: 5.0
