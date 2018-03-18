@@ -15,7 +15,7 @@ time_control:
 files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_0014.nc
-    particle_release_file : streak.rls
+    particle_release_file : restart.rls
     output_file           : split.nc
 
 state:

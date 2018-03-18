@@ -9,6 +9,8 @@
 import os
 import logging
 import datetime
+import re
+# from pathlib import Path
 from typing import Any, Dict
 import numpy as np
 from netCDF4 import Dataset
@@ -27,23 +29,34 @@ class OutPut:
 
         logging.info('Initializing output')
 
+        self.filename = config['output_file']
         self.instance_variables = config['output_instance']
         self.instance_count = 0
         self.outcount = -1    # No output yet
-        if config['skip_initial']:
-            self.outcount = -2
+        self.file_counter = -1   # No file yer
+        self.skip_output = config['skip_initial']
         self.numrec = config['output_numrec']
         if self.numrec == 0:
             self.multi_file = False
             self.numrec = 999999  # A large number
         else:
             self.multi_file = True
+            # If multi_file and output_file ends with number "dddd.nc"
+            # start output number with dddd, else use zero
+            fname0, ext = os.path.splitext(self.filename)
+            # fname = f'{fname0}_{self.file_counter:04d}{ext}'
+            patt = r"_[0-9]{4}$"  # '_dddd' at end of string
+            m = re.search(patt, fname0)
+            # start with number in output_name
+            if m:
+                self.filename = fname0[:-5] + ext   # Strip the number
+                self.file_counter = int(m.group(0)[1:]) - 1
+
         self.dt = config['dt']
         self.config = config    # Better to extract the things needed
         self.release = release
-        self.file_counter = -1
         self.num_output = config['num_output']
-        self.nc = None   # No open netCDF file yet
+        self.nc = None   # No open netCD file yet
          # Indicator for lon/lat output
         self.lonlat = ('lat' in self.instance_variables or
                        'lon' in self.instance_variables)
@@ -53,9 +66,12 @@ class OutPut:
     def write(self, state: State,  grid: Grid) -> None:
         """Write the model state to NetCDF"""
 
-        self.outcount += 1
-        if self.outcount < 0:  # skip_initial == True
+        # May skip initial output
+        if self.skip_output:
+            self.skip_output = False
             return
+
+        self.outcount += 1
         t = self.outcount % self.numrec   # in-file record counter
 
         logging.debug("Writing: timestep, timestamp = {} {}".
@@ -114,10 +130,10 @@ class OutPut:
         """Define a NetCDF output file"""
 
         # Generate file name
-        fname = self.config['output_file']
+        fname = self.filename
         if self.multi_file:
-            # fname = fname0.nc -> fname0_xxxx.nc
-            fname0, ext = os.path.splitext(fname)
+            # fname0 -> fname0_dddd.nc
+            fname0, ext = os.path.splitext(self.filename)
             fname = f'{fname0}_{self.file_counter:04d}{ext}'
 
         logging.debug(f"Defining output netCDF file: {fname}")

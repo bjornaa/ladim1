@@ -11,7 +11,7 @@ from postladim import ParticleFile
 # Files
 unsplit_file = 'unsplit.nc'
 split_file = 'split_0002.nc'
-restarted_file = 'restart_0000.nc'
+restarted_file = 'restart_0002.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
