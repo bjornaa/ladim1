@@ -6,13 +6,15 @@
 
 # Python stuff
 *.pyc
-__pycache__
+__pycache__/*
 *.egg-info/*
 dist/*
+.ipynb_checkpoints/
 
 # Data files
 examples/data/*
 !examples/data/README.rst
+!examples/data/download.py
 *.nc
 *.npy
 

@@ -20,7 +20,8 @@ def main(config_stream, loglevel=logging.INFO):
 
     # --- Logging ---
     logging.basicConfig(
-        level=loglevel,
+        # level=loglevel,
+        level=logging.DEBUG,
         format='%(levelname)s:%(module)s - %(message)s')
 
     # --- Configuration ---

@@ -1,11 +1,16 @@
 #! /usr/bin/env python
 
+"""Main script for running the LADiM particle tracking model"""
+
+# ----------------------------------
+# Bjørn Ådlandsvik <bjorn@imr.no>
+# Institute of Marine Research
+# ----------------------------------
+
 import argparse
 import logging
 import datetime
 from pathlib import Path
-
-#from .ladim import main
 
 from ladim import main
 
@@ -31,8 +36,9 @@ args = parser.parse_args()
 # Sanity check
 # =============
 
-if not Path(args.config_file).exists:
-    raise SystemExit('ERROR: Configuration file not found')
+if not Path(args.config_file).exists():
+    raise SystemExit(
+        f'ERROR: Configuration file {args.config_file} not found')
 
 # =========
 # Logging
@@ -47,14 +53,9 @@ logging.basicConfig(
 # ===================
 
 now = datetime.datetime.now().replace(microsecond=0)
-logging.info(f'LADiM simulation starting, wafll time={now}')
+logging.info(f'LADiM simulation starting, wall time={now}')
 
-try:
-    fp = open(args.config_file, encoding='utf8')
-except FileNotFoundError:
-    print('ERROR: ', f'Configuration file {config_file} not found')
-    raise SystemExit(1)
-
+fp = open(args.config_file, encoding='utf8')
 main(config_stream=fp, loglevel=args.loglevel)
 
 now = datetime.datetime.now().replace(microsecond=0)
