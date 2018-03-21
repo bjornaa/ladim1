@@ -1,0 +1,83 @@
+Hva er nytt med LADiM, 2018-03-21
+---------------------------------
+
+Jeg har i det siste jobbet en del med LADiM. To relaterte bugfikser + generelle
+forbedringer. Versjonen oppdateres til 1.1 og tas inn i rhea. Alt gammelt
+skal etter planen fungere, men klok av skade er forige versjon tilgjengelig.
+Bruk `source activate ladim1.0` for å få tak i denne.
+
+1. Fikset bug i Runge-Kutta adveksjon som kunne gi kræsj. Årsak, LADiM prøvde
+   iblant å sample hastighet utenfor griddet for partikler nær randen.
+
+2. Fikset bug i hastighetsinterpolasjon. Det var en offset i posisjon, slik at
+   hastigheten ble samplet på feilt sted. Kunne være problematisk nær land og nær rand.
+
+3. Det er nå mulig med splittet output. Dette styres av en valfritt nøkkelord
+   numrec under output_variables i yaml-filen. Default = ingen splitting, mens
+   numrec angir antall output tidsteg før splitting og en ny fil opprettes.
+
+   Hvis output_file er a.nc og numrec er satt, får filene navn a_0000.nc,
+   a_0001.nc, ... Unntak er hvis output_file er av format a_0020.nc, understrek
+   + 4 siffre før extension, da blir navnene a_0020.nc, a_0021.nc, ....
+   Se example/restart.
+
+4. LADiM har nå et restart/varmstart opplegg. Legg til et filnavn
+   warm_start_file i files-seksjonen i konfigurasjonsfilen. Legg til en liste
+   med warm_start_variables under state om nødvendig. For lakselus f.eks.
+   brukes warm_start_variables: [X, Y, Z, super, age]. Varmstartfilen må
+   selvsagt inneholde de variable som trengs.
+
+   Varmstart bruker siste fordelingen i varmstartfilen og får problem
+   hvis filen er ufullstendig. Tidspunkt for varmstart bestemmes av
+   tidspunkt i filen, start_time i yaml-filen overstyres og kan stå uendret.
+   Initialfordelingen skrives *ikke* ut ved varm-start. Dette gjør at
+   output-filen blir en naturlig fortsettelse av varmstartfilen uten
+   dublisering. Riktig navnesetting på output_file under files gjør at splittet
+   output fortsetter uten faseforskyvning. Eksempel: fullstendig
+   warm_start_file = a_0020.nc og output_file = a_0021.nc. Se example/restart.
+
+5. LADiM kan nå ta lengde/bredde i stedet for X, Y i release-fil.
+   Må oppgi nøkkelord lon og lat i variables under particle_release i
+   konfigurasjonsfilen. Se example/lonlat. En liten advarsel, ved utslipp av
+   partikler nær land kan posisjonen havne på land i modellens landmaske.
+
+6. Uavhenging av 5 kan LADiM nå skrive lengde/bredde i tillegg til eller i
+   stedet for X og Y i output. Oppgi nøkkelord lon og lat i instance-listen
+   under output_variables i konfigurasjonsfilen. Ta og med attributter for lon
+   og lat. Se example/lonlat.
+
+7. Forenklet tidsangivelse. For å kunne bruke starttidspunkt som
+   referansetidspunkt bruktes tidliger litt yaml-kløning med *time0 og &time0.
+   Dette er nå unødvendig og avlegs (men virker fortsatt). Hvis
+   referansetidspunkt mangler, blir det automatisk satt til starttidspunkt. En
+   annen ting er at det kan være fordelaktig med eksplisitt referansetidspunkt
+   i forbindelse med restart.
+
+8. Det er nå en fil ladim/main.py med en funksjon main som ugjør
+   hovedprogrammet til LADiM. Skriptet ladim er nå en liten snutt som kaller
+   denne funksjonen. Kjøring fra kommandolinjen skal virke uendret. Dette gjør
+   det mulig å kjøre LADiM direkte fra python program. Spesielt er dette greitt
+   for å kjøre LADiM fra en jupyter notebook. Se example/jupyter. Takk til Pål
+   for denne måten å gjøre det på.
+
+9. Forenkling av postladim. Å ta ut data fra partikkelfil ved tidspunkt n er nå
+   forenklet. I stedet for å skrive pf.variables['X'][n], er det nå nok å
+   skrive pf['X'][n]. Alle eksempler skal være oppdatert til denne notasjonen.
+   Den gamle måten er avlegs (obsolete) men virker fremdeles. Det er og innført
+   attributter pf.start og pf.end som forenkler bruk av underliggende
+   netcdf-nivå. For eksempel,
+     pf['X'][n] = pf.nc.variables['X'][pf.start[n]:pf.end[n]]
+
+   Er fristet til å forenkle notasjonen videre til pf.X[n], slik som pandas.
+   Men dette kan gi trøbbel med uheldige valg av variabel-navn. For eksempel
+   hvis en har en variabel nc, så gir pf.nc en konflikt mellom underliggende
+   netcdf-fil og pf['nc'].
+
+10. Pål har funnet en smart måte å animere partikkelfordeling i jupyter
+    notebook. Ved hjelp av kommando HTML(anim.to_html5_video()) så kjøres
+    animasjonen i en notebook og en kan etterpå gå fram og tilbake i tid med en
+    "slider" eller lagre animasjonen i mp4-format. Kjør jupyter notebook
+    animate.ipynb fra examples/line-katalogen, eller kopier og modifiser for
+    egne kjøringer. All tilpasning gjøres i "Basic settings"-cellen. I
+    examples/jupyter er det et mer fullstendig eksempel som også kjører
+    LADiM.

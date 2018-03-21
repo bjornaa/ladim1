@@ -57,10 +57,9 @@ class OutPut:
         self.release = release
         self.num_output = config['num_output']
         self.nc = None   # No open netCD file yet
-         # Indicator for lon/lat output
+        # Indicator for lon/lat output
         self.lonlat = ('lat' in self.instance_variables or
                        'lon' in self.instance_variables)
-
 
     # ----------------------------------------------
     def write(self, state: State,  grid: Grid) -> None:
@@ -112,7 +111,6 @@ class OutPut:
                 self.nc.variables['lat'][start:end] = lat
             else:
                 self.nc.variables[name][start:end] = state[name]
-
 
         # Update counters
         # self.outcount += 1

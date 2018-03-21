@@ -106,8 +106,8 @@ class Tracker:
         return U, V
 
     def RK2a(self,
-            forcing: Forcing,
-            state: State) -> Velocity:
+             forcing: Forcing,
+             state: State) -> Velocity:
         """Runge-Kutta second order = Heun scheme"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
@@ -121,8 +121,8 @@ class Tracker:
         return U, V
 
     def RK2b(self,
-            forcing: Forcing,
-            state: State) -> Velocity:
+             forcing: Forcing,
+             state: State) -> Velocity:
         """Runge-Kutta second order = Heun scheme
 
         This version does not sample velocities outside the grid
@@ -143,8 +143,8 @@ class Tracker:
     RK2 = RK2b
 
     def RK4a(self,
-            forcing: Forcing,
-            state: State) -> Velocity:
+             forcing: Forcing,
+             state: State) -> Velocity:
         """Runge-Kutta fourth order advection"""
 
         X, Y, Z = state['X'], state['Y'], state['Z']
@@ -210,7 +210,6 @@ class Tracker:
         return U, V
 
     RK4 = RK4b
-
 
     def diffuse(self) -> Velocity:
         """Random walk diffusion"""

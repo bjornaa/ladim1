@@ -42,7 +42,7 @@ Yb = np.arange(j0-0.5, j1)
 pf = ParticleFile(particle_file)
 
 # Implement the condition, here pid < 500
-pids = pf.variables['pid'][t]
+pids = pf['pid'][t]
 # I = pids < 500      # The western half of the particles
 # I = pids % 5 == 0   # Alternative condition, every 5th particle
 I = np.in1d(pids, [10, 100, 300])  # Explisit subset of pids

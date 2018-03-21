@@ -20,9 +20,6 @@ class Grid:
         self.X0 = X0 / self.dx
         self.R = R / self.dy
 
-        print(self.imax, self.jmax)
-
-
         self.xmin = 0.0
         self.ymin = 0.0
         self.xmax = float(self.imax) - 1.0

@@ -29,7 +29,6 @@ class Grid:
         self.xmin, self.ymin = 0.0, 0.0
         self.xmax, self.ymax = self.imax-1.0, self.jmax-1.0
 
-
         # Make the sea mask
         self.II, self.JJ = np.meshgrid(
             np.arange(self.imax), np.arange(self.jmax))

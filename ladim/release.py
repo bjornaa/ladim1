@@ -22,6 +22,7 @@ from .utilities import ingrid
 from .configuration import Config
 # from .gridforce import Grid
 
+
 def mylen(df: pd.DataFrame) -> int:
     """Number of rows in a DataFrame,
 
