@@ -47,8 +47,8 @@ Bruk `source activate ladim1.0` for å få tak i denne.
    og lat. Se example/lonlat.
 
 7. Forenklet tidsangivelse. For å kunne bruke starttidspunkt som
-   referansetidspunkt bruktes tidliger litt yaml-kløning med *time0 og &time0.
-   Dette er nå unødvendig og avlegs (men virker fortsatt). Hvis
+   referansetidspunkt bruktes tidliger litt yaml-kløning med "\*time0" og
+   "\&time0". Dette er nå unødvendig og avlegs (men virker fortsatt). Hvis
    referansetidspunkt mangler, blir det automatisk satt til starttidspunkt. En
    annen ting er at det kan være fordelaktig med eksplisitt referansetidspunkt
    i forbindelse med restart.
@@ -65,7 +65,8 @@ Bruk `source activate ladim1.0` for å få tak i denne.
    skrive pf['X'][n]. Alle eksempler skal være oppdatert til denne notasjonen.
    Den gamle måten er avlegs (obsolete) men virker fremdeles. Det er og innført
    attributter pf.start og pf.end som forenkler bruk av underliggende
-   netcdf-nivå. For eksempel,
+   netcdf-nivå. For eksempel::
+
      pf['X'][n] = pf.nc.variables['X'][pf.start[n]:pf.end[n]]
 
    Er fristet til å forenkle notasjonen videre til pf.X[n], slik som pandas.
