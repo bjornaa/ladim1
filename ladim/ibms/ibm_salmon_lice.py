@@ -34,7 +34,7 @@ class IBM:
         state.age += state.temp * state.dt / 86400
 
         # Light at depth
-        lon, lat = grid.lonlat(state.X, state.Y)
+        lon, lat = grid.lonlat(state.X, state.Y, method='nearest')
         light0 = light.surface_light(state.timestamp, lon, lat)
         Eb = light0 * np.exp(-self.k*state.Z)
 

@@ -99,7 +99,7 @@ class OutPut:
 
         # Compute lon, lat if needed
         if self.lonlat:
-            lon, lat = grid.lonlat(state.X, state.Y)
+            lon, lat = grid.xy2ll(state.X, state.Y)
 
         start = pstart - self.pstart0
         end = pstart + pcount - self.pstart0

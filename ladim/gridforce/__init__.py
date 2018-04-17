@@ -29,9 +29,9 @@ class Grid:
         """Return the depth of grid cells"""
         return self.grid.sample_depth(X, Y)
 
-    def lonlat(self, X, Y):
+    def lonlat(self, X, Y, method=None):
         """Return the longitude and latitude from grid coordinates"""
-        return self.grid.lonlat(X, Y)
+        return self.grid.lonlat(X, Y, method=method)
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
@@ -50,7 +50,7 @@ class Grid:
         return self.grid.ll2xy(lon, lat)
 
     def xy2ll(self, X, Y):
-        return self.grid.ll2xy(X, Y)
+        return self.grid.xy2ll(X, Y)
 
 
 class Forcing:

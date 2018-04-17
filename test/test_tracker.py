@@ -20,13 +20,13 @@ class Grid:
         return 50.0*np.ones_like(X)
 
     def ingrid(self, X, Y):
-        return ((1 <= X) & (X <= self.imax-2) &
-                (1 <= Y) & (Y <= self.jmax-2))
+        return ((self.xmin <= X) & (X <= self.xmax) &
+                (self.ymin <= Y) & (Y <= self.ymax))
 
     def atsea(self, X, Y):
         return np.ones(len(X), dtype='bool')
 
-    def lonlat(self, X, Y):
+    def lonlat(self, X, Y, method=None):
         return 5.0*np.ones(len(X)), 60.0*np.ones(len(X))
 
 

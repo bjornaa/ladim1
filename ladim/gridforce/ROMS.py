@@ -152,10 +152,14 @@ class Grid:
         J = Y.round().astype(int) - self.j0
         return self.H[J, I]
 
-    def lonlat(self, X, Y):
+    def lonlat(self, X, Y, method='bilinear'):
         """Return the longitude and latitude from grid coordinates"""
-        return (sample2D(self.lon, X - self.i0, Y - self.j0),
-                sample2D(self.lat, X - self.i0, Y - self.j0))
+        if method == 'bilinear':   # More accurate
+            return self.xy2ll(X, Y)
+        else:  # containing grid cell, less accurate
+            I = X.round().astype('int') - self.i0
+            J = Y.round().astype('int') - self.j0
+            return self.lon[J, I], self.lat[J, I]
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
