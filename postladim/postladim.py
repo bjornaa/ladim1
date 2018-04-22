@@ -1,5 +1,4 @@
 """Main class ParticleFile for reading LADiM output
-
 """
 
 # ---------------------------------
@@ -62,7 +61,14 @@ class ParticleFile:
     # Add reasonable exception if file not exist
     # or file is not a particle file
     def __init__(self, filename: str) -> None:
-        self.nc = Dataset(filename, mode='r')
+        try:
+            self.nc = Dataset(filename, mode='r')
+        except FileNotFoundError:
+            raise SystemExit(f'Particlefile {filename} not found')
+        except OSError:
+            raise SystemExit(f'File {filename} is not a particle file')
+
+
         # Number of particles per time
         self.count = self.nc.variables['particle_count'][:]
         # End and start of segment with particles at a given time

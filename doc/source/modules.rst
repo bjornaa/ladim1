@@ -22,6 +22,7 @@ be written separately.
 .. toctree::
    :maxdepth: 2
 
+   main_module.rst
    configuration_module.rst
    gridforce.rst
    release_module.rst

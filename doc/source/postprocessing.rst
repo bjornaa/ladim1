@@ -1,10 +1,10 @@
 Post processing
 ===============
 
-LADiM comes with a simple python package postladim that can be used
+LADiM comes with a simple python package ``postladim`` that can be used
 for visualisation and analysis of LADiM output.
 
-The basic class is postladim.ParticleFile it is initiated
+The basic class is ``postladim.ParticleFile``, it is initiated
 by the following lines::
 
   from postladim import ParticleFile

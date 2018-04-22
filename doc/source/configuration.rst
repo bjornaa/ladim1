@@ -30,4 +30,6 @@ yaml-files by the extension and will automatically produce spaces when you hit t
 An example configuration file
 -----------------------------
 
-Below is an example configuration file,
+Below is an example configuration file, :file:`models/salmon_lice/ladim.yaml`.
+
+.. literalinclude:: ../../models/salmon_lice/ladim.yaml
