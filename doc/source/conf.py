@@ -185,7 +185,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'ladim.tex', u'LADiM Documentation',
-   r'Bjørn Ådlandsvik\\Institute of Marine Research', 'manual'),
+   ur'Bjørn Ådlandsvik\\Institute of Marine Research', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -215,7 +215,7 @@ latex_logo = 'logo.png'
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'ladim', 'LADiM Documentation',
-     ['Bjørn Ådlandsvik'], 1)
+     [u'Bjørn Ådlandsvik'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -229,7 +229,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'ladim', 'LADiM Documentation',
-   'Bjørn Ådlandsvik', 'ladim', 'One line description of project.',
+   u'Bjørn Ådlandsvik', 'ladim', 'One line description of project.',
    'Miscellaneous'),
 ]
 

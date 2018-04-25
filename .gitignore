@@ -1,15 +1,9 @@
-# Backup files from emacs
-*~
-#*
-.#*
-\#*
-
 # Python stuff
 *.pyc
-__pycache__/*
-*.egg-info/*
-dist/*
-.ipynb_checkpoints/
+build/
+
+# Hidden directories
+.*/
 
 # Data files
 examples/data/*
@@ -21,24 +15,8 @@ examples/data/*
 # Release files
 *.rls
 
-# Build directories
-build/
+# Documentation stuff
 doc/build
 
-# Latex-stuff
-*.pdf
-*.tex
-*.aux
-*.log
-*.out
-
-# pycharm stuff
-.idea
-
-# visual studio code stuff
-.vscode
-
-# Cache
-.cache
-.pytest_cache
-.mypy_cache
+# Emacs noice
+*~
