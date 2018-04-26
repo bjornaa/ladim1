@@ -129,8 +129,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'LADiM.tex', 'LADiM Documentation',
-     'Bjørn Ådlandsvik <bjorn@imr.no>////Institute of Marine Research', 'manual'),
+  ('index', 'ladim.tex', 'LADiM Documentation',
+   r'Bjørn Ådlandsvik <bjorn@imr.no>\\Institute of Marine Research', 'manual'),
 ]
 
 
