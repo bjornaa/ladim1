@@ -94,7 +94,9 @@ However, the python 3.6 environment must be activated before any pre- or post- p
 versions].
 
 For serious use, the job must be submitted to the ``sbatch`` queue system.
-Here is an example ``sbatch`` run script::
+Here is an example ``sbatch`` run script:
+
+.. code-block:: sh
 
   #!/bin/sh
 
