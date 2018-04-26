@@ -14,6 +14,7 @@ LADiM documentation
 
 .. toctree::
    :maxdepth: 2
+   :caption: Contents:
 
    intro.rst
    manual.rst
