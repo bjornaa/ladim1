@@ -75,7 +75,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-#html_theme = 'alabaster'
+html_theme = 'sphinxdoc'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -118,8 +118,11 @@ latex_elements = {
 
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
-
+    # 'preamble': '',   # Needed for readthedocs
+    'preamble': "".join((
+        '\DeclareUnicodeCharacter{F8}{\o}',   # ø
+        '\DeclareUnicodeCharacter{C5}{\AA}',  # Å
+    )),
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -129,8 +132,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'LADiM.tex', 'LADiM Documentation',
-     'Bjørn Ådlandsvik <bjorn@imr.no>////Institute of Marine Research', 'manual'),
+  ('index', 'ladim.tex', 'LADiM Documentation',
+   r'Bjørn Ådlandsvik <bjorn@imr.no>\\Institute of Marine Research', 'manual'),
 ]
 
 
