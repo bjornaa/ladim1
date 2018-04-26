@@ -22,3 +22,5 @@ other ocean models and particles with different behaviour.
 
 The model code is available under the MIT license, and is hosted on github,
 `https://github.com/bjornaa/ladim <https://github.com/bjornaa/ladim>`_.
+This documentation is hosted on `readthedocs
+<https://ladim.readthedocs.io/en/master>`_. A `pdf version <https://media.readthedocs.org/pdf/ladim/master/ladim.pdf>`_ is also available.
