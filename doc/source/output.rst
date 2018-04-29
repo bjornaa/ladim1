@@ -34,7 +34,9 @@ The particle_instance dimension is therefore the single unlimited dimension allo
 
 The indirect indexing is given by the variable ``particle_count(time)``. The
 particle distribution at timestep ``n`` (counting from initial time n=0) can be
-retrieved by the following python code::
+retrieved by the following python code:
+
+.. code-block:: python
 
   nc = Dataset(particle_file)
   particle_count = nc.variables['particle_count'][:n+1]
@@ -42,8 +44,10 @@ retrieved by the following python code::
   count = particle_count[n]
   X = nc.variables['X'][start:start+count]
 
-Note that some languages uses 1-based indexing (MATLAB, fortran by default) In
-MATLAB the code is::
+Note that some languages uses 1-based indexing (MATLAB, fortran by default). In
+MATLAB the code is:
+
+.. code-block:: matlab
 
   % Should be checked by someone who knows matlab
   particle_count = ncread(particle_file, 'particle_count', 1, n+1)
@@ -60,10 +64,6 @@ Version 1.1 adds the possibility of split output. This is activated by adding th
 To simplify restarts of long simulations, if the run is a restart from a file of type ``out_0030.nc``, the new files will start at ``out_0031.nc``.
 
 
-.. seealso::
-
-  Module :mod:`output`
-    Documentation of the :mod:`output` module.
 
 Particle identifier
 -------------------
@@ -71,15 +71,15 @@ Particle identifier
 The particle identifier, ``pid`` should always be present in the output file.
 It is a particle number, starting with 0 and increasing as the particles are
 released. The ``pid`` follows the particle and is not reused if the particle
-becomes inactive.  In particular, ``max(pid) + 1`` is the total number of
+becomes inactive.  In particular, :samp:`max(pid) + 1` is the total number of
 particles involved so far in the simulation and may be larger than the number
 of active particles at any given time. It also has the property that if a
 particle is released before another particle, it has lower ``pid``.
 
 The particle identifiers at a given time frame has the following properties,
 
-* pid[start:start+count] is a sorted integer array.
-* pid[start+p] >= p
+* :samp:`pid[start:start+count]` is a sorted integer array.
+* :samp:`pid[start+p] >= p`
   with equality if and only if all earlier particles are alive at the time
   frame.
 
@@ -88,9 +88,13 @@ These properties can be used to extract the individual trajectories, if needed.
 Example CDL
 -----------
 
-::
+NetCDF has a text representation, Common Data Language, abbreviated as CDL.
+Here is an example CDL, produced by :command:`ncdump -h`:
 
-  netcdf out { dimensions:
+.. code-block:: none
+
+  netcdf out {
+  dimensions:
         particle = 72000 ;
         particle_instance = UNLIMITED ; // (540000 currently)
         time = 13 ;
@@ -133,3 +137,8 @@ Example CDL
         :history = "Created by pyladim" ;
         :date = "2017-02-15" ;
   }
+
+.. seealso::
+
+  Module :mod:`output`
+    Documentation of the :mod:`output` module.

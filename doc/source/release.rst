@@ -14,10 +14,10 @@ The line has the following mandatory fields:
 
 release_time
 
-   Should have the format yyyy-mm-ddThh:mm:ss or "yyyy-mm-dd hh:mm:ss".
+   Should have the format :code:`yyyy-mm-ddThh:mm:ss` or :code:`"yyyy-mm-dd hh:mm:ss"`.
    The time format follows the `ISO 8601 standard <https://xkcd.com/1179>`_.
    Time components can be dropped from the end with obvious defaults.
-   It is essential that the time is interpreted as a **single string**, either
+   It is essential that the time is interpreted as a *single string*, either
    by joining with a "T" or enclosing with double ticks.
 
 X
@@ -35,7 +35,9 @@ particle, is used.
 The additional variables should be specified in the configuration file.
 Unspecified data in the row is ignored (check)
 
-Example::
+Example:
+
+.. code-block:: none
 
   3 1989-05-24T12  68.117  94.989    5.0
 
