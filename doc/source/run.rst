@@ -20,8 +20,8 @@ Look at the results by::
 
   python animate.py
 
-Note, depending on your python installation you may have to substitute python3
-for python in the examples above.
+.. Note::
+   Depending on your python installation you may have to substitute :program:`python3` for :program:`python` in the examples above.
 
 After browsing through the configuration and particle release chapters below,
 you can copy the example directory anywhere and modify with other release
@@ -64,6 +64,6 @@ LADiM can be run inside a python program. This is done by::
   with open('ladim.yaml') as fid:
       ladim.main(config_stream=fid)
 
-The main LADiM script, :file:`scripts/ladim`, uses this approach.The
+The main LADiM script, :file:`scripts/ladim`, uses this approach. The
 :file:`jupyter` example shows how to use this with a triple quoted text string
 for the configuration, using the standard module :mod:`StringIO`.

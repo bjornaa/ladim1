@@ -14,14 +14,16 @@ It is a goal to provide sane defaults in the configuration file, so that
 enhancements of the configuration setup do not break existing configuration
 files.
 
-The configuration file format is a subset of :abbr:`yaml
-(YAML Ain't Markup Language)` (`<http:yaml.org>`_). Knowledge of yaml is not
-necessary. The example configuration files are self-describing and can
-easily be modified.
+The configuration file format is a subset of `yaml (YAML Ain't Markup
+Language) <http:yaml.org>`_. Knowledge of ``yaml`` is not necessary. The
+example configuration files are self-describing and can easily be modified.
 
-Note that the indentation in a yaml file is mandatory, it is part of the syntax.
-The indentation has to be done by spaces, not tabs. Reasonable editors will recognize
-yaml-files by the extension and will automatically produce spaces when you hit the tab key.
+.. note::
+
+  The indentation in a yaml file is mandatory, it is part of the syntax. In
+  particular note that the indentation has to be done by **spaces**, **not tabs**.
+  Reasonable editors will recognize yaml-files by the extension and will
+  automatically produce spaces when you hit the tab key.
 
 .. seealso::
   Module :mod:`configuration`
