@@ -3,8 +3,8 @@ Output
 
 The particle distributions are written to NetCDF files. The file name, output frequency, included variables and their attributes are governed by the configuration file.
 
-Output format
--------------
+:index:`Output format`
+----------------------
 
 This is a not backwards compatible modification of the old LADiM format. The
 fundamental data structure is the same, so scripts should be easy to modify.
@@ -55,16 +55,6 @@ MATLAB the code is:
   count = particle_count(n+1)
   X = ncread(particle_file, 'X', start, count)
 
-Split output
-------------
-
-For long simulations, the output file may become large and difficult to handle.
-Version 1.1 adds the possibility of split output. This is activated by adding the keyword ``numrec`` to the output section in the configuration file. This will split the output file after every numrec record. If the ``output_file`` has the value ``out.nc``, the actual files are named ``out_0000,nc``, ``out_0001.nc``, ... .
-
-To simplify restarts of long simulations, if the run is a restart from a file of type ``out_0030.nc``, the new files will start at ``out_0031.nc``.
-
-
-
 Particle identifier
 -------------------
 
@@ -84,6 +74,8 @@ The particle identifiers at a given time frame has the following properties,
   frame.
 
 These properties can be used to extract the individual trajectories, if needed.
+
+
 
 Example CDL
 -----------
@@ -137,6 +129,35 @@ Here is an example CDL, produced by :command:`ncdump -h`:
         :history = "Created by pyladim" ;
         :date = "2017-02-15" ;
   }
+
+
+:index:`Split output`
+---------------------
+
+For long simulations, the output file may become large and difficult to handle.
+Version 1.1 adds the possibility of split output. This is activated by adding
+the keyword ``numrec`` to the output section in the configuration file. This
+will split the output file after every numrec record. If the ``output_file``
+has the value :file:`out.nc`, the actual files are named :file:`out_0000,nc`,
+:file:`out_0001.nc`, ... .
+
+:index:`Restart`
+----------------
+
+Version 1.1 also adds the  of :index:`warm start`, most typically a restart. In
+this mode LADiM starts with an existing particle distribution, the last time
+instance in an output NetCDF file.
+
+This mode is triggered by the specification of a ``warm_start_file`` in the
+configuration. As the initial distribution already exist on file, it is by
+default not rewritten.
+
+Restart and split output works nicely together.  Suppose ``numrec`` is present
+and equal in both config files. If the warm start file is nam ed
+:file:`out_0030.nc` and is complete, the new files will start at
+:file:`out_0031.nc` and continue as in the original simulation. With no
+diffusion and unchanged settings, the new files should be identical to the
+original.
 
 .. seealso::
 
