@@ -1,0 +1,11 @@
+Example adding a southward speed.
+
+This is done by an extra variable angle in the Grid class.
+(same as ROMS angle)
+
+gosouth_ibm implements the rest.
+
+Can easily be extended to arbitrary (constant) direction
+
+Southward speed is taken as 10 cm/s. Large enough
+to be clearly visible in the animation

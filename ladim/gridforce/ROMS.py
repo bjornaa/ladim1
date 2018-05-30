@@ -111,6 +111,7 @@ class Grid:
         self.dy = 1. / ncid.variables['pn'][self.J, self.I]
         self.lon = ncid.variables['lon_rho'][self.J, self.I]
         self.lat = ncid.variables['lat_rho'][self.J, self.I]
+        self.angle = ncid.variables['angle'][self.J, self.I]
 
         self.z_r = sdepth(self.H, self.hc, self.Cs_r,
                           stagger='rho', Vtransform=self.Vtransform)
