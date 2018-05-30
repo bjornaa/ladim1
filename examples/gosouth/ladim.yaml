@@ -18,8 +18,7 @@ files:
     grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_*.nc
     particle_release_file : line.rls
-    output_file           : line.nc
-    # warm_start_file       : a4.nc
+    output_file           : gosouth.nc
 
 state:
     # pid, X, Y, Z are mandatory and should not be given

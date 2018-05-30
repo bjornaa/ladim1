@@ -10,8 +10,7 @@ from postladim import ParticleFile
 # ---------------
 
 # Files
-particle_file = 'line.nc'
-# particle_file = 'line_0004.nc'
+particle_file = 'gosouth.nc'
 grid_file = '../data/ocean_avg_0014.nc'
 
 # Subgrid definition
