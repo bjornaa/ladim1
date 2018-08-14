@@ -14,7 +14,6 @@ from .output import OutPut
 
 
 def main(config_stream, loglevel=logging.INFO):
-
     # ==================
     # Initiate the model
     # ==================
@@ -48,7 +47,7 @@ def main(config_stream, loglevel=logging.INFO):
     # ==============
 
     logging.info("Starting time loop")
-    for step in range(config['numsteps']+1):
+    for step in range(config['numsteps'] + 1):
 
         # --- Update forcing ---
         forcing.update(step)

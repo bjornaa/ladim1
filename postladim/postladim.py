@@ -68,7 +68,6 @@ class ParticleFile:
         except OSError:
             raise SystemExit(f'File {filename} is not a particle file')
 
-
         # Number of particles per time
         self.count = self.nc.variables['particle_count'][:]
         # End and start of segment with particles at a given time
@@ -136,8 +135,8 @@ class ParticleFile:
             # index = sum(pid < p) # eller lignende
             index = pid.searchsorted(p)
             if pid[index] > p:  # p is missing
-                last_time = n     #
-                break             # No need for more cycles
+                last_time = n  #
+                break  # No need for more cycles
 
             X.append(f.variables['X'][start + index])
             Y.append(f.variables['Y'][start + index])

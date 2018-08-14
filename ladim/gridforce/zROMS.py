@@ -560,7 +560,7 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     """
     H = np.asarray(H)
     Hshape = H.shape  # Save the shape of H
-    H = H.ravel()  # and make H 1D for easy shape maniplation
+    H = H.ravel()  # and make H 1D for easy shape manipulation
     C = np.asarray(C)
     N = len(C)
     outshape = (N,) + Hshape  # Shape of output

@@ -28,3 +28,4 @@ A simplified, but working, version of the :program:`ladim` script::
 
   with open(config_file, encoding='utf8') as fp:
       main(config_stream=fp, loglevel=loglevel)
+

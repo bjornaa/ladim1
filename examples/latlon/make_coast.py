@@ -22,6 +22,7 @@ The polygons are saved to a npy-file
 import sys
 
 import numpy as np
+
 try:
     from mpl_toolkits.basemap import Basemap
 except ImportError:
@@ -38,8 +39,8 @@ def main():
 
     # Determine geographical extent
     # Use slightly larger latitudal range
-    lon0, lon1 = -6, 12         # Longitude range
-    lat0, lat1 =  54, 62.5    # Latitude range
+    lon0, lon1 = -6, 12  # Longitude range
+    lat0, lat1 = 54, 62.5  # Latitude range
 
     # Choose GSHHS resolution
     # 'f' = full, 'h' = high, 'i' = intermediate,
@@ -97,6 +98,7 @@ def makecoast(lon0, lon1, lat0, lat1, GSHHSres, GSHHStypes, coastfile):
     # --------------------
 
     np.save(coastfile, polygons)
+
 
 if __name__ == '__main__':
     main()

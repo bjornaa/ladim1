@@ -1,7 +1,7 @@
 Using LADiM at IMR
 ==================
 
-This chapter is specific to the Isntitute of Marine Research (IMR) and shows
+This chapter is specific to the Institute of Marine Research (IMR) and shows
 how to use LADiM on computing resources available to us.
 
 LADiM at ``rhea``
@@ -67,7 +67,7 @@ given by the command :command:`module load python`. A newer version, 3.4.3, is
 available as an alternative module. Presently, the module system does not
 provide version 3.6 required by LADiM. For the time being, a separate minimal
 python installation by the conda system is available at
-:file:`/shared/projects/imr/miniconda3`. This can be activated by modying the
+:file:`/shared/projects/imr/miniconda3`. This can be activated by modyfying the
 PATH environment variable::
 
   export PATH=/shared/projects/imr/miniconda3/bin:$PATH
