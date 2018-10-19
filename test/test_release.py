@@ -14,17 +14,18 @@ def test_discrete() -> None:
         'stop_time': np.datetime64('2015-04-04'),
         'dt': 3600,
         'particle_release_file': 'release.rls',
-        'release_format': ['mult', 'release_time', 'X'],
-        'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_format': ['mult', 'release_time', 'X', 'Y'],
+        'release_dtype': dict(mult=int, release_time=np.datetime64,
+                              X=float, Y=float),
         'release_type': 'discrete',
         'particle_variables': [],
     }
 
     # Make a release file
     with open('release.rls', mode='w') as f:
-        f.write('2 2015-04-01 100\n')
-        f.write('1 2015-04-01T00 111\n')
-        f.write('3 "2015-04-03 12" 200\n')
+        f.write('2 2015-04-01 100 200\n')
+        f.write('1 2015-04-01T00 111 220\n')
+        f.write('3 "2015-04-03 12" 200 300\n')
     # Make the ParticleReleaser object
     release = ParticleReleaser(config, grid=None)
     # Clean up the release file
@@ -38,6 +39,7 @@ def test_discrete() -> None:
     assert(np.all(S['pid'] == [0, 1, 2]))
     assert(S['release_time'][0] == np.datetime64('2015-04-01'))
     assert(np.all(S['X'] == [100, 100, 111]))
+    assert(np.all(S['Y'] == [200, 200, 220]))
 
     # Second release
     S = next(release)
@@ -61,8 +63,9 @@ def test_continuous() -> None:
         'stop_time': np.datetime64('2015-04-04'),
         'dt': 3600,
         'particle_release_file': 'release.rls',
-        'release_format': ['mult', 'release_time', 'X'],
-        'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_format': ['mult', 'release_time', 'X', 'Y'],
+        'release_dtype': dict(mult=int, release_time=np.datetime64,
+                              X=float, Y=float),
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
@@ -70,9 +73,9 @@ def test_continuous() -> None:
 
     # Make a release file
     with open('release.rls', mode='w') as f:
-        f.write('2 2015-04-01 100\n')
-        f.write('1 2015-04-01T00 111\n')
-        f.write('3 "2015-04-02" 200\n')
+        f.write('2 2015-04-01 100 200\n')
+        f.write('1 2015-04-01T00 111 220\n')
+        f.write('3 "2015-04-02" 200 300\n')
 
     # Make the ParticleReleaser object
     release = ParticleReleaser(config, grid=None)
@@ -106,8 +109,9 @@ def test_late_start() -> None:
         'stop_time': np.datetime64('2015-04-05 13'),
         'dt': 3600,
         'particle_release_file': 'release.rls',
-        'release_format': ['mult', 'release_time', 'X'],
-        'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_format': ['mult', 'release_time', 'X', 'Y'],
+        'release_dtype': dict(mult=int, release_time=np.datetime64,
+                              X=float, Y=float),
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
@@ -115,18 +119,18 @@ def test_late_start() -> None:
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
-        f.write('2 2015-04-01 100\n')
-        f.write('1 2015-04-01 150\n')
-        f.write('4 2015-04-02 200\n')
-        f.write('3 2015-04-02 250\n')
-        f.write('4 2015-04-03 300\n')
-        f.write('1 2015-04-03 350\n')
-        f.write('2 2015-04-04 400\n')
-        f.write('1 2015-04-04 450\n')
-        f.write('2 2015-04-05 500\n')
-        f.write('2 2015-04-05 550\n')
-        f.write('3 2015-04-06 600\n')
-        f.write('2 2015-04-06 650\n')
+        f.write('2 2015-04-01 100 200\n')
+        f.write('1 2015-04-01 150 200\n')
+        f.write('4 2015-04-02 200 200\n')
+        f.write('3 2015-04-02 250 200\n')
+        f.write('4 2015-04-03 300 200\n')
+        f.write('1 2015-04-03 350 200\n')
+        f.write('2 2015-04-04 400 200\n')
+        f.write('1 2015-04-04 450 200\n')
+        f.write('2 2015-04-05 500 200\n')
+        f.write('2 2015-04-05 550 200\n')
+        f.write('3 2015-04-06 600 200\n')
+        f.write('2 2015-04-06 650 200.0\n')
     release = ParticleReleaser(config, grid=None)
     os.remove('release.rls')
 
@@ -162,8 +166,9 @@ def test_too_late_start() -> None:
         'start_time': np.datetime64('2015-05-02 12'),
         'stop_time': np.datetime64('2015-05-03 12'),
         'particle_release_file': 'release.rls',
-        'release_format': ['mult', 'release_time', 'X'],
-        'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_format': ['mult', 'release_time', 'X', 'Y'],
+        'release_dtype': dict(mult=int, release_time=np.datetime64,
+                              X=float, Y=float),
         'release_type': 'discrete',
         'dt': 3600,
         'particle_variables': []
@@ -171,7 +176,7 @@ def test_too_late_start() -> None:
 
     # Make a release file
     with open('release.rls', mode='w') as f:
-        f.write('2 2015-04-01 100\n')
+        f.write('2 2015-04-01 100 200\n')
 
     # Release should quit with SystemExit
     with pytest.raises(SystemExit):
@@ -190,8 +195,9 @@ def test_early_stop() -> None:
         'stop_time': np.datetime64('2015-04-05'),
         'dt': 3600,
         'particle_release_file': 'release.rls',
-        'release_format': ['mult', 'release_time', 'X'],
-        'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_format': ['mult', 'release_time', 'X', 'Y'],
+        'release_dtype': dict(mult=int, release_time=np.datetime64,
+                              X=float, Y=float),
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
@@ -199,9 +205,9 @@ def test_early_stop() -> None:
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
-        f.write('2 2015-04-01 100\n')
-        f.write('3 2015-04-03 200\n')
-        f.write('1 2015-04-08 300\n')
+        f.write('2 2015-04-01 100 201\n')
+        f.write('3 2015-04-03 200 202\n')
+        f.write('1 2015-04-08 300 203\n')
     release = ParticleReleaser(config, grid=None)
     os.remove('release.rls')
 
@@ -235,8 +241,9 @@ def test_too_early_stop() -> None:
         'stop_time': np.datetime64('2015-03-05'),
         'dt': 3600,
         'particle_release_file': 'release.rls',
-        'release_format': ['mult', 'release_time', 'X'],
-        'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_format': ['mult', 'release_time', 'X', 'Y'],
+        'release_dtype': dict(mult=int, release_time=np.datetime64,
+                              X=float, Y=float),
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
@@ -244,8 +251,8 @@ def test_too_early_stop() -> None:
 
     # Release file: create, read and remove
     with open('release.rls', mode='w') as f:
-        f.write('2 2015-04-01 100\n')
-        f.write('3 2015-04-03 200\n')
+        f.write('2 2015-04-01 100 200\n')
+        f.write('3 2015-04-03 200 300\n')
 
     # Should exit
     with pytest.raises(SystemExit):
@@ -265,7 +272,8 @@ def test_subgrid() -> None:
         'dt': 3600,
         'particle_release_file': 'release.rls',
         'release_format': ['mult', 'release_time', 'X', 'Y'],
-        'release_dtype': dict(mult=int, release_time=np.datetime64, X=float),
+        'release_dtype': dict(mult=int, release_time=np.datetime64,
+                              X=float, Y=float),
         'release_type': 'continuous',
         'release_frequency': np.timedelta64(12, 'h'),
         'particle_variables': [],
