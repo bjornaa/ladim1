@@ -20,14 +20,14 @@
 # -- Project information -----------------------------------------------------
 
 project = 'LADiM'
-copyright = '2018, Bjørn Ådlandsvik'
 author = 'Bjørn Ådlandsvik'
+copyright = '2018, Institute of Marine Research'
 
 # The short X.Y version
 version = '1.1'
 # The full version, including alpha/beta/rc tags
 release = '1.1.0'
-
+today_fmt = '%Y-%m-%d'
 
 # -- General configuration ---------------------------------------------------
 
@@ -64,7 +64,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = []
+# exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -97,7 +97,7 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
-
+html_logo = 'logo.png'
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -157,6 +157,5 @@ texinfo_documents = [
      author, 'LADiM', 'One line description of project.',
      'Miscellaneous'),
 ]
-
 
 # -- Extension configuration -------------------------------------------------

@@ -19,7 +19,7 @@ Coordinate system in LADiM
 The coordinate system should be curvilinear orthogonal. Grids as used by
 ROMS for instance are suitable. The coordinates should have integer values at
 the grid cell centers. [Necessary, or a detail left to the implementation?]
-Particle release and movements is referred to this coordinate system.
+Particle release and movements are referred to this coordinate system.
 
 The grid spacing is given by horizontal arrays of metric coefficients
 :math:`\Delta x` and :math:`\Delta y`

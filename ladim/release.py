@@ -20,6 +20,8 @@ from netCDF4 import Dataset
 
 from .utilities import ingrid
 from .configuration import Config
+
+
 # from .gridforce import Grid
 
 
@@ -59,15 +61,19 @@ class ParticleReleaser(Iterator):
         A.index = A['release_time']
 
         # Conversion from longitude, latitude to grid coordinates
-        if 'lon' and 'lat' in A.columns:
-            X, Y = grid.ll2xy(A['lon'], A['lat'])
-            A['lon'] = X
-            A['lat'] = Y
-            A.rename(columns={'lon': 'X', 'lat': 'Y'}, inplace=True)
+        if 'X' not in A.columns or 'Y' not in A.columns:
+            if 'lon' not in A.columns or 'lat' not in A.columns:
+                logging.error("Particle release mush have position")
+                raise SystemExit
+            else:
+                X, Y = grid.ll2xy(A['lon'], A['lat'])
+                A['lon'] = X
+                A['lat'] = Y
+                A.rename(columns={'lon': 'X', 'lat': 'Y'}, inplace=True)
 
         # Remove everything after simulation stop time
         # A = A[A['release_time'] <= stop_time]   # Use < ?
-        A = A[A.index <= stop_time]   # Use < ?
+        A = A[A.index <= stop_time]  # Use < ?
         if len(A) == 0:  # All release after simulation time
             logging.error("All particles released after similation stop")
             raise SystemExit
@@ -124,7 +130,7 @@ class ParticleReleaser(Iterator):
             # Correct time index
             S: List[int] = []
             for t in times:
-                S.extend(M[J[t]]*[t])
+                S.extend(M[J[t]] * [t])
             A['release_time'] = S
             A.index = S
 
@@ -139,7 +145,7 @@ class ParticleReleaser(Iterator):
 
         # If discrete, there is an error to have only early releases
         # OK if warm start
-        else:   # Discrete
+        else:  # Discrete
             if A.index[-1] < start_time and config['start'] == 'cold':
                 logging.error("All particles released before similation start")
                 raise SystemExit
@@ -167,8 +173,8 @@ class ParticleReleaser(Iterator):
         self._B = [x[1] for x in A.groupby(A.index)]
 
         # Read the particle variables
-        self._index = 0            # Index of next release
-        self._particle_count = 0   # Particle counter
+        self._index = 0  # Index of next release
+        self._particle_count = 0  # Particle counter
 
         # Handle the particle variables initially
         # TODO: Need a test to check that this iw working properly
@@ -222,7 +228,7 @@ class ParticleReleaser(Iterator):
         config['total_particle_count'] = self.total_particle_count
 
         # Reset the counter after the particle counting
-        self._index = 0    # Index of next release
+        self._index = 0  # Index of next release
         self._particle_count = warm_particle_count
 
     def __next__(self) -> pd.DataFrame:
@@ -262,7 +268,7 @@ class ParticleReleaser(Iterator):
         nnew = len(V)
 
         pids = pd.Series(range(self._particle_count,
-                         self._particle_count + nnew),
+                               self._particle_count + nnew),
                          name='pid')
         V = V.join(pids)
 

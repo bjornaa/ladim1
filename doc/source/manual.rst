@@ -4,11 +4,11 @@ User Manual
 .. toctree::
 
   install
-  try
+  run
   configuration
   release
   output
   workflow
   postprocessing
-
-How to use LADiM.
+  examples
+  ladim_at_imr

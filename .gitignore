@@ -11,6 +11,7 @@ examples/data/*
 !examples/data/download.py
 *.nc
 *.npy
+*.wkb
 
 # Release files
 *.rls
@@ -18,5 +19,5 @@ examples/data/*
 # Documentation stuff
 doc/build
 
-# Emacs noice
+# Emacs noise
 *~
