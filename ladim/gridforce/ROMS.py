@@ -225,34 +225,34 @@ class Forcing:
 
             time_units = nc.variables['ocean_time'].units
 
-            self.scaled = dict()
-            self.scale_factor = dict()
-            self.add_offset = dict()
+            # self.scaled = dict()
+            # self.scale_factor = dict()
+            # self.add_offset = dict()
 
-            if hasattr(nc.variables['u'], 'scale_factor'):
-                self.scaled['U'] = True
-                self.scale_factor['U'] = np.float32(
-                    nc.variables['u'].scale_factor)
-                self.add_offset['U'] = np.float32(
-                    nc.variables['u'].add_offset)
-                self.scaled['V'] = True
-                self.scale_factor['V'] = np.float32(
-                    self.scale_factor['U'])
-                self.add_offset['V'] = np.float32(
-                    self.add_offset['U'])
-            else:
-                self.scaled['U'] = False
-                self.scaled['V'] = False
+            # if hasattr(nc.variables['u'], 'scale_factor'):
+            #     self.scaled['U'] = True
+            #     self.scale_factor['U'] = np.float32(
+            #         nc.variables['u'].scale_factor)
+            #     self.add_offset['U'] = np.float32(
+            #         nc.variables['u'].add_offset)
+            #     self.scaled['V'] = True
+            #     self.scale_factor['V'] = np.float32(
+            #         self.scale_factor['U'])
+            #     self.add_offset['V'] = np.float32(
+            #         self.add_offset['U'])
+            # else:
+            #     self.scaled['U'] = False
+            #     self.scaled['V'] = False
 
-            for key in self.ibm_forcing:
-                if hasattr(nc.variables[key], 'scale_factor'):
-                    self.scaled[key] = True
-                    self.scale_factor[key] = np.float32(
-                        nc.variables[key].scale_factor)
-                    self.add_offset[key] = np.float32(
-                        nc.variables[key].add_offset)
-                else:
-                    self.scaled[key] = False
+            # for key in self.ibm_forcing:
+            #     if hasattr(nc.variables[key], 'scale_factor'):
+            #         self.scaled[key] = True
+            #         self.scale_factor[key] = np.float32(
+            #             nc.variables[key].scale_factor)
+            #         self.add_offset[key] = np.float32(
+            #             nc.variables[key].add_offset)
+            #     else:
+            #         self.scaled[key] = False
 
         # ---------------------------
         # Overview of all the files
@@ -419,13 +419,13 @@ class Forcing:
         first = True
         if first:  # Open file initiallt
             self._nc = Dataset(self._files[self.file_idx[n]])
-            self._nc.set_auto_maskandscale(False)
+            # self._nc.set_auto_maskandscale(False)
             first = False
         else:
             if self.frame_idx[n] == 0:  # New file
                 self._nc.close()  # Close previous file
                 self._nc = Dataset(self._files[self.file_idx[n]])
-                self._nc.set_auto_maskandscale(False)
+                # self._nc.set_auto_maskandscale(False)
 
         frame = self.frame_idx[n]
 
@@ -434,9 +434,9 @@ class Forcing:
         V = self._nc.variables['v'][frame, :, self._grid.Jv, self._grid.Iv]
         # Scale if needed
         # Assume offset = 0 for velocity
-        if self.scaled['U']:
-            U = self.scale_factor['U'] * U
-            V = self.scale_factor['U'] * V
+        # if self.scaled['U']:
+        #    U = self.scale_factor['U'] * U
+        #    V = self.scale_factor['U'] * V
             # U = self.add_offset['U'] + self.scale_factor['U']*U
             # V = self.add_offset['U'] + self.scale_factor['U']*V
 
@@ -450,8 +450,8 @@ class Forcing:
         """Read a 3D field"""
         frame = self.frame_idx[n]
         F = self._nc.variables[name][frame, :, self._grid.J, self._grid.I]
-        if self.scaled[name]:
-            F = self.add_offset[name] + self.scale_factor[name] * F
+        # if self.scaled[name]:
+        #    F = self.add_offset[name] + self.scale_factor[name] * F
         return F
 
     # Allow item notation
