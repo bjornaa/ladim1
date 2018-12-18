@@ -417,15 +417,33 @@ class Forcing:
         # Always read velocity before other fields
         logging.info('Reading velocity for time step = {}'.format(n))
         first = True
-        if first:  # Open file initiallt
-            self._nc = Dataset(self._files[self.file_idx[n]])
-            # self._nc.set_auto_maskandscale(False)
-            first = False
-        else:
-            if self.frame_idx[n] == 0:  # New file
+
+        if first or self.frame_idx == 0:
+            if first:
+                first = False
+            else:
                 self._nc.close()  # Close previous file
-                self._nc = Dataset(self._files[self.file_idx[n]])
-                # self._nc.set_auto_maskandscale(False)
+
+            nc = Dataset(self._files[self.file_idx[n]])
+            nc.set_auto_maskandscale(False)
+
+            sfactor = {}
+            offset = {}
+            if hasattr(nc.variables['u'], 'scale_factor'):
+                sfactor['u'] = np.float32(nc.variables['u'].scale_factor)
+            else:
+                sfactor['u'] = -999
+
+            for key in self.ibm_forcing:
+                if hasattr(nc.variables[key], 'scale_factor'):
+                    sfactor[key] = np.float32(nc.variables[key].scale_factor)
+                    offset[key] = np.float32(nc.variables[key].add_offset)
+                else:
+                    sfactor[key] = np.float32(1.0)
+                    offset[key] = np.float32(0.0)
+            self.sfactor = sfactor
+            self.offset = offset
+            self._nc = nc
 
         frame = self.frame_idx[n]
 
@@ -434,11 +452,10 @@ class Forcing:
         V = self._nc.variables['v'][frame, :, self._grid.Jv, self._grid.Iv]
         # Scale if needed
         # Assume offset = 0 for velocity
-        # if self.scaled['U']:
-        #    U = self.scale_factor['U'] * U
-        #    V = self.scale_factor['U'] * V
-            # U = self.add_offset['U'] + self.scale_factor['U']*U
-            # V = self.add_offset['U'] + self.scale_factor['U']*V
+        uscale = sfactor['u']
+        if uscale > 0:
+           U = uscale * U
+           V = uscale * V
 
         # If necessary put U,V = zero on land and land boundaries
         # Stay as float32
@@ -450,8 +467,7 @@ class Forcing:
         """Read a 3D field"""
         frame = self.frame_idx[n]
         F = self._nc.variables[name][frame, :, self._grid.J, self._grid.I]
-        # if self.scaled[name]:
-        #    F = self.add_offset[name] + self.scale_factor[name] * F
+        F = self.offset[name] + self.sfactor[name] * F
         return F
 
     # Allow item notation
