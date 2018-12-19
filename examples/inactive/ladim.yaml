@@ -1,0 +1,91 @@
+
+# Configuration file for ladim
+#
+# Line source example
+#
+
+time_control:
+    # Start and stop of simulation
+    # start_time: 1989-06-03 09
+    start_time: 1989-05-24 12:00:00
+    # stop_time:  1989-06-15 12:00:00
+    stop_time:  1989-06-05T12
+    # Reference time for netcdf output
+    # by default set to start_time
+    reference_time: 1970-01-01 00
+
+files:
+    grid_file             : ../data/ocean_avg_0014.nc
+    input_file            : ../data/ocean_avg_*.nc
+    particle_release_file : inactive.rls
+    output_file           : inactive.nc
+    # warm_start_file       : a4.nc
+
+state:
+    # pid, X, Y, Z are mandatory and should not be given
+    # Ingen, kan bruke [] eller kutte linjen
+    # [lon, lat]
+    ibm_variables: [active]
+
+ibm:
+    ibm_module: inactive_ibm
+
+particle_release:
+    variables: [release_time, X, Y, Z, active]
+    # Converters (if not float)
+    # mult: int
+    release_time: time
+    active: int
+    particle_variables: [release_time]
+
+gridforce:
+    # Gridforce module
+    module: ladim.gridforce.ROMS
+
+    # mapping: model name -> name in input file
+    # velocity: {U: u, V: v}
+    # ibm_forcing: {}
+
+output_variables:
+    # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET
+    # format: NETCDF3_64BIT_DATA
+    format: NETCDF3_CLASSIC
+
+    # Records per file
+    # Default = 0 meaning unlimited i.e. only one (unnumbered) output file
+    # numrec: 20
+
+    # Output period, format [value, unit], unit = s, m, h, or d
+    outper: [3, h]
+    # Variable names
+    particle: [release_time]
+    instance: [pid, X, Y, Z, active]
+    # NetCDF arguments
+    release_time:
+        ncformat: f8
+        long_name: particle release time
+        units: seconds since reference_time
+    # Få til template over
+    pid: {ncformat: i4, long_name: particle identifier}
+    X: {ncformat: f4, long_name: particle X-coordinate}
+    Y: {ncformat: f4, long_name: particle Y-coordinate}
+    Z:
+        ncformat: f4
+        long_name: particle depth
+        standard_name: depth_below_surface
+        units: m
+        positive: down
+    active: {ncformat: i4, long_name: activity indicator}
+    # lon: {ncformat: f4, long_name: particle longitude, units: degrees_east}
+    # lat: {ncformat: f4, long_name: particle latitude, units: degrees_north}
+
+numerics:
+    # Model time step, [value, unit]
+    dt: [1, h]
+    # Advection method: options =
+    #        EF = Euler-Forward,
+    #        RK2, RK4 = Runge-Kutta 2nd or 4th order
+    advection: EF
+    # Horizontal diffusion coefficient [m2.s-1]
+    #         zero = no diffusion
+    diffusion: 0.0

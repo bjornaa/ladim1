@@ -36,6 +36,8 @@ class State(Sized):
              if var not in self.particle_variables])
 
         self.pid = np.array([], dtype=int)
+        # self.active = np.array([], dtype=int)
+
         for name in self.instance_variables:
             setattr(self, name, np.array([], dtype=float))
 
@@ -100,6 +102,12 @@ class State(Sized):
         # Update the IBM
         if self.ibm:
             self.ibm.update_ibm(grid, self, forcing)
+        # Extension, allow inactive particles (not moved next time)
+        if 'active' in self.ibm_variables:
+            pass
+            # self.active = self.ibm_variables['active']
+        else:  # Default = active
+            self.active = np.ones_like(self.pid)
 
         # Surface/bottom boundary conditions
         #     Reflective  at surface
