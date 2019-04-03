@@ -35,19 +35,19 @@ class Grid:
 
         logging.info("Initializing zROMS grid object")
         try:
-            ncid = Dataset(config['grid_file'])
+            ncid = Dataset(config["grid_file"])
         except OSError:
-            logging.error('Grid file {} not found'.format(config['grid_file']))
+            logging.error("Grid file {} not found".format(config["grid_file"]))
             raise SystemExit(1)
 
         # Subgrid, only considers internal grid cells
         # 1 <= i0 < i1 <= imax-1, default=end points
         # 1 <= j0 < j1 <= jmax-1, default=end points
         # Here, imax, jmax refers to whole grid
-        jmax, imax = ncid.variables['h'].shape
+        jmax, imax = ncid.variables["h"].shape
         whole_grid = [1, imax - 1, 1, jmax - 1]
-        if 'subgrid' in config['grid_args']:
-            limits = list(config['grid_args']['subgrid'])
+        if "subgrid" in config["grid_args"]:
+            limits = list(config["grid_args"]["subgrid"])
         else:
             limits = whole_grid
         # Allow None if no imposed limitation
@@ -63,9 +63,9 @@ class Grid:
 
         # Limits for where velocities are defined
         self.xmin = float(self.i0)
-        self.xmax = float(self.i1-1)
+        self.xmax = float(self.i1 - 1)
         self.ymin = float(self.j0)
-        self.ymax = float(self.j1-1)
+        self.ymax = float(self.j1 - 1)
 
         # Slices
         #   rho-points
@@ -82,14 +82,14 @@ class Grid:
         self.z_levels = np.array([0, 1, 2, 3, 5, 10, 15, 20])
 
         # Read some variables
-        self.H = ncid.variables['h'][self.J, self.I]
-        self.M = ncid.variables['mask_rho'][self.J, self.I].astype(int)
+        self.H = ncid.variables["h"][self.J, self.I]
+        self.M = ncid.variables["mask_rho"][self.J, self.I].astype(int)
         # self.Mu = ncid.variables['mask_u'][self.Ju, self.Iu]
         # self.Mv = ncid.variables['mask_v'][self.Jv, self.Iv]
-        self.dx = 1. / ncid.variables['pm'][self.J, self.I]
-        self.dy = 1. / ncid.variables['pn'][self.J, self.I]
-        self.lon = ncid.variables['lon_rho'][self.J, self.I]
-        self.lat = ncid.variables['lat_rho'][self.J, self.I]
+        self.dx = 1.0 / ncid.variables["pm"][self.J, self.I]
+        self.dy = 1.0 / ncid.variables["pn"][self.J, self.I]
+        self.lon = ncid.variables["lon_rho"][self.J, self.I]
+        self.lat = ncid.variables["lat_rho"][self.J, self.I]
 
         # self.z_r = sdepth(self.H, self.hc, self.Cs_r,
         #                  stagger='rho', Vtransform=self.Vtransform)
@@ -131,22 +131,23 @@ class Grid:
         J = Y.round().astype(int) - self.j0
         return self.H[J, I]
 
-    def lonlat(self, X, Y, method='bilinear'):
+    def lonlat(self, X, Y, method="bilinear"):
         """Return the longitude and latitude from grid coordinates"""
-        if method == 'bilinear':   # More accurate
+        if method == "bilinear":  # More accurate
             return self.xy2ll(X, Y)
         else:  # containing grid cell, less accurate
-            I = X.round().astype('int') - self.i0
-            J = Y.round().astype('int') - self.j0
+            I = X.round().astype("int") - self.i0
+            J = Y.round().astype("int") - self.j0
             return self.lon[J, I], self.lat[J, I]
 
-        return (sample2D(self.lon, X - self.i0, Y - self.j0),
-                sample2D(self.lat, X - self.i0, Y - self.j0))
+        return (
+            sample2D(self.lon, X - self.i0, Y - self.j0),
+            sample2D(self.lat, X - self.i0, Y - self.j0),
+        )
 
     def ingrid(self, X, Y):
         """Returns True for points inside the subgrid"""
-        return ((self.xmin < X) & (X < self.xmax) &
-                (self.ymin < Y) & (Y < self.ymax))
+        return (self.xmin < X) & (X < self.xmax) & (self.ymin < Y) & (Y < self.ymax)
 
     def onland(self, X, Y):
         """Returns True for points on land"""
@@ -162,12 +163,15 @@ class Grid:
         return self.M[J, I] > 0
 
     def xy2ll(self, X, Y):
-        return (sample2D(self.lon, X-self.i0, Y-self.j0),
-                sample2D(self.lat, X-self.i0, Y-self.j0))
+        return (
+            sample2D(self.lon, X - self.i0, Y - self.j0),
+            sample2D(self.lat, X - self.i0, Y - self.j0),
+        )
 
     def ll2xy(self, lon, lat):
         Y, X = bilin_inv(lon, lat, self.lon, self.lat)
         return X + self.i0, Y + self.j0
+
 
 # -----------------------------------------------
 # The Forcing class from the old forcing module
@@ -186,16 +190,16 @@ class Forcing:
 
         self._grid = grid  # Get the grid object, make private?
 
-        self.ibm_forcing = config['ibm_forcing']
+        self.ibm_forcing = config["ibm_forcing"]
 
         # Test for glob, use MFDataset if needed
-        files = glob.glob(config['input_file'])
+        files = glob.glob(config["input_file"])
         files.sort()
         numfiles = len(files)
         if numfiles == 0:
-            logging.error("No input file: {}".format(config['input_file']))
+            logging.error("No input file: {}".format(config["input_file"]))
             raise SystemExit(3)
-        logging.info('Number of forcing files = {}'.format(numfiles))
+        logging.info("Number of forcing files = {}".format(numfiles))
 
         # ----------------------------------------
         # Open first file for some general info
@@ -205,34 +209,28 @@ class Forcing:
         with Dataset(files[0]) as nc:
 
             # time_units = nc.variables['ocean_time'].units
-            time_units = nc.variables['time'].units
+            time_units = nc.variables["time"].units
 
             self.scaled = dict()
             self.scale_factor = dict()
             self.add_offset = dict()
 
-            if hasattr(nc.variables['u'], 'scale_factor'):
-                self.scaled['U'] = True
-                self.scale_factor['U'] = np.float32(
-                    nc.variables['u'].scale_factor)
-                self.add_offset['U'] = np.float32(
-                    nc.variables['u'].add_offset)
-                self.scaled['V'] = True
-                self.scale_factor['V'] = np.float32(
-                    self.scale_factor['U'])
-                self.add_offset['V'] = np.float32(
-                    self.add_offset['U'])
+            if hasattr(nc.variables["u"], "scale_factor"):
+                self.scaled["U"] = True
+                self.scale_factor["U"] = np.float32(nc.variables["u"].scale_factor)
+                self.add_offset["U"] = np.float32(nc.variables["u"].add_offset)
+                self.scaled["V"] = True
+                self.scale_factor["V"] = np.float32(self.scale_factor["U"])
+                self.add_offset["V"] = np.float32(self.add_offset["U"])
             else:
-                self.scaled['U'] = False
-                self.scaled['V'] = False
+                self.scaled["U"] = False
+                self.scaled["V"] = False
 
             for key in self.ibm_forcing:
-                if hasattr(nc.variables[key], 'scale_factor'):
+                if hasattr(nc.variables[key], "scale_factor"):
                     self.scaled[key] = True
-                    self.scale_factor[key] = np.float32(
-                        nc.variables[key].scale_factor)
-                    self.add_offset[key] = np.float32(
-                        nc.variables[key].add_offset)
+                    self.scale_factor[key] = np.float32(nc.variables[key].scale_factor)
+                    self.add_offset[key] = np.float32(nc.variables[key].add_offset)
                 else:
                     self.scaled[key] = False
 
@@ -247,23 +245,22 @@ class Forcing:
             print(fname)
             with Dataset(fname) as nc:
                 # new_times = nc.variables['ocean_time'][:]
-                new_times = nc.variables['time'][:]
+                new_times = nc.variables["time"][:]
                 times.extend(new_times)
                 num_frames.append(len(new_times))
-        logging.info("Number of available forcing times = {:d}".
-                     format(len(times)))
+        logging.info("Number of available forcing times = {:d}".format(len(times)))
 
         # Find first/last forcing times
         # -----------------------------
         time0 = num2date(times[0], time_units)
         time1 = num2date(times[-1], time_units)
-        logging.info('time0 = {}'.format(str(time0)))
-        logging.info('time1 = {}'.format(str(time1)))
+        logging.info("time0 = {}".format(str(time0)))
+        logging.info("time1 = {}".format(str(time1)))
         # print(time0)
         # print(time1)
-        start_time = np.datetime64(config['start_time'])
+        start_time = np.datetime64(config["start_time"])
         # self.time = start_time
-        self.dt = np.timedelta64(int(config['dt']), 's')  # or use
+        self.dt = np.timedelta64(int(config["dt"]), "s")  # or use
 
         # Check that forcing period covers the simulation period
         # ------------------------------------------------------
@@ -272,7 +269,7 @@ class Forcing:
         if time0 > start_time:
             logging.error("No forcing at start time")
             raise SystemExit(3)
-        if time1 < config['stop_time']:
+        if time1 < config["stop_time"]:
             logging.error("No forcing at stop time")
             raise SystemExit(3)
 
@@ -282,8 +279,8 @@ class Forcing:
         for t in times:
             # print(num2date(t, time_units), t)
             otime = np.datetime64(str(num2date(t, time_units)))
-            dtime = np.timedelta64(otime - start_time, 's').astype(int)
-            steps.append(int(dtime / config['dt']))
+            dtime = np.timedelta64(otime - start_time, "s").astype(int)
+            steps.append(int(dtime / config["dt"]))
 
         # print(steps)
 
@@ -321,14 +318,14 @@ class Forcing:
             self.dU = (self.Unew - self.U) / stepdiff
             self.dV = (self.Vnew - self.V) / stepdiff
             # Interpolate to time step = -1
-            self.U = self.U - (prestep+1)*self.dU
-            self.V = self.V - (prestep+1)*self.dV
+            self.U = self.U - (prestep + 1) * self.dU
+            self.V = self.V - (prestep + 1) * self.dV
             # Other forcing
             for name in self.ibm_forcing:
                 self[name] = self._read_field(name, prestep)
-                self[name+'new'] = self._read_field(name, nextstep)
-                self['d'+name] = (self[name+'new'] - self[name]) / prestep
-                self[name] = self[name] - (prestep+1)*self['d'+name]
+                self[name + "new"] = self._read_field(name, nextstep)
+                self["d" + name] = (self[name + "new"] - self[name]) / prestep
+                self[name] = self[name] - (prestep + 1) * self["d" + name]
 
         elif steps[0] == 0:
             # Simulation start at first forcing time
@@ -345,9 +342,9 @@ class Forcing:
             # Other forcing:
             for name in self.ibm_forcing:
                 self[name] = self._read_field(name, 0)
-                self[name+'new'] = self._read_field(name, steps[1])
-                self['d'+name] = (self[name+'new'] - self[name]) / steps[1]
-                self[name] = self[name] - self['d'+name]
+                self[name + "new"] = self._read_field(name, steps[1])
+                self["d" + name] = (self[name + "new"] - self[name]) / steps[1]
+                self[name] = self[name] - self["d" + name]
 
         self.steps = steps
         self._files = files
@@ -368,21 +365,20 @@ class Forcing:
             self.U = self.Unew
             self.V = self.Vnew
             for name in self.ibm_forcing:
-                self[name] = self[name + 'new']
+                self[name] = self[name + "new"]
         else:
             if t - 1 in self.steps:  # Need new fields
                 stepdiff = self.stepdiff[self.steps.index(t - 1)]
                 nextstep = t - 1 + stepdiff
                 self.Unew, self.Vnew = self._read_velocity(nextstep)
                 for name in self.ibm_forcing:
-                    self[name + 'new'] = self._read_field(name, nextstep)
+                    self[name + "new"] = self._read_field(name, nextstep)
                 if interpolate_velocity_in_time:
                     self.dU = (self.Unew - self.U) / stepdiff
                     self.dV = (self.Vnew - self.V) / stepdiff
                 if interpolate_ibm_forcing_in_time:
                     for name in self.ibm_forcing:
-                        self['d' + name] = (
-                            (self[name + 'new'] - self[name]) / stepdiff)
+                        self["d" + name] = (self[name + "new"] - self[name]) / stepdiff
 
             # "Ordinary" time step (including self.steps+1)
             if interpolate_velocity_in_time:
@@ -390,7 +386,7 @@ class Forcing:
                 self.V += self.dV
             if interpolate_ibm_forcing_in_time:
                 for name in self.ibm_forcing:
-                    self[name] += self['d' + name]
+                    self[name] += self["d" + name]
 
     # --------------
 
@@ -401,7 +397,7 @@ class Forcing:
 
         # Handle file opening/closing
         # Always read velocity before other fields
-        logging.debug('Reading velocity for time step = {}'.format(n))
+        logging.debug("Reading velocity for time step = {}".format(n))
         first = True
         if first:  # Open file initiallt
             self._nc = Dataset(self._files[self.file_idx[n]])
@@ -416,13 +412,13 @@ class Forcing:
         frame = self.frame_idx[n]
 
         # Read the velocity
-        U = self._nc.variables['u'][frame, :, self._grid.Ju, self._grid.Iu]
-        V = self._nc.variables['v'][frame, :, self._grid.Jv, self._grid.Iv]
+        U = self._nc.variables["u"][frame, :, self._grid.Ju, self._grid.Iu]
+        V = self._nc.variables["v"][frame, :, self._grid.Jv, self._grid.Iv]
         # Scale if needed
         # Assume offset = 0 for velocity
-        if self.scaled['U']:
-            U = self.scale_factor['U'] * U
-            V = self.scale_factor['U'] * V
+        if self.scaled["U"]:
+            U = self.scale_factor["U"] * U
+            V = self.scale_factor["U"] * V
             # U = self.add_offset['U'] + self.scale_factor['U']*U
             # V = self.add_offset['U'] + self.scale_factor['U']*V
 
@@ -455,17 +451,23 @@ class Forcing:
         self._nc.close()
 
     # def sample_velocity(self, X, Y, Z, tstep=0, method='bilinear'):
-    def velocity(self, X, Y, Z, tstep=0, method='bilinear'):
+    def velocity(self, X, Y, Z, tstep=0, method="bilinear"):
 
         i0 = self._grid.i0
         j0 = self._grid.j0
         K, A = vert_level(self._grid.z_levels, X - i0, Y - j0, Z)
         if tstep < 0.001:
-            return sample3DUV(self.U, self.V,
-                              X - i0, Y - j0, K, A, method=method)
+            return sample3DUV(self.U, self.V, X - i0, Y - j0, K, A, method=method)
         else:
-            return sample3DUV(self.U + tstep * self.dU, self.V + tstep * self.dV,
-                              X - i0, Y - j0, K, A, method=method)
+            return sample3DUV(
+                self.U + tstep * self.dU,
+                self.V + tstep * self.dV,
+                X - i0,
+                Y - j0,
+                K,
+                A,
+                method=method,
+            )
 
     # Simplify to grid cell
     def field(self, X, Y, Z, name):
@@ -474,7 +476,7 @@ class Forcing:
         j0 = self._grid.j0
         K, A = vert_level(self._grid.z_levels, X - i0, Y - j0, Z)
         F = self[name]
-        return sample3D(F, X - i0, Y - j0, K, A, method='nearest')
+        return sample3D(F, X - i0, Y - j0, K, A, method="nearest")
 
 
 # ---------------------------------------------
@@ -484,7 +486,7 @@ class Forcing:
 # ----------------------------------------------
 
 
-def s_stretch(N, theta_s, theta_b, stagger='rho', Vstretching=1):
+def s_stretch(N, theta_s, theta_b, stagger="rho", Vstretching=1):
     """Compute a s-level stretching array
 
     *N* : Number of vertical levels
@@ -499,7 +501,7 @@ def s_stretch(N, theta_s, theta_b, stagger='rho', Vstretching=1):
 
     """
 
-    if stagger == 'rho':
+    if stagger == "rho":
         S = -1.0 + (0.5 + np.arange(N)) / N
     elif stagger == "w":
         S = np.linspace(-1.0, 0.0, N + 1)
@@ -509,8 +511,9 @@ def s_stretch(N, theta_s, theta_b, stagger='rho', Vstretching=1):
     if Vstretching == 1:
         cff1 = 1.0 / np.sinh(theta_s)
         cff2 = 0.5 / np.tanh(0.5 * theta_s)
-        return ((1.0 - theta_b) * cff1 * np.sinh(theta_s * S) +
-                theta_b * (cff2 * np.tanh(theta_s * (S + 0.5)) - 0.5))
+        return (1.0 - theta_b) * cff1 * np.sinh(theta_s * S) + theta_b * (
+            cff2 * np.tanh(theta_s * (S + 0.5)) - 0.5
+        )
 
     elif Vstretching == 2:
         a, b = 1.0, 1.0
@@ -564,9 +567,9 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     C = np.asarray(C)
     N = len(C)
     outshape = (N,) + Hshape  # Shape of output
-    if stagger == 'rho':
+    if stagger == "rho":
         S = -1.0 + (0.5 + np.arange(N)) / N  # Unstretched coordinates
-    elif stagger == 'w':
+    elif stagger == "w":
         S = np.linspace(-1.0, 0.0, N)
     else:
         raise ValueError("stagger must be 'rho' or 'w'")
@@ -578,7 +581,7 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
 
     elif Vtransform == 2:  # New transform by Shchepetkin
         N = Hc * S[:, None] + np.outer(C, H)
-        D = (1.0 + Hc / H)
+        D = 1.0 + Hc / H
         return (N / D).reshape(outshape)
 
     else:
@@ -621,7 +624,7 @@ def vert_level(z_level, X, Y, Z):
     return K, A
 
 
-def sample3D(F, X, Y, K, A, method='bilinear'):
+def sample3D(F, X, Y, K, A, method="bilinear"):
     """
     Sample a 3D field on the (sub)grid
 
@@ -644,10 +647,10 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
     # print('sample3D: method =', method)
 
     # sjekk om 1-A eller A
-    if method == 'bilinear':
+    if method == "bilinear":
         # Find rho-point as lower left corner
-        I = X.astype('int')
-        J = Y.astype('int')
+        I = X.astype("int")
+        J = Y.astype("int")
         P = X - I
         Q = Y - J
         W000 = (1 - P) * (1 - Q) * A
@@ -659,17 +662,25 @@ def sample3D(F, X, Y, K, A, method='bilinear'):
         W101 = P * (1 - Q) * (1 - A)
         W111 = P * Q * (1 - A)
 
-        return (W000 * F[K, J, I] + W010 * F[K, J + 1, I] +
-                W100 * F[K, J, I + 1] + W110 * F[K, J + 1, I + 1] +
-                W001 * F[K - 1, J, I] + W011 * F[K - 1, J + 1, I] +
-                W101 * F[K - 1, J, I + 1] + W111 * F[K - 1, J + 1, I + 1])
+        return (
+            W000 * F[K, J, I]
+            + W010 * F[K, J + 1, I]
+            + W100 * F[K, J, I + 1]
+            + W110 * F[K, J + 1, I + 1]
+            + W001 * F[K - 1, J, I]
+            + W011 * F[K - 1, J + 1, I]
+            + W101 * F[K - 1, J, I + 1]
+            + W111 * F[K - 1, J + 1, I + 1]
+        )
 
     else:  # method == 'nearest'
-        I = X.round().astype('int')
-        J = Y.round().astype('int')
+        I = X.round().astype("int")
+        J = Y.round().astype("int")
         return F[K, J, I]
 
 
-def sample3DUV(U, V, X, Y, K, A, method='bilinear'):
-    return (sample3D(U, X+0.5, Y, K, A, method=method),
-            sample3D(V, X, Y+0.5, K, A, method=method))
+def sample3DUV(U, V, X, Y, K, A, method="bilinear"):
+    return (
+        sample3D(U, X + 0.5, Y, K, A, method=method),
+        sample3D(V, X, Y + 0.5, K, A, method=method),
+    )

@@ -10,7 +10,7 @@ from nested_gridforce import Grid
 # ---------------
 
 # Files
-particle_file = 'nested.nc'
+particle_file = "nested.nc"
 
 
 # Define the grids
@@ -38,10 +38,10 @@ num_times = pf.num_times
 
 # Set up the plot area
 fig = plt.figure(figsize=(12, 10))
-ax = plt.axes(aspect='equal')
+ax = plt.axes(aspect="equal")
 
 # Background bathymetry
-cmap = plt.get_cmap('Blues')
+cmap = plt.get_cmap("Blues")
 ax.contourf(Xcell, Ycell, H, cmap=cmap, alpha=0.3)
 
 # Lon/lat lines
@@ -56,17 +56,16 @@ M = np.ma.masked_where(~M, M)
 plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 
 # Plot border of fine subgrid
-x0, y0 = 55, 12   # Not easy to get from nested_gridforce
+x0, y0 = 55, 12  # Not easy to get from nested_gridforce
 x1 = x0 + g.fine_grid.imax
 y1 = y0 + g.fine_grid.jmax
-plt.plot([x0, x1, x1, x0, x0], [y0, y0, y1, y1, y0], color='black')
+plt.plot([x0, x1, x1, x0, x0], [y0, y0, y1, y1, y0], color="black")
 
 # Plot initial particle distribution
 X, Y = pf.position(0)
-particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
+particle_dist, = ax.plot(X, Y, ".", color="red", markeredgewidth=0, lw=0.5)
 # title = ax.set_title(pf.time(0))
-timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15,
-                    transform=ax.transAxes)
+timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15, transform=ax.transAxes)
 
 
 # Update function
@@ -91,9 +90,16 @@ def onClick(event):
 
 
 # Do the animation
-anim = FuncAnimation(fig, animate, frames=num_times, interval=20,
-                     repeat=True, repeat_delay=500, blit=True)
+anim = FuncAnimation(
+    fig,
+    animate,
+    frames=num_times,
+    interval=20,
+    repeat=True,
+    repeat_delay=500,
+    blit=True,
+)
 
-fig.canvas.mpl_connect('button_press_event', onClick)
+fig.canvas.mpl_connect("button_press_event", onClick)
 
 plt.show()

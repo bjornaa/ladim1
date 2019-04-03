@@ -36,8 +36,8 @@ def cellcount(X, Y, W=None, gridspec=None, return_edges=False):
     # C = np.zeros((jmax, imax))
 
     # Count
-    x_edges = np.arange(i0-0.5, i1)
-    y_edges = np.arange(j0-0.5, j1)
+    x_edges = np.arange(i0 - 0.5, i1)
+    y_edges = np.arange(j0 - 0.5, j1)
     if W is None:
         C = np.histogram2d(Y, X, bins=[y_edges, x_edges])
     else:

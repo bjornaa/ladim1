@@ -45,14 +45,14 @@ def main():
     # Choose GSHHS resolution
     # 'f' = full, 'h' = high, 'i' = intermediate,
     # 'l' = low, 'c' = crude
-    GSHHSres = 'i'
+    GSHHSres = "i"
 
     # Choose a list of GSHHS types
     # 1 = land, 2 = lake, 3 = island in lake, 4 = pond in island in lake
     GSHHStypes = [1]
 
     # Output coast file
-    coastfile = 'coast.npy'
+    coastfile = "coast.npy"
 
     # --- End user settings ---
 
@@ -77,10 +77,14 @@ def makecoast(lon0, lon1, lat0, lat1, GSHHSres, GSHHStypes, coastfile):
 
     # Use the identity projection, x=lon, y=lat
     # This is called the cylindrical equidistand projection
-    bmap = Basemap(projection='cyl',
-                   llcrnrlon=lon0, llcrnrlat=lat0,
-                   urcrnrlon=lon1, urcrnrlat=lat1,
-                   resolution=GSHHSres)
+    bmap = Basemap(
+        projection="cyl",
+        llcrnrlon=lon0,
+        llcrnrlat=lat0,
+        urcrnrlon=lon1,
+        urcrnrlat=lat1,
+        resolution=GSHHSres,
+    )
 
     # ----------------------------
     # Get the coast polygon data
@@ -90,8 +94,9 @@ def makecoast(lon0, lon1, lat0, lat1, GSHHSres, GSHHStypes, coastfile):
     polygons = bmap.coastpolygons
 
     # Only use the selected polygon types
-    polygons = [p for (p, t) in zip(polygons, bmap.coastpolygontypes)
-                if t in GSHHStypes]
+    polygons = [
+        p for (p, t) in zip(polygons, bmap.coastpolygontypes) if t in GSHHStypes
+    ]
 
     # --------------------
     # Save the coast data
@@ -100,5 +105,5 @@ def makecoast(lon0, lon1, lat0, lat1, GSHHSres, GSHHStypes, coastfile):
     np.save(coastfile, polygons)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

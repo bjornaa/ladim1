@@ -1,4 +1,3 @@
-
 # Main gridforce controller
 
 import os
@@ -9,12 +8,11 @@ import importlib
 
 
 class Grid:
-
     def __init__(self, config):
         # Allow gridforce module in current directory
         sys.path.insert(0, os.getcwd())
         # Import correct gridforce_module
-        gridforce_module = importlib.import_module(config['gridforce_module'])
+        gridforce_module = importlib.import_module(config["gridforce_module"])
         self.grid = gridforce_module.Grid(config)
         self.xmin = self.grid.xmin
         self.xmax = self.grid.xmax
@@ -54,12 +52,11 @@ class Grid:
 
 
 class Forcing:
-
     def __init__(self, config, grid, **args):
         # Allow gridforce module in current directory
         sys.path.insert(0, os.getcwd())
         # Import correct gridforce_module
-        gridforce_module = importlib.import_module(config['gridforce_module'])
+        gridforce_module = importlib.import_module(config["gridforce_module"])
         self.forcing = gridforce_module.Forcing(config, grid.grid, **args)
         # self.steps = self.forcing.steps
         # self.U = self.forcing.U

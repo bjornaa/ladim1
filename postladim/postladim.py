@@ -170,7 +170,7 @@ class Trajectory:
     """Single particle trajectory"""
 
     def __init__(self, times: List[int], X: np.ndarray, Y: np.ndarray) -> None:
-    #def __init__(self, times, X, Y) -> None:
+        # def __init__(self, times, X, Y) -> None:
         self.times = times
         self.X = X
         self.Y = Y

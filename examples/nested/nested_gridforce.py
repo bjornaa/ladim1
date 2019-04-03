@@ -5,7 +5,6 @@ from ladim.sample import sample2D
 
 
 class Grid(object):
-
     def __init__(self, config):
 
         # Make a virtual grid, subgrid of original
@@ -31,18 +30,18 @@ class Grid(object):
         #
         # dx and dy can be estimated from lon/lat
         # but for the example use the original grid
-        orig_file = '../data/ocean_avg_0014.nc'
+        orig_file = "../data/ocean_avg_0014.nc"
         with Dataset(orig_file) as nc:
-            self.lon = nc.variables['lon_rho'][j0: j1, i0: i1]
-            self.lat = nc.variables['lat_rho'][j0: j1, i0: i1]
-            self.dx = 1. / nc.variables['pm'][j0: j1, i0: i1]
-            self.dy = 1. / nc.variables['pn'][j0: j1, i0: i1]
+            self.lon = nc.variables["lon_rho"][j0:j1, i0:i1]
+            self.lat = nc.variables["lat_rho"][j0:j1, i0:i1]
+            self.dx = 1.0 / nc.variables["pm"][j0:j1, i0:i1]
+            self.dy = 1.0 / nc.variables["pn"][j0:j1, i0:i1]
 
         # Initiate coarse grid
         # Original grid, subsampled 3x3
         coarse_config = config.copy()
-        coarse_config['grid_file'] = 'forcing_northsea.nc'
-        coarse_config['input_file'] = 'forcing_northsea.nc'
+        coarse_config["grid_file"] = "forcing_northsea.nc"
+        coarse_config["input_file"] = "forcing_northsea.nc"
         self.coarse_grid = ROMS.Grid(coarse_config)
         self.coarse_config = coarse_config
         print("Coarse grid OK")
@@ -50,8 +49,8 @@ class Grid(object):
         # Initiate fine grid
         # subgrid: i0, i1 = 135, 172, j0, j1 = 42, 81 of orginal
         fine_config = config.copy()
-        fine_config['grid_file'] = 'forcing_skagerrak.nc'
-        fine_config['input_file'] = 'forcing_skagerrak.nc'
+        fine_config["grid_file"] = "forcing_skagerrak.nc"
+        fine_config["input_file"] = "forcing_skagerrak.nc"
         self.fine_grid = ROMS.Grid(fine_config)
         self.fine_config = fine_config
         print("Fine grid OK")
@@ -91,38 +90,33 @@ class Grid(object):
         return A
 
     def sample_depth(self, X, Y):
-        return self.delegate(X, Y, 'sample_depth')
+        return self.delegate(X, Y, "sample_depth")
 
     def lonlat(self, X, Y):
         """Return the longitude and latitude from grid coordinates"""
-        return (sample2D(self.lon, X, Y),
-                sample2D(self.lat, X, Y))
+        return (sample2D(self.lon, X, Y), sample2D(self.lat, X, Y))
 
     def ingrid(self, X, Y):
         # Hva med endepunkyrt i C-grid, er her konservativ
         # utelukker siste grid-celle
         """Returns True for points inside the subgrid"""
-        return ((0.5 <= X) & (X <= self.imax-1.5) &
-                (0.5 <= Y) & (Y <= self.jmax-1.5))
+        return (0.5 <= X) & (X <= self.imax - 1.5) & (0.5 <= Y) & (Y <= self.jmax - 1.5)
 
     def onland(self, X, Y):
-        return self.delegate(X, Y, 'onland') > 0.5
+        return self.delegate(X, Y, "onland") > 0.5
 
     def atsea(self, X, Y):
-        return self.delegate(X, Y, 'atsea') > 0.5
+        return self.delegate(X, Y, "atsea") > 0.5
 
 
 class Forcing:
-
     def __init__(self, config, grid):
 
-        self.fine_forcing = ROMS.Forcing(
-            grid.fine_config, grid.fine_grid)
+        self.fine_forcing = ROMS.Forcing(grid.fine_config, grid.fine_grid)
         print("Fine forcing OK")
 
         # May adjust coonfig
-        self.coarse_forcing = ROMS.Forcing(
-            grid.coarse_config, grid.coarse_grid)
+        self.coarse_forcing = ROMS.Forcing(grid.coarse_config, grid.coarse_grid)
         print("Coarse forcing OK")
 
         # TODO: generalize to consider different timings in the grids
@@ -167,8 +161,6 @@ class Forcing:
 
         U = np.empty(len(X), dtype=float)
         V = np.empty(len(X), dtype=float)
-        U[fine], V[fine] = self.fine_forcing.velocity(
-            X1, Y1, Z1, tstep=tstep)
-        U[~fine], V[~fine] = self.coarse_forcing.velocity(
-            X2, Y2, Z2, tstep=tstep)
+        U[fine], V[fine] = self.fine_forcing.velocity(X1, Y1, Z1, tstep=tstep)
+        U[~fine], V[~fine] = self.coarse_forcing.velocity(X2, Y2, Z2, tstep=tstep)
         return U, V

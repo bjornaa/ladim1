@@ -14,8 +14,8 @@ from postladim import ParticleFile
 # ----------------
 
 
-particle_file = '/hexagon/vol1/bjorn_rhea/out.nc'
-grid_file = '/data/model_data006/anneds/Lusedata/Gridfiler/norkyst_800m_grid_full.nc'
+particle_file = "/hexagon/vol1/bjorn_rhea/out.nc"
+grid_file = "/data/model_data006/anneds/Lusedata/Gridfiler/norkyst_800m_grid_full.nc"
 
 output_file = "c2.nc"
 
@@ -33,10 +33,10 @@ date1 = datetime.datetime(2017, 3, 11)
 # ----------------
 
 f = Dataset(grid_file)
-H = f.variables['h'][:, :]
-M = f.variables['mask_rho'][:, :]
-lon = f.variables['lon_rho'][:, :]
-lat = f.variables['lat_rho'][:, :]
+H = f.variables["h"][:, :]
+M = f.variables["mask_rho"][:, :]
+lon = f.variables["lon_rho"][:, :]
+lat = f.variables["lat_rho"][:, :]
 f.close()
 
 jmax, imax = H.shape
@@ -67,13 +67,16 @@ C = np.zeros((jmax, imax))
 for n in range(n0, n1 + 1):
     print(n)
     X0, Y0 = pf.position(n)
-    S0 = pf['super', n]
-    A = pf['age', n]
+    S0 = pf["super", n]
+    A = pf["age", n]
     I = (ddmin <= A) & (A < ddmax)
     C0, Yb, Xb = np.histogram2d(
-        Y0[I], X0[I], weights=S0[I],
+        Y0[I],
+        X0[I],
+        weights=S0[I],
         bins=(jmax, imax),
-        range=[[-0.5, jmax - 0.5], [-0.5, imax - 0.5]])
+        range=[[-0.5, jmax - 0.5], [-0.5, imax - 0.5]],
+    )
     C += C0
 
 # pf.close()
@@ -84,17 +87,16 @@ C /= n1 + 1 - n0
 # Define output NetCDF file
 # --------------------------
 
-nc = Dataset(output_file, mode='w',
-             format='NETCDF3_CLASSIC')
+nc = Dataset(output_file, mode="w", format="NETCDF3_CLASSIC")
 
 # Dimensions
-nc.createDimension('xi_rho', imax)
-nc.createDimension('eta_rho', jmax)
+nc.createDimension("xi_rho", imax)
+nc.createDimension("eta_rho", jmax)
 # nc.createDimension('release_locations', N_release)
 
 
 # Variables
-v = nc.createVariable('conc', 'f', ('eta_rho', 'xi_rho'))
+v = nc.createVariable("conc", "f", ("eta_rho", "xi_rho"))
 v.long_name = "Particle concentration"
 v.units = "number of particles in grid cell"
 
@@ -108,7 +110,7 @@ nc.history = "Created %s by spreading2nc.py" % datetime.date.today()
 # Save variables
 # ------------------
 
-nc.variables['conc'][:, :] = C
+nc.variables["conc"][:, :] = C
 
 # -------------
 # Clean up

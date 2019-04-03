@@ -1,7 +1,7 @@
 # import pprint
 import yaml
 
-f = open('test.yaml')
+f = open("test.yaml")
 
 A = yaml.safe_load(f)
 

@@ -3,7 +3,6 @@ from netCDF4 import Dataset
 
 
 class InstanceVariable:
-
     def __init__(self, particlefile, name):
         self._pf = particlefile
         self._name = name
@@ -16,7 +15,6 @@ class InstanceVariable:
 
 
 class ParticleVariable:
-
     def __init__(self, particlefile, name):
         self._pf = particlefile
         self._name = name
@@ -30,20 +28,19 @@ class ParticleVariable:
 
 
 class ParticleFile:
-
     def __init__(self, filename):
-        self.nc = Dataset(filename, mode='r')
-        self.num_times = len(self.nc.dimensions['time'])
+        self.nc = Dataset(filename, mode="r")
+        self.num_times = len(self.nc.dimensions["time"])
         self.variables = dict()
         self.instance_variables, self.particle_variables = [], []
         for key, var in self.nc.variables.items():
-            if 'particle_instance' in var.dimensions:
+            if "particle_instance" in var.dimensions:
                 self.instance_variables.append(key)
                 self.variables[key] = InstanceVariable(self, key)
-            elif 'particle' in var.dimensions:
+            elif "particle" in var.dimensions:
                 self.particle_variables.append(key)
                 self.variables[key] = ParticleVariable(self, key)
-        self._count = self.nc.variables['particle_count'][:]
+        self._count = self.nc.variables["particle_count"][:]
         self._start = np.concatenate(([0], np.cumsum(self._count[:-1])))
 
     def _get_variable(self, name, n):
@@ -51,5 +48,4 @@ class ParticleFile:
         # Må ha test, om name er variabel
         start = self._start[n]
         count = self._count[n]
-        return self.nc.variables[name][start:start+count]
-
+        return self.nc.variables[name][start : start + count]

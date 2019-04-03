@@ -11,14 +11,14 @@ from particlefile import ParticleFile
 
 # Files
 # particle_file = '../output/pyladim_out.nc'
-particle_file = '../output/streak.nc'
-roms_file = '../input/ocean_avg_0014.nc'
+particle_file = "../output/streak.nc"
+roms_file = "../input/ocean_avg_0014.nc"
 
 # Subgrid definition
 i0, j0 = 70, 80
 i1, j1 = 150, 133
 
-t = 96     # time step 31
+t = 96  # time step 31
 
 # Length scale (in grid units)
 sigma = 3.14
@@ -48,12 +48,12 @@ tstring = pf.get_time(t)
 #         for i in range(i0, i1):
 #             A[j-j0, i-i0] += g.mask_rho * np.exp
 
-A = np.zeros((j1-j0, i1-i0))
-L2 = 2*sigma
+A = np.zeros((j1 - j0, i1 - i0))
+L2 = 2 * sigma
 for j in range(j0, j1):
     for i in range(i0, i1):
-        A[j-j0, i-i0] = np.sum(np.exp(- ((i-X)/L2)**2 - ((j-Y)/L2)**2))
-A /= (np.pi * L2**2)
+        A[j - j0, i - i0] = np.sum(np.exp(-((i - X) / L2) ** 2 - ((j - Y) / L2) ** 2))
+A /= np.pi * L2 ** 2
 
 print(np.sum(A))
 
@@ -73,9 +73,9 @@ fig.colorbar(h)
 landmask(g, (0.6, 0.8, 0.0))
 
 # Plot iparticle distribution
-h = ax.plot(X, Y, '.', color='black', markeredgewidth=0, lw=0.5)
+h = ax.plot(X, Y, ".", color="black", markeredgewidth=0, lw=0.5)
 ax.set_title(tstring)
 
 # Show the results
-plt.axis('image')
+plt.axis("image")
 plt.show()
