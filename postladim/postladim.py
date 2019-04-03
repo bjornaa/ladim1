@@ -20,6 +20,7 @@ class InstanceVariable:
         self.name = varname
         # Copy the netcdf attributes
         nc = particlefile.nc
+        nc.set_auto_mask(False)
         for v in nc.variables[varname].ncattrs():
             setattr(self, v, getattr(nc.variables[varname], v))
 
@@ -41,6 +42,24 @@ class InstanceVariable:
             raise TypeError("index must be int or slice")
 
         return self.pf.nc.variables[self.name][start:end]
+
+    def get_value(self, time_index: int, pid: int) -> Any:
+        """Return value given time index and particle identifier"""
+        # TODO: Let time_index be a slice => trajectory
+        n = time_index
+        start = self.pf.start[n]
+        end = self.pf.end[n]
+        pids = self.pf.nc.variables["pid"][start:end]
+
+        if pid > pids[-1]:  # Particle not released yet
+            raise IndexError(f"Particle {pid} not released at time index {n}")
+        if pid < 0:
+            raise IndexError("Negative particle identifier is not allowed")
+        index = pids.searchsorted(pid)
+        if pid != pids[index]:
+            raise IndexError(f"Particle {pid} is terminated at time index {n}")
+
+        return self.pf.nc.variables[self.name][start + index]
 
 
 class ParticleVariable:
@@ -126,7 +145,7 @@ class ParticleFile:
 
         f = self.nc
         X, Y = [], []
-        first_time = None
+        first_time = -99
         last_time = self.num_times
 
         # After loop
@@ -141,7 +160,7 @@ class ParticleFile:
             if pid[-1] < p:  # particle not released yet
                 continue
 
-            if first_time is None:
+            if first_time < 0:
                 first_time = n
 
             # index = sum(pid < p) # eller lignende
