@@ -48,7 +48,7 @@ class ParticleReleaser(Iterator):
         logging.info("Initializing the particle releaser")
 
         # Read the particle release file
-        A = pd.read_table(
+        A = pd.read_csv(
             config["particle_release_file"],
             names=config["release_format"],
             converters=config["release_dtype"],
