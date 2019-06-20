@@ -63,8 +63,7 @@ class InstanceVariable:
 
 
 class ParticleVariable:
-    """Particle variable, time-independent
-    """
+    """Particle variable, time-independent"""
 
     def __init__(self, particlefile: "ParticleFile", varname: str) -> None:
         self.pf = particlefile
@@ -77,17 +76,19 @@ class ParticleVariable:
     def __getitem__(self, p: int) -> Any:
         """Get the value of particle with pid = p
         """
-
         return self.pf.nc.variables[self.name][p]
 
+    def __getattr__(self, p: int) -> Any:
+        """Get the value of particle with pid = p
+        """
+        return self.pf.nc.variables[self.name][p]
 
 # Variable type, for type hinting
 Variable = Union[InstanceVariable, ParticleVariable]
 
 
 class ParticleFile:
-    """Dataset from a LADiM output fil
-    """
+    """Dataset from a LADiM output fil"""
 
     # Add reasonable exception if file not exist
     # or file is not a particle file
@@ -124,6 +125,7 @@ class ParticleFile:
         tvar = self.nc.variables["time"]
         return num2date(tvar[n], tvar.units)
 
+    # Not needed, use self.count[] directly
     def particle_count(self, n: int) -> int:
         """Return number of particles at a time frame"""
         return self.count[n]
@@ -138,6 +140,10 @@ class ParticleFile:
 
     # Allow simpler pf['X'] notation for pf.variables['X']
     def __getitem__(self, varname: str) -> Variable:
+        return self.variables[varname]
+
+    # Allow even simpler pf.X notation for pf['X']
+    def __getattr__(self, varname: str) -> Variable:
         return self.variables[varname]
 
     def trajectory(self, p: int) -> "Trajectory":
