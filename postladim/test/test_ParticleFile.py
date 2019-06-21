@@ -97,6 +97,26 @@ def test_X_slice(particle_file):
         assert all(pf.X[1:3] == pf.nc.variables["X"][pf.start[1] : pf.end[2]])
         assert list(pf.X[:]) == [5, 6, 10, 7, 11, 12]
         assert all(pf.X[:] == pf.nc.variables["X"][:])
+        with pytest.raises(IndexError):
+            pf.X[::2]      # Do not accept strides != 1
+
+
+def test_slice_advanced(particle_file):
+    """More advanced slicing"""
+    with ParticleFile(particle_file) as pf:
+        I = [True, True, False, True, False, False]
+        assert list(pf.X[I] == [5, 6, 7])
+        assert list(pf.X[[0,1,3]] == [5, 6, 7])
+        # Accept only integer or boolean sequences
+        with pytest.raises(IndexError):
+            pf.X["abc"]          # Not a sequence of integers
+        with pytest.raises(IndexError):
+            pf.X[3.14]           # Not integer, slice, or sequence
+        with pytest.raises(IndexError):   # Not a sequence
+            pf.X[{'a': 1}]       # Not integer, slice, or sequence
+        # Strange feature, inherited from NetCDF4
+        assert pf.X[[3.14]] == pf.X[[3]]
+
 
 
 def test_position(particle_file):

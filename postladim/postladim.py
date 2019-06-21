@@ -6,7 +6,8 @@
 # Institute of Marine Research
 # ---------------------------------
 
-from typing import Any, List, Dict, Union, Tuple
+from typing import Any, List, Dict, Union, Tuple, Sequence
+import collections
 import numpy as np
 from netCDF4 import Dataset, num2date
 
@@ -24,24 +25,27 @@ class InstanceVariable:
         for v in nc.variables[varname].ncattrs():
             setattr(self, v, getattr(nc.variables[varname], v))
 
-    def __getitem__(self, index: Union[int, slice]) -> np.ndarray:
+    def __getitem__(self, index: Union[int, slice, Sequence[int]]) -> np.ndarray:
         """Get values at time step = n
         """
 
         if isinstance(index, int):
             start = self.pf.start[index]
             end = self.pf.end[index]
-        elif isinstance(index, slice):
+            return self.pf.nc.variables[self.name][start:end]
+        if isinstance(index, slice):
             n = self.pf.num_times
             istart, istop, step = index.indices(n)
             if step != 1:
-                raise TypeError("step > 1 is not allowed")
+                raise IndexError("step > 1 is not allowed")
             start = self.pf.start[istart]
             end = self.pf.end[istop - 1]
-        else:
-            raise TypeError("index must be int or slice")
+            return self.pf.nc.variables[self.name][start:end]
+        if isinstance(index, collections.abc.Sequence):
+            return self.pf.nc.variables[self.name][index]
 
-        return self.pf.nc.variables[self.name][start:end]
+        raise IndexError("index must be int or slice or boolean sequence")
+
 
     def get_value(self, time_index: int, pid: int) -> Any:
         """Return value given time index and particle identifier"""
