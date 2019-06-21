@@ -1,6 +1,7 @@
 import numpy as np
 import xarray as xr
 
+
 def cellcount(X, Y, W=None, gridspec=None):
     """Count the (weighted) number of particles in grid cells
 
@@ -37,8 +38,8 @@ def cellcount(X, Y, W=None, gridspec=None):
         j1 = int(round(Y.max())) + 1
     else:
         i0, i1, j0, j1 = gridspec
-    imax = i1-i0
-    jmax = j1-j0
+    imax = i1 - i0
+    jmax = j1 - j0
 
     # Count
     x_edges = np.arange(i0 - 0.5, i1)

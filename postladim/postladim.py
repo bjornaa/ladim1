@@ -46,7 +46,6 @@ class InstanceVariable:
 
         raise IndexError("index must be int or slice or boolean sequence")
 
-
     def get_value(self, time_index: int, pid: int) -> Any:
         """Return value given time index and particle identifier"""
         # TODO: Let time_index be a slice => trajectory
@@ -86,6 +85,7 @@ class ParticleVariable:
         """Get the value of particle with pid = p
         """
         return self.pf.nc.variables[self.name][p]
+
 
 # Variable type, for type hinting
 Variable = Union[InstanceVariable, ParticleVariable]
