@@ -18,6 +18,37 @@ from netCDF4 import Dataset, num2date
 
 Config = Dict[str, Any]  # type of the config dictionary
 
+def configure_ibm(conf: Dict[str, Any]) -> Config:
+    # Assure that module is defined and correct obsolete ibm_module and ibm_variables
+    # Other arguments are passed on
+    if conf is None:
+        return {}
+    D = conf.get("ibm")
+    if D is None:
+        return {}
+
+    # Mandatory: module (or obsolete ibm_module)
+    if not "module" in D.keys():
+        if "ibm_module" in D.keys():
+            D["module"] = D.pop("ibm_module")
+        else:
+            logging.error("No IBM module specified")
+            raise SystemExit(1)
+
+    # Variables: variables (or obsolete ibm_variables)
+    if not "variables" in D.keys():
+        if "ibm_variables" in D.keys():
+            D["variables"] = D.pop("variables")
+        # ibm_variables may live under state
+        elif "state" in conf and conf["state"] is not None:
+            if "ibm_variables" in conf.get("state", dict()).keys():
+                D["variables"] = conf["state"]["ibm_variables"]
+        else:
+            D["variables"] = []
+
+    return D
+
+
 
 def configure(config_stream) -> Config:
 
@@ -38,14 +69,12 @@ def configure(config_stream) -> Config:
     logging.info("Configuration: Time Control")
     for name in ["start_time", "stop_time"]:
         config[name] = np.datetime64(conf["time_control"][name]).astype("M8[s]")
-        logging.info(f"    {name:15s}: {config[name]}")
-    try:
-        config["reference_time"] = np.datetime64(
-            conf["time_control"]["reference_time"]
-        ).astype("M8[s]")
-    except KeyError:
-        config["reference_time"] = config["start_time"]
-    logging.info(f'    {"reference_time":15s}: {config["reference_time"]}')
+        logging.info(f"    {name.replace('_', ' '):15s}: {config[name]}")
+    # reference_time, default = start_time
+    config["reference_time"] = np.datetime64(
+        conf["time_control"].get("reference_time", config["start_time"])
+    ).astype("M8[s]")
+    logging.info(f'    {"reference time":15s}: {config["reference_time"]}')
 
     # -------------
     # Files
@@ -121,13 +150,33 @@ def configure(config_stream) -> Config:
     logging.info(f'    {"ibm_forcing":15s}: {config["ibm_forcing"]}')
 
     # --- IBM ---
-    try:
-        config["ibm_module"] = conf["ibm"]["ibm_module"]
-        logging.info("Configuration: IBM")
-        logging.info(f'    {"ibm_module":15s}: {config["ibm_module"]}')
+
+    config["ibm"] = configure_ibm(conf)
+    # Make obsolete
+    config["ibm_variables"] = config["ibm"].get("variables", [])
+    config["ibm_module"] = config["ibm"].get("module")
+
+    # config["ibm"] = conf.get("ibm")
+    # print(config["ibm"])
+    # if config["ibm"] is not None:
+    #     # Mandatory: module, variables
+    #     if "ibm_module" in config["ibm"].keys():
+    #         config["ibm"]["module"] = config["ibm"].pop("ibm_module")
+    #     if "variables" not in config["ibm"].keys():
+    #         config["ibm"]["variables"] = []
+    #     config["ibm_module"] = config["ibm"]["module"]
+    #     config["ibm_variables"] = config["ibm"]["variables"]
+    # else:
+    #     config["ibm_module"] = None
+    #     config["ibm_variables"] = []
+    # # try:
+    #    config["ibm"] = conf["ibm"]
+    #
+    ##    config["ibm_module"] = conf["ibm"]["module"]
+    #
+    #    logging.info("Configuration: IBM")
+    #    logging.info(f'    {"ibm_module":15s}: {config["ibm_module"]}')
     # Skille på om ikke gitt, eller om navnet er feil
-    except KeyError:
-        config["ibm_module"] = ""
 
     # --- Particle release ---
     logging.info("Configuration: Particle Releaser")
@@ -157,12 +206,11 @@ def configure(config_stream) -> Config:
 
     # --- Model state ---
     logging.info("Configuration: Model State Variables")
-    state = conf["state"]
-    if state:
-        config["ibm_variables"] = state["ibm_variables"]
-    else:
-        config["ibm_variables"] = []
-    logging.info(f'    ibm_variables: {config["ibm_variables"]}')
+    # state = conf["state"]
+    state = dict()
+    # OBSOLETE
+    state["ibm_variables"] = config["ibm_variables"]
+    # logging.info(f'    ibm_variables: {config["ibm_variables"]}')
 
     # -----------------
     # Output control

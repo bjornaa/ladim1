@@ -18,10 +18,12 @@ files:
 state:
     # pid, X, Y, Z are mandatory and should not be given
     # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: [age]
+    #ibm_variables: [age]
 
 ibm:
-    ibm_module: killer_ibm
+    module: killer_ibm
+    variables: [age]
+    lifetime: 2   # Life time of particles in days
 
 particle_release:
     # type = continuous or discrete [default]

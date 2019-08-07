@@ -118,6 +118,16 @@ def test_slice_advanced(particle_file):
         assert pf.X[[3.14]] == pf.X[[3]]
 
 
+def test_isel(particle_file):
+    """Indexing in xarray style"""
+    with ParticleFile(particle_file) as pf:
+        X = pf.X
+        assert X.isel() == X
+        assert all(X.isel(time=2) == X[2])
+
+
+
+
 def test_position(particle_file):
     with ParticleFile(particle_file) as pf:
         X, Y = pf.position(2)

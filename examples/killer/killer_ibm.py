@@ -6,7 +6,7 @@ DAY = 24 * 60 * 60  # Number of seconds in a day
 class IBM:
     def __init__(self, config):
         print("Initializing killer feature")
-        pass
+        self.lifetime = config['ibm']['lifetime']
 
     def update_ibm(self, grid, state, forcing):
 
@@ -14,4 +14,4 @@ class IBM:
         state.age += state.dt  # Update the age
 
         # Mark particles older than 2 days as dead
-        state.alive = state.age < 2 * DAY
+        state.alive = state.age <  self.lifetime * DAY
