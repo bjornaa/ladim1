@@ -4,43 +4,59 @@ time_control:
     # Start and stop of simulation
     start_time     : 2015-04-01 00:00:00
     stop_time      : 2015-04-01 12:00:00
+    # reference_time is optional. default = start_time
     reference_time : 2015-01-01
 
 files:
     particle_release_file : salmon_lice.rls
     output_file           : out.nc
+    # For warm start, the warm_start_file goes here
 
 gridforce:
+    # Module name is mandatory.
+    # The other items are module dependent
     module: ladim.gridforce.ROMS
+    # An optional grid_file name can be given
+    # Here using the default = first input file
+    # grid_file: /scratch/Data/NK800/file_0000.nc
     input_file: /scratch/Data/NK800/file_????.nc
+    # subgrid format [i0, i1, j0, j1]
     subgrid: [200, 750, 300, 900]
+    # Any extra forcing besides horizontal velocity
     ibm_forcing: [temp, salt]
 
-# Samle IBM-variablene her
+# IBM section is optional
+# When using an IBM the module name is mandatory
+# The optional item variables is standardized, default = []
+# Other items are module dependent
 ibm:
-    # IBM-module, omit or '' for no IBM
     module: ladim.ibms.ibm_salmon_lice
     variables: [super, age]
 
 particle_release:
-    # release_type, discrete or continuous
+    # Discrete or continuous release in time
     release_type: continuous
+    # Frequency of continuous particle release, ignored if discrete
     release_frequency: [1, h]   # Hourly release
+    # List of variables in the release file
     variables: [mult, release_time, X, Y, Z, farmid, super]
-    # Converters (if not float)
+    # Converters (for variables that are not float)
     mult: int
     release_time: time   # np.datetime64[s]
     farmid: int
+    # Mark variables as time independent
     particle_variables: [release_time, farmid]
 
 output_variables:
+    # Frequency of output
     outper: [1, h]    # Output every hour
-    # Variable names
+    # Variables included in output
     particle: [release_time, farmid]
     instance: [pid, X, Y, Z, super, age]
     # NetCDF arguments
+    # format string and attributes
     release_time:
-        ncformat: f8
+        ncformat: f8   # 64 bit float
         long_name: particle release time
         # Reference_time becomes substituted with value set above
         units: seconds since reference_time
@@ -66,5 +82,6 @@ numerics:
     dt: [600, s]     # Format = [value, unit]
     # Advection method, EF, RK2, or RK4
     advection: RK2   # Second order Runge Kutta
-    # Horizontal diffusion coefficient
+    # Horizontal random walk diffusion coefficient
+    # omit or set to zero if no diffusion
     diffusion: 10    # [m/s**2]
