@@ -35,9 +35,9 @@ class Grid:
 
         logging.info("Initializing zROMS grid object")
         try:
-            ncid = Dataset(config["grid_file"])
+            ncid = Dataset(config["gridforce"]["grid_file"])
         except OSError:
-            logging.error("Grid file {} not found".format(config["grid_file"]))
+            logging.error("Grid file {} not found".format(config["gridforce"]["grid_file"]))
             raise SystemExit(1)
 
         # Subgrid, only considers internal grid cells
@@ -46,8 +46,8 @@ class Grid:
         # Here, imax, jmax refers to whole grid
         jmax, imax = ncid.variables["h"].shape
         whole_grid = [1, imax - 1, 1, jmax - 1]
-        if "subgrid" in config["grid_args"]:
-            limits = list(config["grid_args"]["subgrid"])
+        if "subgrid" in config["gridforce"]:
+            limits = list(config["gridforce"]["subgrid"])
         else:
             limits = whole_grid
         # Allow None if no imposed limitation
@@ -193,11 +193,11 @@ class Forcing:
         self.ibm_forcing = config["ibm_forcing"]
 
         # Test for glob, use MFDataset if needed
-        files = glob.glob(config["input_file"])
+        files = glob.glob(config["gridforce"]["input_file"])
         files.sort()
         numfiles = len(files)
         if numfiles == 0:
-            logging.error("No input file: {}".format(config["input_file"]))
+            logging.error("No input file: {}".format(config["gridforce"]["input_file"]))
             raise SystemExit(3)
         logging.info("Number of forcing files = {}".format(numfiles))
 

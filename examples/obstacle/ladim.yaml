@@ -8,19 +8,11 @@
 time_control:
     # Start and stop of simulation
     start_time: 2000-01-01 00:00:00
-    # stop_time:  1989-06-15 12:00:00
     stop_time:  2000-01-02 00:00:00
 
 files:
-    grid_file             : ""
-    input_file            : ""
     particle_release_file : obstacle.rls
     output_file           : obstacle.nc
-
-state:
-    # pid, X, Y, Z are mandatory and should not be given
-    # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: []
 
 particle_release:
     variables: [release_time, X, Y, Z]
@@ -30,10 +22,7 @@ particle_release:
 
 gridforce:
     module: gridforce_analytic
-    # module: gridforce_discrete
-    # mapping: model name -> name in input file
-    # velocity: {U: u, V: v}
-    # ibm_forcing: {}
+    #module: gridforce_discrete
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d

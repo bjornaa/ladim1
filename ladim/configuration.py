@@ -21,6 +21,7 @@ Config = Dict[str, Any]  # type of the config dictionary
 def configure_ibm(conf: Dict[str, Any]) -> Config:
     # Assure that module is defined and correct obsolete ibm_module and ibm_variables
     # Other arguments are passed on
+    logging.info("Configuration: IBM")
     if conf is None:
         return {}
     D = conf.get("ibm")
@@ -28,23 +29,64 @@ def configure_ibm(conf: Dict[str, Any]) -> Config:
         return {}
 
     # Mandatory: module (or obsolete ibm_module)
-    if not "module" in D.keys():
-        if "ibm_module" in D.keys():
+    if not "module" in D:
+        if "ibm_module" in D:
             D["module"] = D.pop("ibm_module")
         else:
             logging.error("No IBM module specified")
             raise SystemExit(1)
+    logging.info(f'    {"module":15s}: {D["module"]}')
 
     # Variables: variables (or obsolete ibm_variables)
-    if not "variables" in D.keys():
-        if "ibm_variables" in D.keys():
+    if not "variables" in D:
+        if "ibm_variables" in D:
             D["variables"] = D.pop("variables")
         # ibm_variables may live under state
         elif "state" in conf and conf["state"] is not None:
-            if "ibm_variables" in conf.get("state", dict()).keys():
+            if "ibm_variables" in conf.get("state", dict()):
                 D["variables"] = conf["state"]["ibm_variables"]
         else:
             D["variables"] = []
+
+    for key in D:
+        if key != "module":
+            logging.info(f'    {key:15s}: {D[key]}')
+
+
+    return D
+
+
+def configure_gridforce(conf: Dict[str, Any]) -> Config:
+    """Parse gridforce related info and pass on"""
+    logging.info("Configuration: gridforce")
+    if conf is None:
+        logging.error("No gridforce section in configuration file")
+        raise SystemExit(1)
+    D = conf.get("gridforce")
+    if D is None:
+        logging.error("No gridforce section in configuration file")
+        raise SystemExit(1)
+
+    # module is the only mandatory field
+    if "module" not in D:
+        logging.error("No gridforce module specified")
+        raise SystemExit(1)
+    logging.info(f'    {"module":15s}: {D["module"]}')
+
+    # Backwards compability (for ROMS.py)
+    if "files" in conf and conf["files"] is not None:
+        if "grid_file" in conf["files"]:
+            # Give grid_file under gridforce highest priority
+            if "grid_file" not in D:
+                D["grid_file"] = conf["files"]["grid_file"]
+        if "input_file" in conf["files"]:
+            # Give input_file under gridforce highest priority
+            if "input_file" not in D:
+                D["input_file"] = conf["files"]["input_file"]
+
+    for key in D:
+        if key != "module":
+            logging.info(f'    {key:15s}: {D[key]}')
 
     return D
 
@@ -81,7 +123,7 @@ def configure(config_stream) -> Config:
     # -------------
     logging.info("Configuration: Files")
     logging.info(f'    {"config_stream":15s}: {config_stream}')
-    for name in ["grid_file", "input_file", "particle_release_file", "output_file"]:
+    for name in ["particle_release_file", "output_file"]:
         config[name] = conf["files"][name]
         logging.info(f"    {name:15s}: {config[name]}")
 
@@ -131,16 +173,21 @@ def configure(config_stream) -> Config:
     logging.info(f'    {"number of time steps":15s}: {config["numsteps"]}')
 
     #  --- Grid ---
-    logging.info("Configuration: gridforce")
-    config["gridforce_module"] = conf["gridforce"]["module"]
-    logging.info(f'    {"module":15s}: {config["gridforce_module"]}')
-    # Grid arguments
-    try:
-        config["grid_args"] = conf["gridforce"]["grid"]
-    except KeyError:
-        config["grid_args"] = dict()
-    logging.info(f'    {"grid arguments":15s}: {config["grid_args"]}')
-    config["Vinfo"] = dict()
+    config["gridforce"] = configure_gridforce(conf)
+    # Backwards
+    # config["gridforce_module"] = config["gridforce"]["module"]
+    # config["grid_args"] = config["gridforce"]
+
+    # logging.info("Configuration: gridforce")
+    # config["gridforce_module"] = conf["gridforce"]["module"]
+    # logging.info(f'    {"module":15s}: {config["gridforce_module"]}')
+    # # Grid arguments
+    # try:
+    #     config["grid_args"] = conf["gridforce"]["grid"]
+    # except KeyError:
+    #     config["grid_args"] = dict()
+    # logging.info(f'    {"grid arguments":15s}: {config["grid_args"]}')
+    # config["Vinfo"] = dict()
 
     # --- Forcing ---
     try:
@@ -207,9 +254,9 @@ def configure(config_stream) -> Config:
     # --- Model state ---
     logging.info("Configuration: Model State Variables")
     # state = conf["state"]
-    state = dict()
+    #state = dict()
     # OBSOLETE
-    state["ibm_variables"] = config["ibm_variables"]
+    #state["ibm_variables"] = config["ibm_variables"]
     # logging.info(f'    ibm_variables: {config["ibm_variables"]}')
 
     # -----------------

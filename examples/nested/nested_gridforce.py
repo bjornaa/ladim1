@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 from netCDF4 import Dataset
 from ladim.gridforce import ROMS
@@ -39,18 +40,18 @@ class Grid(object):
 
         # Initiate coarse grid
         # Original grid, subsampled 3x3
-        coarse_config = config.copy()
-        coarse_config["grid_file"] = "forcing_northsea.nc"
-        coarse_config["input_file"] = "forcing_northsea.nc"
+        coarse_config = copy.deepcopy(config)
+        coarse_config["gridforce"] = dict()
+        coarse_config["gridforce"]["input_file"] = "forcing_northsea.nc"
         self.coarse_grid = ROMS.Grid(coarse_config)
-        self.coarse_config = coarse_config
+        self.coarse_config = copy.deepcopy(coarse_config)
         print("Coarse grid OK")
 
         # Initiate fine grid
         # subgrid: i0, i1 = 135, 172, j0, j1 = 42, 81 of orginal
         fine_config = config.copy()
-        fine_config["grid_file"] = "forcing_skagerrak.nc"
-        fine_config["input_file"] = "forcing_skagerrak.nc"
+        fine_config["gridforce"] = dict()
+        fine_config["gridforce"]["input_file"] = "forcing_skagerrak.nc"
         self.fine_grid = ROMS.Grid(fine_config)
         self.fine_config = fine_config
         print("Fine grid OK")

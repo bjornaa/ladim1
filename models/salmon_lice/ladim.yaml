@@ -7,27 +7,20 @@ time_control:
     reference_time : 2015-01-01
 
 files:
-    grid_file             : /scratch/Data/NK800/file_0000.nc
-    input_file            : /scratch/Data/NK800/file_????.nc
     particle_release_file : salmon_lice.rls
     output_file           : out.nc
 
 gridforce:
     module: ladim.gridforce.ROMS
-    ibm_forcing: {temp: temp, salt: salt}
-    # grid arguments
-    grid:
-        # subgrid, format=[i0, i1, j0, j1]
-        subgrid: [200, 750, 300, 900]
+    input_file: /scratch/Data/NK800/file_????.nc
+    subgrid: [200, 750, 300, 900]
+    ibm_forcing: [temp, salt]
 
 # Samle IBM-variablene her
 ibm:
     # IBM-module, omit or '' for no IBM
-    ibm_module: ladim.ibms.ibm_salmon_lice
-
-state:
-    # ibm_varables, optional default = []
-    ibm_variables: [super, age]
+    module: ladim.ibms.ibm_salmon_lice
+    variables: [super, age]
 
 particle_release:
     # release_type, discrete or continuous

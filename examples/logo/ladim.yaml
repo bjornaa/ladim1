@@ -11,15 +11,8 @@ time_control:
     stop_time:  1989-05-30 12:00:00
 
 files:
-    grid_file             : ../data/ocean_avg_0014.nc
-    input_file            : ../data/ocean_avg_*.nc
     particle_release_file : logo.rls
     output_file           : logo.nc
-
-state:
-    # pid, X, Y, Z are mandatory and should not be given
-    # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: []
 
 particle_release:
     variables: [release_time, X, Y, Z]
@@ -30,6 +23,7 @@ particle_release:
 
 gridforce:
     module: ladim.gridforce.ROMS
+    input_file            : ../data/ocean_avg_*.nc
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d

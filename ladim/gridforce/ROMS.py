@@ -35,10 +35,22 @@ class Grid:
     def __init__(self, config):
 
         logging.info("Initializing ROMS-type grid object")
+
+        # Grid file
+        if "grid_file" in config["gridforce"]:
+            grid_file = config["gridforce"]["grid_file"]
+        elif "input_file" in config["gridforce"]:
+            files = glob.glob(config["gridforce"]["input_file"])
+            files.sort()
+            grid_file = files[0]
+        else:
+            logging.error("No grid file specified")
+            raise SystemExit(1)
+
         try:
-            ncid = Dataset(config["grid_file"])
+            ncid = Dataset(grid_file)
         except OSError:
-            logging.error("Grid file {} not found".format(config["grid_file"]))
+            logging.error("Could not open grid file " + grid_file)
             raise SystemExit(1)
 
         # Subgrid, only considers internal grid cells
@@ -47,8 +59,8 @@ class Grid:
         # Here, imax, jmax refers to whole grid
         jmax, imax = ncid.variables["h"].shape
         whole_grid = [1, imax - 1, 1, jmax - 1]
-        if "subgrid" in config["grid_args"]:
-            limits = list(config["grid_args"]["subgrid"])
+        if "subgrid" in config["gridforce"]:
+            limits = list(config["gridforce"]["subgrid"])
         else:
             limits = whole_grid
         # Allow None if no imposed limitation
@@ -80,8 +92,8 @@ class Grid:
 
         # Vertical grid
 
-        if "Vinfo" in config["grid_args"]:
-            Vinfo = config["grid_args"]["Vinfo"]
+        if "Vinfo" in config["gridforce"]:
+            Vinfo = config["gridforce"]["Vinfo"]
             self.N = Vinfo["N"]
             self.hc = Vinfo["hc"]
             self.Vstretching = Vinfo.get("Vstretching", 1)
@@ -218,15 +230,14 @@ class Forcing:
         logging.info("Initiating forcing")
 
         self._grid = grid  # Get the grid object, make private?
-
         self.ibm_forcing = config["ibm_forcing"]
 
         # Forcing file(s)
-        files = glob.glob(config["input_file"])
+        files = glob.glob(config["gridforce"]["input_file"])
         files.sort()
         numfiles = len(files)
         if numfiles == 0:
-            logging.error("No input file: {}".format(config["input_file"]))
+            logging.error("No input file: {}".format(config["gridforce"]["input_file"]))
             raise SystemExit(3)
         logging.info("Number of available forcing files = {}".format(numfiles))
 
@@ -438,6 +449,7 @@ class Forcing:
         # Read the velocity
         U = self._nc.variables["u"][frame, :, self._grid.Ju, self._grid.Iu]
         V = self._nc.variables["v"][frame, :, self._grid.Jv, self._grid.Iv]
+
         # Scale if needed
         # Assume offset = 0 for velocity
         if self.scaled["U"]:

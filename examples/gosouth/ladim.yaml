@@ -5,26 +5,13 @@
 #
 
 time_control:
-    # Start and stop of simulation
-    # start_time: 1989-06-03 09
     start_time: 1989-05-24 12:00:00
-    # stop_time:  1989-06-15 12:00:00
     stop_time:  1989-06-05T12
-    # Reference time for netcdf output
-    # by default set to start_time
     reference_time: 1970-01-01 00
 
 files:
-    grid_file             : ../data/ocean_avg_0014.nc
-    input_file            : ../data/ocean_avg_*.nc
     particle_release_file : line.rls
     output_file           : gosouth.nc
-
-state:
-    # pid, X, Y, Z are mandatory and should not be given
-    # Ingen, kan bruke [] eller kutte linjen
-    # [lon, lat]
-    # ibm_variables: []
 
 ibm:
     ibm_module: gosouth_ibm
@@ -32,18 +19,13 @@ ibm:
 particle_release:
     variables: [release_time, X, Y, Z]
     # Converters (if not float)
-    # mult: int
     release_time: time
-    # farmid: int
     particle_variables: [release_time]
 
 gridforce:
     # Gridforce module
     module: ladim.gridforce.ROMS
-
-    # mapping: model name -> name in input file
-    # velocity: {U: u, V: v}
-    # ibm_forcing: {}
+    input_file            : ../data/ocean_avg_*.nc
 
 output_variables:
     # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET

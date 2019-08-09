@@ -13,7 +13,7 @@ time_control:
 
 
 files:
-    grid_file             : ../data/ocean_avg_0014.nc
+    # grid_file             : ../data/ocean_avg_0014.nc
     input_file            : ../data/ocean_avg_*.nc
     particle_release_file : latlon.rls
     output_file           : latlon.nc

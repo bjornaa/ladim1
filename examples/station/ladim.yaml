@@ -8,19 +8,11 @@ time_control:
     # Start and stop of simulation
     start_time: 1989-05-24 12:00:00
     stop_time:  1989-06-15 12:00:00
-    # Reference time for netcdf output
-    reference_time: 1989-05-01
+    reference_time: 1989-01-01
 
 files:
-    grid_file             : ../data/ocean_avg_0014.nc
-    input_file            : ../data/ocean_avg_0014.nc
     particle_release_file : station.rls
     output_file           : station.nc
-
-state:
-    # pid, X, Y, Z are mandatory and should not be given
-    # Ingen, kan bruke [] eller kutte linjen
-    ibm_variables: []
 
 particle_release:
     variables: [release_time, X, Y, Z]
@@ -30,6 +22,7 @@ particle_release:
 
 gridforce:
     module: ladim.gridforce.ROMS
+    input_file            : ../data/ocean_avg_0014.nc
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
@@ -52,7 +45,6 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
-
 
 numerics:
     # Model time step, [value, unit]

@@ -8,11 +8,11 @@ config = dict(
     warm_start_file="",
     start_time=np.datetime64("2017-02-10 20"),
     dt=600,
-    ibm_variables=["super", "age"],
+    ibm_module="ladim.ibms.ibm_salmon_lice",
+    ibm=dict( variables=["super", "age"]),
     particle_variables=[],
     advection="RK4",
     diffusion=False,
-    ibm_module="ladim.ibms.ibm_salmon_lice",
 )
 
 state = State(config)
