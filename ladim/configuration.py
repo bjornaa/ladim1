@@ -18,17 +18,27 @@ from netCDF4 import Dataset, num2date
 
 Config = Dict[str, Any]  # type of the config dictionary
 
+
 def configure_ibm(conf: Dict[str, Any]) -> Config:
-    # Assure that module is defined and correct obsolete ibm_module and ibm_variables
-    # Other arguments are passed on
+    """Configure the IBM module
+
+    Input: Raw conf dictionary from configuration file
+
+    Return: Dictionary with IBM configuration
+
+    If an IBM is used, check that module name is present
+    Special treatment for the variables item
+    Other items are stored for the IBM module
+    """
+
     logging.info("Configuration: IBM")
-    if conf is None:
+    if conf is None:  # No ibm section
         return {}
-    D = conf.get("ibm")
+    D = conf.get("ibm")  # Empty ibm section
     if D is None:
         return {}
 
-    # Mandatory: module (or obsolete ibm_module)
+    # Mandatory: module name (or obsolete ibm_module)
     if not "module" in D:
         if "ibm_module" in D:
             D["module"] = D.pop("ibm_module")
@@ -37,11 +47,11 @@ def configure_ibm(conf: Dict[str, Any]) -> Config:
             raise SystemExit(1)
     logging.info(f'    {"module":15s}: {D["module"]}')
 
-    # Variables: variables (or obsolete ibm_variables)
+    # The variables item
     if not "variables" in D:
         if "ibm_variables" in D:
-            D["variables"] = D.pop("variables")
-        # ibm_variables may live under state
+            D["variables"] = D.pop("ibm_variables")
+        # ibm_variables may live under state (obsolete)
         elif "state" in conf and conf["state"] is not None:
             if "ibm_variables" in conf.get("state", dict()):
                 D["variables"] = conf["state"]["ibm_variables"]
@@ -50,21 +60,26 @@ def configure_ibm(conf: Dict[str, Any]) -> Config:
 
     for key in D:
         if key != "module":
-            logging.info(f'    {key:15s}: {D[key]}')
-
+            logging.info(f"    {key:15s}: {D[key]}")
 
     return D
 
 
 def configure_gridforce(conf: Dict[str, Any]) -> Config:
-    """Parse gridforce related info and pass on"""
+    """Parse gridforce related info and pass on
+
+    Input: raw conf dictionary from configuration file
+
+    Return: dictionary with gridforce configuration
+
+    """
     logging.info("Configuration: gridforce")
     if conf is None:
         logging.error("No gridforce section in configuration file")
         raise SystemExit(1)
     D = conf.get("gridforce")
     if D is None:
-        logging.error("No gridforce section in configuration file")
+        logging.error("Empty gridforce section in configuration file")
         raise SystemExit(1)
 
     # module is the only mandatory field
@@ -86,13 +101,21 @@ def configure_gridforce(conf: Dict[str, Any]) -> Config:
 
     for key in D:
         if key != "module":
-            logging.info(f'    {key:15s}: {D[key]}')
+            logging.info(f"    {key:15s}: {D[key]}")
 
     return D
 
+# ---------------------------------------
 
 
 def configure(config_stream) -> Config:
+    """The main configuration handling function
+
+    Input: Name of configuration file in yaml format
+
+    Returns: Configuration dictionary
+
+    """
 
     config: Config = dict()
 
@@ -174,20 +197,6 @@ def configure(config_stream) -> Config:
 
     #  --- Grid ---
     config["gridforce"] = configure_gridforce(conf)
-    # Backwards
-    # config["gridforce_module"] = config["gridforce"]["module"]
-    # config["grid_args"] = config["gridforce"]
-
-    # logging.info("Configuration: gridforce")
-    # config["gridforce_module"] = conf["gridforce"]["module"]
-    # logging.info(f'    {"module":15s}: {config["gridforce_module"]}')
-    # # Grid arguments
-    # try:
-    #     config["grid_args"] = conf["gridforce"]["grid"]
-    # except KeyError:
-    #     config["grid_args"] = dict()
-    # logging.info(f'    {"grid arguments":15s}: {config["grid_args"]}')
-    # config["Vinfo"] = dict()
 
     # --- Forcing ---
     try:
@@ -202,28 +211,6 @@ def configure(config_stream) -> Config:
     # Make obsolete
     config["ibm_variables"] = config["ibm"].get("variables", [])
     config["ibm_module"] = config["ibm"].get("module")
-
-    # config["ibm"] = conf.get("ibm")
-    # print(config["ibm"])
-    # if config["ibm"] is not None:
-    #     # Mandatory: module, variables
-    #     if "ibm_module" in config["ibm"].keys():
-    #         config["ibm"]["module"] = config["ibm"].pop("ibm_module")
-    #     if "variables" not in config["ibm"].keys():
-    #         config["ibm"]["variables"] = []
-    #     config["ibm_module"] = config["ibm"]["module"]
-    #     config["ibm_variables"] = config["ibm"]["variables"]
-    # else:
-    #     config["ibm_module"] = None
-    #     config["ibm_variables"] = []
-    # # try:
-    #    config["ibm"] = conf["ibm"]
-    #
-    ##    config["ibm_module"] = conf["ibm"]["module"]
-    #
-    #    logging.info("Configuration: IBM")
-    #    logging.info(f'    {"ibm_module":15s}: {config["ibm_module"]}')
-    # Skille på om ikke gitt, eller om navnet er feil
 
     # --- Particle release ---
     logging.info("Configuration: Particle Releaser")
@@ -252,12 +239,7 @@ def configure(config_stream) -> Config:
     config["particle_variables"] = prelease["particle_variables"]
 
     # --- Model state ---
-    logging.info("Configuration: Model State Variables")
-    # state = conf["state"]
-    #state = dict()
-    # OBSOLETE
-    #state["ibm_variables"] = config["ibm_variables"]
-    # logging.info(f'    ibm_variables: {config["ibm_variables"]}')
+    # logging.info("Configuration: Model State Variables")
 
     # -----------------
     # Output control

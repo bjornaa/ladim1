@@ -18,7 +18,7 @@ def test_top_level():
 
 
 def test_gridforce():
-    D = config['gridforce']
+    D = config["gridforce"]
     assert D["module"] == "ladim.gridforce.ROMS"
     assert D["input_file"] == "/scratch/Data/NK800/file_????.nc"
     assert D["subgrid"] == [200, 750, 300, 900]

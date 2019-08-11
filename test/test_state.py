@@ -9,7 +9,7 @@ config = dict(
     start_time=np.datetime64("2017-02-10 20"),
     dt=600,
     ibm_module="ladim.ibms.ibm_salmon_lice",
-    ibm=dict( variables=["super", "age"]),
+    ibm=dict(variables=["super", "age"]),
     particle_variables=[],
     advection="RK4",
     diffusion=False,

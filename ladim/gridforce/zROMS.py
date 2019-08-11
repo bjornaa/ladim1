@@ -37,7 +37,9 @@ class Grid:
         try:
             ncid = Dataset(config["gridforce"]["grid_file"])
         except OSError:
-            logging.error("Grid file {} not found".format(config["gridforce"]["grid_file"]))
+            logging.error(
+                "Grid file {} not found".format(config["gridforce"]["grid_file"])
+            )
             raise SystemExit(1)
 
         # Subgrid, only considers internal grid cells

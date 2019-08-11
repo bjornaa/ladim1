@@ -66,6 +66,20 @@ def test_variables():
     assert config["ibm"]["variables"] == ["temp"]
 
 
+def test_ibm_variables():
+    """The variables key is handled properly"""
+    input = StringIO(
+        """
+            ibm:
+                module: myibm
+                ibm_variables: [temp]
+        """
+    )
+    conf = yaml.safe_load(input)
+    config = {"ibm": configure_ibm(conf)}
+    assert config["ibm"]["variables"] == ["temp"]
+
+
 def test_extra_keys():
     """Extra keys are passed on to config["ibm"]"""
     input = StringIO(
