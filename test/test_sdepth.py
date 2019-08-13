@@ -166,54 +166,6 @@ class test_Vstretching4(unittest.TestCase):
         self.assertEqual(len(C), N + 1)
 
 
-class test_z2s(unittest.TestCase):
-    def test_correct(self):
-        # Set-up
-        N = 30
-        H = 100 + np.zeros((1, 1))
-        Hc = 10.0
-        # Make a random increasing sequence of N values between -1 to 0
-        # with end points -1 and 0
-        C = np.zeros(N + 1)
-        C[0] = -1
-        C[1:-1] = np.random.uniform(-1, 0, N - 1)
-        C.sort()
-        z_w = sdepth(H, Hc, C, stagger="w")
-
-        # at surface
-        Z = 0.0
-        K, A = z2s(z_w, 0.5, 0.5, Z)
-        assert z_w[K] <= -Z <= z_w[K + 1]
-        assert 0 <= A <= 1
-        assert abs(A * z_w[K] + (1 - A) * z_w[K + 1] + Z) < 1.0e-5
-
-        # near surface
-        Z = 0.1
-        K, A = z2s(z_w, 0.5, 0.5, Z)
-        assert z_w[K] <= -Z <= z_w[K + 1]
-        assert 0 <= A <= 1
-        assert abs(A * z_w[K] + (1 - A) * z_w[K + 1] + Z) < 1.0e-5
-
-        # mid water
-        Z = 50
-        K, A = z2s(z_w, 0.5, 0.5, Z)
-        assert z_w[K] <= -Z <= z_w[K + 1]
-        assert 0 <= A <= 1
-        assert abs(A * z_w[K] + (1 - A) * z_w[K + 1] + Z) < 1.0e-5
-
-        # near bottom
-        Z = H[0, 0] - 0.1
-        K, A = z2s(z_w, 0.5, 0.5, Z)
-        assert z_w[K] <= -Z <= z_w[K + 1]
-        assert 0 <= A <= 1
-        assert abs(A * z_w[K] + (1 - A) * z_w[K + 1] + Z) < 1.0e-5
-
-        # at bottom
-        Z = H[0, 0]
-        K, A = z2s(z_w, 0.5, 0.5, Z)
-        assert z_w[K] <= -Z <= z_w[K + 1]
-        assert 0 <= A <= 1
-        assert abs(A * z_w[K] + (1 - A) * z_w[K + 1] + Z) < 1.0e-5
 
 
 # --------------------------------------

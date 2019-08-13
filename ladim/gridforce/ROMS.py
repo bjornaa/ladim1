@@ -622,35 +622,49 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
 # ------------------------
 
 
-def z2s(z_w, X, Y, Z):
+def z2s(z_rho, X, Y, Z):
     """
     Find s-level and coefficients for vertical interpolation
 
-    input: X, Y, Z is 3D position, Z positive
+    input:
+        z_rho  3D array with vertical s-coordinate structure at rho-points
+        X, Y   1D arrays, horizontal position in grid coordinates
+        Z      1D array, particle depth, meters, positive
 
-    Returns K and A where:
+    Returns
+        K      1D integer array
+        A      1D float array
 
-    K is a 2D integer array such that
-       -H  <= z_w[K] <= -Z < z_w[K+1] <= 0
-
-    A is a 2D float array such that
-        -Z = A*z_rho[K] + (1-A)*z_rho[K+1]
+    With:
+        1 <= K < kmax = z_rho.shape[0]
+        z_rho[K-1] < -Z < z_rho[K] for 1 < K < kmax - 1
+        -Z < z_rho[1] for K = 1
+        z_rho[-1] < -Z for K = kmax - 1
+        0.0 <= A <= 1
+        Interior linear interpolation:
+            A * z_rho[K - 1] + (1 - A) * z_rho[K] = -Z
+            for z_rho[0] < -Z < z_rho[-1]
+        Extend constant below lowest:
+            A * z_rho[K - 1] + (1 - A) * z_rho[K] = z_rho[0]
+            for -Z < z_rho[0]  (K=1, A=1)
+        Extend constantly above highest:
+            A * z_rho[K - 1] + (1 - A) * z_rho[K] = z_rho[-1]
+            for -Z > z_rho[-1]  (K=kmax-1, A=0)
 
     """
 
-    kmax = z_w.shape[0] - 1  # Number of vertical
-    # jmax, imax = z_w.shape[1:]  # Number of horizontal cells
+    kmax = z_rho.shape[0]  # Number of vertical levels
 
-    # Find rho-based horizontal grid cell
-    # i.e. closest rho-point
+    # Find rho-based horizontal grid cell (rho-point)
     I = np.around(X).astype("int")
     J = np.around(Y).astype("int")
 
-    K = np.sum(z_w[:, J, I] < -Z, axis=0) - 1
-    K = K.clip(0, kmax - 1)
+    # Vectorized searchsorted
+    K = np.sum(z_rho[:, J, I] < -Z, axis=0)
+    K = K.clip(1, kmax-1)
 
-    A = (z_w[K + 1, J, I] + Z) / (z_w[K + 1, J, I] - z_w[K, J, I])
-    A = A.clip(0, 1)
+    A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K-1, J, I])
+    A = A.clip(0, 1)   # Extend constantly
 
     return K, A
 
