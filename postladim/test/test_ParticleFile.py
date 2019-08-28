@@ -6,6 +6,11 @@ from pathlib import Path
 from netCDF4 import Dataset
 from postladim import ParticleFile
 
+def test_open():
+    with pytest.raises(FileNotFoundError):
+        pf = ParticleFile("no_such_file.nc")
+
+
 
 @pytest.fixture(scope="module")
 def particle_file():

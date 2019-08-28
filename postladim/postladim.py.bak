@@ -9,18 +9,15 @@
 from typing import Any, List, Dict, Union, Tuple, Sequence
 import collections
 import numpy as np
-# from netCDF4 import Dataset, num2date
-from netCDF4 import num2date
-import xarray as xr
+from netCDF4 import Dataset, num2date
 
 
 class InstanceVariable:
     """Particle instance variable, depending on particle and time
     """
 
-    def __init__(self, , varname: str) -> None:
-        # self.pf = particlefile    # Needed ?
-        self.ds =
+    def __init__(self, particlefile: "ParticleFile", varname: str) -> None:
+        self.pf = particlefile
         self.name = varname
         # Copy the netcdf attributes
         nc = particlefile.nc
@@ -49,7 +46,7 @@ class InstanceVariable:
 
         raise IndexError("index must be int or slice or boolean sequence")
 
-    def _get_value(self, time_index: int, pid: int) -> Any:
+    def get_value(self, time_index: int, pid: int) -> Any:
         """Return value given time index and particle identifier"""
         # TODO: Let time_index be a slice => trajectory
         n = time_index
@@ -66,18 +63,6 @@ class InstanceVariable:
             raise IndexError(f"Particle {pid} is terminated at time index {n}")
 
         return self.pf.nc.variables[self.name][start + index]
-
-    # def isel(self, **args):
-    #     """Select values in xarray style"""
-    #     print(set(args.keys()))
-    #     keys = set(args.keys())
-    #     if args == {}:
-    #         return self
-    #     if not keys.issubset({'time', 'pid'}):
-    #         raise ValueError("Arguments must be 'time' or 'pid'")
-    #     if keys == {'time'}:
-    #         return self.__getitem__(args['time'])
-    #     if keys == {'pid'}:
 
 
 class ParticleVariable:
@@ -103,7 +88,8 @@ class ParticleVariable:
 
 
 # Variable type, for type hinting
-# Variable = Union[InstanceVariable, ParticleVariable]
+Variable = Union[InstanceVariable, ParticleVariable]
+
 
 class ParticleFile:
     """Dataset from a LADiM output fil"""
@@ -112,100 +98,101 @@ class ParticleFile:
     # or file is not a particle file
     def __init__(self, filename: str) -> None:
         try:
-            self.ds = xr.open_dataset(filename)
+            self.nc = Dataset(filename, mode="r")
         except FileNotFoundError:
             raise SystemExit(f"Particlefile {filename} not found")
         except OSError:
             raise SystemExit(f"File {filename} is not a particle file")
 
         # Number of particles per time
-        self.count = self.ds["particle_count"][:]
+        self.count = self.nc.variables["particle_count"][:]
         # End and start of segment with particles at a given time
         self.end = np.cumsum(self.count)
         self.start = np.concatenate(([0], self.end[:-1]))
-        self.num_times = len(self.ds["time"])
+
+        self.num_times = len(self.nc.dimensions["time"])
 
         # Extract instance and particle variables from the netCDF file
         self.instance_variables: List[InstanceVariable] = []
         self.particle_variables: List[ParticleVariable] = []
         self.variables: Dict[str, Variable] = {}
-        for key in list(self.ds.variables):
-            print(key)
-            if "particle_instance" in self.ds[key].dims:
+        for key, var in self.nc.variables.items():
+            if "particle_instance" in var.dimensions:
                 self.instance_variables.append(key)
                 self.variables[key] = InstanceVariable(self, key)
-            elif "particle" in self.ds[key].dims:
+            elif "particle" in var.dimensions:
                 self.particle_variables.append(key)
-                #self.variables[key] = ParticleVariable(self, key)
+                self.variables[key] = ParticleVariable(self, key)
 
     def time(self, n: int) -> str:
         """Get timestamp from a time frame"""
-        return num2date(self.ds["time"][n], tvar.units)
+        tvar = self.nc.variables["time"]
+        return num2date(tvar[n], tvar.units)
 
-    # # Not needed, use self.count[] directly
+    # Not needed, use self.count[] directly
     def particle_count(self, n: int) -> int:
         """Return number of particles at a time frame"""
         return self.count[n]
 
-    # def position(self, n: int) -> Tuple[np.ndarray, np.ndarray]:
-    #     """Get particle positions at n-th time frame"""
-    #     start = self.start[n]
-    #     end = self.end[n]
-    #     X = self.nc.variables["X"][start:end]
-    #     Y = self.nc.variables["Y"][start:end]
-    #     return X, Y
+    def position(self, n: int) -> Tuple[np.ndarray, np.ndarray]:
+        """Get particle positions at n-th time frame"""
+        start = self.start[n]
+        end = self.end[n]
+        X = self.nc.variables["X"][start:end]
+        Y = self.nc.variables["Y"][start:end]
+        return X, Y
 
-    # # Allow simpler pf['X'] notation for pf.variables['X']
-    # def __getitem__(self, varname: str) -> Variable:
-    #     return self.variables[varname]
+    # Allow simpler pf['X'] notation for pf.variables['X']
+    def __getitem__(self, varname: str) -> Variable:
+        return self.variables[varname]
 
-    # # Allow even simpler pf.X notation for pf['X']
-    # def __getattr__(self, varname: str) -> Variable:
-    #     return self.variables[varname]
+    # Allow even simpler pf.X notation for pf['X']
+    def __getattr__(self, varname: str) -> Variable:
+        return self.variables[varname]
 
-    # def trajectory(self, p: int) -> "Trajectory":
-    #     """Get particle positions along a single track"""
+    def trajectory(self, p: int) -> "Trajectory":
+        """Get particle positions along a single track"""
 
-    #     f = self.nc
-    #     X, Y = [], []
-    #     first_time = -99
-    #     last_time = self.num_times
+        f = self.nc
+        X, Y = [], []
+        first_time = -99
+        last_time = self.num_times
 
-    #     # After loop
-    #     # particle is alive for n in [first_time:last_time]
-    #     # or to the end if last_time == 0
+        # After loop
+        # particle is alive for n in [first_time:last_time]
+        # or to the end if last_time == 0
 
-    #     for n in range(self.num_times):
-    #         start = self.start[n]
-    #         end = self.end[n]
-    #         pid = f.variables["pid"][start:end]
+        for n in range(self.num_times):
+            start = self.start[n]
+            end = self.end[n]
+            pid = f.variables["pid"][start:end]
 
-    #         if pid[-1] < p:  # particle not released yet
-    #             continue
+            if pid[-1] < p:  # particle not released yet
+                continue
 
-    #         if first_time < 0:
-    #             first_time = n
+            if first_time < 0:
+                first_time = n
 
-    #         # index = sum(pid < p) # eller lignende
-    #         index = pid.searchsorted(p)
-    #         if pid[index] > p:  # p is missing
-    #             last_time = n  #
-    #             break  # No need for more cycles
+            # index = sum(pid < p) # eller lignende
+            index = pid.searchsorted(p)
+            if pid[index] > p:  # p is missing
+                last_time = n  #
+                break  # No need for more cycles
 
-    #         X.append(f.variables["X"][start + index])
-    #         Y.append(f.variables["Y"][start + index])
+            X.append(f.variables["X"][start + index])
+            Y.append(f.variables["Y"][start + index])
 
-    #     return Trajectory(list(range(first_time, last_time)), X, Y)
+        return Trajectory(list(range(first_time, last_time)), X, Y)
 
-    # def close(self) -> None:
-    #     self.nc.close()
+    def close(self) -> None:
+        self.nc.close()
 
-    # # Make ParticleFile a context manager
-    # def __enter__(self):
-    #     return self
+    # Make ParticleFile a context manager
+    def __enter__(self):
+        return self
 
-    # def __exit__(self, atype, value, traceback):
-    #     self.close()
+    def __exit__(self, atype, value, traceback):
+        self.close()
 
 
 class Trajectory:
