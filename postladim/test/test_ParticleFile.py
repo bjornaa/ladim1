@@ -44,7 +44,7 @@ def particle_file():
         nc.variables["time"][:] = time
         nc.variables["particle_count"][:] = count
         nc.variables["start_time"][:] = time[:nparticles]
-        nc.variables["position"][:] = 11111 * np.arange(nparticles)
+        nc.variables["position"][:] = [10000, 10001, 10002]
         nc.variables["pid"][:] = [v for v in pid.flat if v >= 0]
         nc.variables["X"][:] = [v for v in X.flat if not np.isnan(v)]
         nc.variables["Y"][:] = [v for v in Y.flat if not np.isnan(v)]
@@ -212,3 +212,17 @@ def test_trajectory(particle_file):
         assert all(traj.time == pf.time[:-1])
         assert all(traj.X == pf.X.sel(pid=0))
         assert all(traj.Y == pf.Y.sel(pid=0))
+
+
+def test_particle_variable(particle_file):
+    """Two particle variables, start_time and position"""
+    with ParticleFile(particle_file) as pf:
+        print(pf.start_time)
+        assert pf.start_time[0] == np.datetime64("1970-01-01")
+        assert pf["start_time"][1] == np.datetime64("1970-01-01 01")
+        assert pf["position"][0] == 10000
+        assert pf["position"][1] == 10001
+        assert pf["position"][2] == 10002
+        # pf.position is a method, therefore not a particle variable
+        with pytest.raises(TypeError):
+                pf.position[2]

@@ -56,7 +56,12 @@ plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 # Scatter plot, colour = particle age
 X, Y = pf.position(0)
 pids = pf["pid"][0]
-C = pf["release_time"][pids] / 86400  # release time, reverse to get age
+
+### Clean up these time computations
+time0 = pf["release_time"][0]
+print(pf["release_time"][pids])
+C = np.timedelta64(pf["release_time"][pids] - time0, 'm8[s]') # release time in seconds
+C = C.astype(int) / 86400  # Days
 vmax = pf.num_times / 24  # Maximun particle age in days
 pdistr = ax.scatter(X, Y, c=C[::-1], vmin=0, vmax=vmax, cmap=plt.get_cmap("plasma_r"))
 cb = plt.colorbar(pdistr)

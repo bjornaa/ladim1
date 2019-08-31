@@ -40,9 +40,13 @@ def animate(t):
     X, Y = pf.position(t)
     particle_dist.set_data(X, Y)
     # Time since start in minutes
-    dtime = int((pf.time(t) - time0).total_seconds() / 60)
+    print(pf.time(t))
+    print(time0)
+    print(pf.time(t) - time0)
+    dtime = (pf.time(t) - time0) / 60
     # Format hh:mm
-    dtimestr = "{:02d}:{:02d}".format(*divmod(dtime, 60))
+    #dtimestr = "{:02d}:{:02d}".format(*divmod(dtime, 60))
+    dtimestr = str(dtime)
     timestamp.set_text(dtimestr)
     return particle_dist, timestamp
 

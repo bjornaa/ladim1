@@ -59,7 +59,7 @@ ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2), colors="black", linestyle
 
 # Trajectories
 for p in pids:
-    #traj = pf.trajectory(p)
+    # traj = pf.trajectory(p)
     plt.plot(pf.X.sel(pid=p), pf.Y.sel(pid=p).values, "r")
     # plt.plot(traj.X[0], traj.Y[0], 'ro')  # Start points
 

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import List, Dict, Union
+from typing import Any, List, Dict, Union
 import numpy as np
 import xarray as xr
 
@@ -134,6 +134,21 @@ class InstanceVariable:
     def __len__(self):
         return len(self.time)
 
+# --------------------------------------------
+
+class ParticleVariable:
+    """Particle variable, time-independent"""
+
+    # def __init__(self, particlefile: "ParticleFile", varname: str) -> None:
+    def __init__(self, data) -> None:
+        self.da = data
+
+    def __getitem__(self, p: int) -> Any:
+        """Get the value of particle with pid = p
+        """
+        return self.da[p]
+
+
 
 # --------------------------------------------
 
@@ -208,7 +223,7 @@ class ParticleFile:
                 )
             elif "particle" in self.ds[var].dims:
                 self.particle_variables.append(var)
-                # self.variables[key] = ParticleVariable(self, key)
+                self.variables[var] = ParticleVariable(self.ds[var])
 
     # For backwards compability
     # should it be a DataSet
@@ -219,11 +234,6 @@ class ParticleFile:
     # Could define ParticleDataset (from file)
     # This could slice and take trajectories og that
     # Could improve speed by computing X and Y at same time
-    # def trajectory(self, pid):
-    #     X = self["X"].sel(pid=pid)
-    #     Y = self["Y"].sel(pid=pid)
-    #     vars = {'X': X, 'Y': Y, 'time': X["time"]}
-    #     return xr.Dataset(vars)
     def trajectory(self, pid):
         X = self["X"].sel(pid=pid)
         Y = self["Y"].sel(pid=pid)
