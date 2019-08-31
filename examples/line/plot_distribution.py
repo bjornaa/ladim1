@@ -37,7 +37,7 @@ Yb = np.arange(j0 - 0.5, j1)
 # Read particle_file
 with ParticleFile(particle_file) as pf:
     X, Y = pf.position(t)
-    timestamp = pf.time(t)
+    timestamp = pf.time[t]
 
 # ---------------------
 # Plotting

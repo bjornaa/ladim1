@@ -58,14 +58,14 @@ plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 X, Y = pf.position(0)
 particle_dist, = ax.plot(X, Y, ".", color="red", markeredgewidth=0, lw=0.5)
 # title = ax.set_title(pf.time(0))
-timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15, transform=ax.transAxes)
+timestamp = ax.text(0.01, 0.97, pf.time[0], fontsize=15, transform=ax.transAxes)
 
 
 # Update function
 def animate(t):
     X, Y = pf.position(t)
     particle_dist.set_data(X, Y)
-    timestamp.set_text(pf.time(t))
+    timestamp.set_text(pf.time[t])
     return particle_dist, timestamp
 
 
