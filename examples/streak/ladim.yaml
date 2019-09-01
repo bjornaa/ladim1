@@ -10,8 +10,7 @@ time_control:
     stop_time:  1989-06-15 12:00:00
 
 files:
-    grid_file             : ../data/ocean_avg_0014.nc
-    input_file            : ../data/ocean_avg_0014.nc
+    # grid_file             : ../data/ocean_avg_0014.nc
     particle_release_file : streak.rls
     output_file           : streak.nc
 
@@ -31,6 +30,7 @@ particle_release:
 
 gridforce:
     module: ladim.gridforce.ROMS
+    input_file: ../data/ocean_avg_0014.nc
 
 
 output_variables:
@@ -61,7 +61,7 @@ output_variables:
 
 numerics:
     # Model time step, [value, unit]
-    dt: [1, h]
+    dt: [900, s]
     # Advection method: options =
     #        EF = Euler-Forward,
     #        RK2, RK4 = Runge-Kutta 2nd or 4th order
