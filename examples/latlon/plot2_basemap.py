@@ -45,7 +45,7 @@ m = Basemap(
 )
 
 # Land
-polys = np.load(coast_file)
+polys = np.load(coast_file, allow_pickle=True)
 for p in polys:
     # There is no m.fill, transform explicitly
     px, py = m(p[0], p[1])

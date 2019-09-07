@@ -53,7 +53,7 @@ ax.set_boundary(Path(boundary), transform=proj)
 
 
 # Plot coast
-polys = np.load(coast_file)
+polys = np.load(coast_file, allow_pickle=True)
 for p in polys:
     ax.fill(p[0], p[1], facecolor="Khaki", edgecolor="black", transform=lonlat)
 # --- Add graticule
