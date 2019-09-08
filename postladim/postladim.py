@@ -1,11 +1,20 @@
 from collections import namedtuple
-from typing import Any, List, Dict, Union
+import datetime
+from typing import Any, List, Dict, Union, Optional
 import numpy as np
 import xarray as xr
 
+Time = Union[str, np.datetime64, datetime.datetime]
+
 
 class InstanceVariable:
-    def __init__(self, data, pid, ptime, pcount):
+    def __init__(
+        self,
+        data: xr.DataArray,
+        pid: xr.DataArray,
+        ptime: xr.DataArray,
+        pcount: np.ndarray,
+    ) -> None:
         self.da = data
         self.pid = pid
         self.time = ptime
@@ -16,7 +25,7 @@ class InstanceVariable:
         self.particles = np.unique(self.pid)
         self.num_particles = len(self.particles)  # Number of distinct particles
 
-    def _sel_time_idx(self, n: int) -> xr.DataArray:
+    def _sel_time_index(self, n: int) -> xr.DataArray:
         """Select by time index, return xarray."""
         start = self.start[n]
         end = self.end[n]
@@ -34,7 +43,7 @@ class InstanceVariable:
     #     dims = ("pid",)
     #     return xr.DataArray(self.da[start:end].values, dims=dims, coords=coords)
 
-    def _sel_time_slice_idx(self, tslice: slice) -> "InstanceVariable":
+    def _sel_time_slice_index(self, tslice: slice) -> "InstanceVariable":
         """Take a time slice based on time indices"""
         n = self.num_times
         istart, istop, step = tslice.indices(n)
@@ -49,31 +58,21 @@ class InstanceVariable:
             pcount=self.count[tslice],
         )
 
-    def _isel2(self, t_idx, pid_idx):
-        """Value at time and pid index"""
-        idx = int(self.pf.start[t_idx]) + pid_idx
-        V = self.da[idx]
-        V = V.assign_coords(time=self.pf.ds.time[t_idx])
-        V = V.assign_coords(pid=self.pf.ds.pid[idx])
-        # V = V.swap_dims({"particle_instance": "pid"})
-        return V
+    def _sel_time_value(self, time_val: np.datetime64) -> xr.DataArray:
+        idx = self.time.get_index("time").get_loc(time_val)
+        return self._sel_time_index(idx)
 
-    # Denne tar lengre tid,
-    def _isel2b(self, t_idx, pid_idx):
-        """Value at time and pid index"""
-        return self._get_by_time(t_idx)[pid_idx]
+    # def _sel2(self, t_idx, pid):
+    #     return self._get_by_time(t_idx).sel(pid=pid)
 
-    def _sel2(self, t_idx, pid):
-        return self._get_by_time(t_idx).sel(pid=pid)
-
-    def _sel_pid_value(self, pid):
+    def _sel_pid_value(self, pid: int) -> xr.DataArray:
         """Selection based on single pid value"""
         # Burde få en pid-koordinat også
         data = []
         times = []
         for t_idx in range(self.num_times):
             try:
-                data.append(self._sel_time_idx(t_idx).sel(pid=pid))
+                data.append(self._sel_time_index(t_idx).sel(pid=pid))
                 times.append(t_idx)
             except KeyError:
                 pass
@@ -84,46 +83,44 @@ class InstanceVariable:
         V["pid"] = pid
         return V
 
-    def _time_sel(self, time_label):
-        time_idx = self.pf.time.indexes["time"].get_loc(time_label)
-        return self._get_by_time(time_idx)
+    def isel(self, *, time: Optional[int] = None) -> xr.DataArray:
+        if time is not None:
+            return self._sel_time_index(time)
 
-    def isel(self, *, pid=None, time=None):
-        if pid is not None and time is None:
-            pass
-            # V = self._sel_pid_va(pid)
-            # V["pid"] = pid
-            # return V
-        if time is not None and pid is None:
-            return self._sel_time_idx(time)
-
-    def sel(self, *, pid=None, time=None):
+    def sel(
+        self, *, pid: Optional[int] = None, time: Optional[Time] = None
+    ) -> xr.DataArray:
+        """Select from InstanceVariable by value of pid or time or both"""
         if pid is not None and time is None:
             return self._sel_pid_value(pid)
         if time is not None and pid is None:
-            return self._time_sel(time)
+            return self._sel_time_value(time)
+        if time is not None and pid is not None:
+            return self._sel_time_value(time).sel(pid=pid)
 
-    def full(self):
+
+    # Do something like dask if the array gets to big
+    def full(self) -> xr.DataArray:
         """Return a full DataArray"""
         data = np.empty((self.num_times, self.num_particles))
         data[:, :] = np.nan
         for n in range(self.num_times):
-            # data[n, self.pid[n]] = self._sel_time_idx(n)
-            data[n, self.pid[self.start[n] : self.end[n]]] = self._sel_time_idx(n)
+            data[n, self.pid[self.start[n] : self.end[n]]] = self._sel_time_index(n)
         coords = dict(time=self.time, pid=self.particles)
         V = xr.DataArray(data=data, coords=coords, dims=("time", "pid"))
         return V
 
-    def __getitem__(self, index):
+    # More complicated typeong
+    def __getitem__(self, index: Union[int, slice]) -> xr.DataArray:
         if isinstance(index, int):  # index = time_idx
-            return self._sel_time_idx(index)
+            return self._sel_time_index(index)
         if isinstance(index, slice):
-            return self._sel_time_slice_idx(index)
+            return self._sel_time_slice_index(index)
         else:  # index = time_idx, pid
             time_idx, pid = index
             if 0 <= pid < self.num_particles:
                 try:
-                    v = self._sel_time_idx(time_idx).sel(pid=pid)
+                    v = self._sel_time_index(time_idx).sel(pid=pid)
                 except KeyError:
                     # Også håndtere v != floatpf.
                     v = np.nan
@@ -134,20 +131,21 @@ class InstanceVariable:
     def __len__(self):
         return len(self.time)
 
+
 # --------------------------------------------
+
 
 class ParticleVariable:
     """Particle variable, time-independent"""
 
     # def __init__(self, particlefile: "ParticleFile", varname: str) -> None:
-    def __init__(self, data) -> None:
+    def __init__(self, data: xr.DataArray) -> None:
         self.da = data
 
     def __getitem__(self, p: int) -> Any:
         """Get the value of particle with pid = p
         """
         return self.da[p]
-
 
 
 # --------------------------------------------
@@ -170,7 +168,7 @@ class Trajectory(namedtuple("Trajectory", "X Y")):
 # ---------------------------------------------
 
 
-class Time:
+class CTime:
     """Callable version of time DataArray
 
     For backwards compability, obsolete
@@ -179,20 +177,20 @@ class Time:
     def __init__(self, ptime):
         self._time = ptime
 
-    def __call__(self, n):
+    def __call__(self, n: int) -> np.datetime64:
         """Prettier version of self[n]"""
         return self._time[n].values.astype("M8[s]")
 
     def __getitem__(self, arg):
         return self._time[arg]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self._time)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self._time)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._time)
 
 
@@ -208,7 +206,7 @@ class ParticleFile:
         self.end = self.count.cumsum()
         self.start = self.end - self.count
         self.num_times = len(self.count)
-        self.time = Time(ds.time)
+        self.time = CTime(ds.time)
         self.num_particles = int(ds.pid.max()) + 1  # Number of particles
 
         # Extract instance and particle variables from the netCDF file

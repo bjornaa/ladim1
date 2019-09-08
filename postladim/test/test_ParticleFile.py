@@ -1,7 +1,10 @@
 import os
 import pytest
 
+import datetime
+
 import numpy as np
+
 # import xarray as xr
 # from pathlib import Path
 from netCDF4 import Dataset
@@ -12,6 +15,12 @@ from postladim import ParticleFile
 def particle_file():
     # set up
     # Return a small particle file
+    #
+    #  0   -   -
+    #  1  11   -
+    #  2   -  22
+    #  -   -  23
+    #
     pfile = "test.nc"
     nparticles = 3
     X = np.array(
@@ -55,14 +64,9 @@ def particle_file():
     os.remove(pfile)
 
 
-
-
-# def test_open():
-#    with pytest.raises(FileNotFoundError):
-#        pf = ParticleFile("no_such_file.nc")
-
-
-
+def test_open():
+    with pytest.raises(FileNotFoundError):
+        pf = ParticleFile("no_such_file.nc")
 
 
 def test_count(particle_file):
@@ -109,15 +113,14 @@ def test_pid(particle_file):
 
 # Detemine how this should work
 def test_pid2(particle_file):
-    """The pid from a Instance variable"""
+    """The pid from an instance variable"""
     with ParticleFile(particle_file) as pf:
         X = pf.X
-        # assert X.pid.isel(time=0) == 0
-        # assert pf["pid"][0] == 0
-        # assert pf.pid[0] == 0
-        # assert all(pf.pid[1] == [0, 1])
-        # assert list(pf.pid[2]) == [0, 1]
-        # assert pf.pid[3] == 1
+        assert all(X.pid == pf.ds.pid)
+        for i in range(4):
+            assert all(X[i].pid == pf.pid[i])
+        # X.pid[3] is not the same as X[3].pid
+        assert not all(X.pid[3] == X[3].pid)
 
 
 def test_getX(particle_file):
@@ -149,11 +152,25 @@ def test_X_slice(particle_file):
             pf.X[::2]  # Do not accept strides != 1
 
 
-def test_select_pid(particle_file):
+def test_isel(particle_file):
     with ParticleFile(particle_file) as pf:
         X = pf.X
-        assert all(X._sel_pid_value(0) == [0, 1, 2])
+        assert all(X.isel(time=2) == X[2])
+
+# Ta med noen tester med feil input
+def test_sel(particle_file):
+    with ParticleFile(particle_file) as pf:
+        X = pf.X
+        assert all(X.sel(pid=0) == [0, 1, 2])
+        assert all(X.sel(pid=1) == [11])
         assert all(X.sel(pid=2) == [22, 23])
+
+        assert all(X.sel(time=X.time[2]) == X[2])
+        assert all(X.sel(time="1970-01-01 02") == X[2])
+        assert all(X.sel(time=np.datetime64("1970-01-01 02")) == X[2])
+        assert all(X.sel(time=datetime.datetime(1970, 1, 1, 2)) == X[2])
+
+        assert X.sel(time="1970-01-01 02", pid=0) == X[2, 0]
 
 
 def test_full(particle_file):
@@ -172,24 +189,6 @@ def test_full(particle_file):
         assert np.isnan(V[3, 0])
         assert np.isnan(V[3, 1])
         assert V[3, 2] == 23
-
-
-
-def rest_slice_advanced(particle_file):
-    """More advanced slicing"""
-    with ParticleFile(particle_file) as pf:
-        I = [True, True, False, True, False, False]
-        assert list(pf.X[I] == [5, 6, 7])
-        assert list(pf.X[[0, 1, 3]] == [5, 6, 7])
-        # Accept only integer or boolean sequences
-        with pytest.raises(IndexError):
-            pf.X["abc"]  # Not a sequence of integers
-        with pytest.raises(IndexError):
-            pf.X[3.14]  # Not integer, slice, or sequence
-        with pytest.raises(IndexError):  # Not a sequence
-            pf.X[{"a": 1}]  # Not integer, slice, or sequence
-        # Strange feature, inherited from NetCDF4
-        assert pf.X[[3.14]] == pf.X[[3]]
 
 
 def test_position(particle_file):
@@ -217,7 +216,6 @@ def test_trajectory(particle_file):
 def test_particle_variable(particle_file):
     """Two particle variables, start_time and position"""
     with ParticleFile(particle_file) as pf:
-        print(pf.start_time)
         assert pf.start_time[0] == np.datetime64("1970-01-01")
         assert pf["start_time"][1] == np.datetime64("1970-01-01 01")
         assert pf["position"][0] == 10000
@@ -225,4 +223,4 @@ def test_particle_variable(particle_file):
         assert pf["position"][2] == 10002
         # pf.position is a method, therefore not a particle variable
         with pytest.raises(TypeError):
-                pf.position[2]
+            pf.position[2]
