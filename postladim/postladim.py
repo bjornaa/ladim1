@@ -4,7 +4,7 @@ from typing import Any, List, Dict, Union, Optional
 import numpy as np
 import xarray as xr
 
-Time = Union[str, np.datetime64, datetime.datetime]
+Timetype = Union[str, np.datetime64, datetime.datetime]
 
 
 class InstanceVariable:
@@ -58,12 +58,10 @@ class InstanceVariable:
             pcount=self.count[tslice],
         )
 
-    def _sel_time_value(self, time_val: np.datetime64) -> xr.DataArray:
+    def _sel_time_value(self, time_val: Timetype) -> xr.DataArray:
         idx = self.time.get_index("time").get_loc(time_val)
         return self._sel_time_index(idx)
 
-    # def _sel2(self, t_idx, pid):
-    #     return self._get_by_time(t_idx).sel(pid=pid)
 
     def _sel_pid_value(self, pid: int) -> xr.DataArray:
         """Selection based on single pid value"""
@@ -88,7 +86,7 @@ class InstanceVariable:
             return self._sel_time_index(time)
 
     def sel(
-        self, *, pid: Optional[int] = None, time: Optional[Time] = None
+        self, *, pid: Optional[int] = None, time: Optional[Timetype] = None
     ) -> xr.DataArray:
         """Select from InstanceVariable by value of pid or time or both"""
         if pid is not None and time is None:
@@ -110,7 +108,7 @@ class InstanceVariable:
         V = xr.DataArray(data=data, coords=coords, dims=("time", "pid"))
         return V
 
-    # More complicated typeong
+    # More complicated typing
     def __getitem__(self, index: Union[int, slice]) -> xr.DataArray:
         if isinstance(index, int):  # index = time_idx
             return self._sel_time_index(index)
@@ -128,7 +126,7 @@ class InstanceVariable:
                 raise IndexError(f"pid={pid} is out of bound={self.num_particles}")
             return v
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.time)
 
 
@@ -158,17 +156,17 @@ class Trajectory(namedtuple("Trajectory", "X Y")):
     """Single particle trajectory"""
 
     @property
-    def time(self):
+    def time(self) -> np.datetime64:
         return self.X.time
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.X.time)
 
 
 # ---------------------------------------------
 
 
-class CTime:
+class Time:
     """Callable version of time DataArray
 
     For backwards compability, obsolete
@@ -198,7 +196,7 @@ class CTime:
 
 
 class ParticleFile:
-    def __init__(self, filename: str):
+    def __init__(self, filename: str) -> None:
         ds = xr.open_dataset(filename)
         self.ds = ds
         # End and start of segment with particles at a given time
@@ -206,7 +204,7 @@ class ParticleFile:
         self.end = self.count.cumsum()
         self.start = self.end - self.count
         self.num_times = len(self.count)
-        self.time = CTime(ds.time)
+        self.time = Time(ds.time)
         self.num_particles = int(ds.pid.max()) + 1  # Number of particles
 
         # Extract instance and particle variables from the netCDF file
@@ -225,26 +223,25 @@ class ParticleFile:
 
     # For backwards compability
     # should it be a DataSet
-    def position(self, n):
+    def position(self, n : int) -> Position:
         return Position(self.X[n], self.Y[n])
 
     # For backwards compability
     # Could define ParticleDataset (from file)
     # This could slice and take trajectories og that
     # Could improve speed by computing X and Y at same time
-    def trajectory(self, pid):
+    def trajectory(self, pid: int) -> Trajectory:
         X = self["X"].sel(pid=pid)
         Y = self["Y"].sel(pid=pid)
         return Trajectory(X, Y)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.time)
 
-    def __getattr__(self, var):
+    def __getattr__(self, var: str) -> Union[InstanceVariable, ParticleVariable]:
         return self.variables[var]
-        # return InstanceVariable(self, self.ds[var])
 
-    def __getitem__(self, var):
+    def __getitem__(self, var: str) -> Union[InstanceVariable, ParticleVariable]:
         return self.variables[var]
 
     def close(self) -> None:

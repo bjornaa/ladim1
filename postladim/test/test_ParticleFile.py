@@ -125,12 +125,15 @@ def test_pid2(particle_file):
 
 def test_getX(particle_file):
     with ParticleFile(particle_file) as pf:
-        assert pf["X"].isel(time=0) == 0
-        assert pf["X"][0] == 0
-        assert pf.X[0] == 0
-        assert all(pf.X[1] == [1, 11])
-        assert all(pf.X[2] == [2, 22])
-        assert pf.X[3] == 23
+        X = pf.X
+        assert X == pf["X"]
+        assert X == pf.variables["X"]   # Obsolete
+        assert X.isel(time=0) == 0
+        assert X[0] == 0
+        assert X[0] == 0
+        assert all(X[1] == [1, 11])
+        assert all(X[2] == [2, 22])
+        assert X[3] == 23
 
 
 def test_X_slice(particle_file):
@@ -157,6 +160,7 @@ def test_isel(particle_file):
         X = pf.X
         assert all(X.isel(time=2) == X[2])
 
+
 # Ta med noen tester med feil input
 def test_sel(particle_file):
     with ParticleFile(particle_file) as pf:
@@ -171,6 +175,10 @@ def test_sel(particle_file):
         assert all(X.sel(time=datetime.datetime(1970, 1, 1, 2)) == X[2])
 
         assert X.sel(time="1970-01-01 02", pid=0) == X[2, 0]
+        assert X.sel(pid=2, time="1970-01-01 03") == X[3, 2]
+        # Determine what to do
+        # assert np.isnan(X.sel(pid=1, time="1970-01-01 03"))
+
 
 
 def test_full(particle_file):
