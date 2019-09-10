@@ -186,9 +186,14 @@ class Grid:
             J = Y.round().astype("int") - self.j0
             return self.lon[J, I], self.lat[J, I]
 
-    def ingrid(self, X, Y):
+    def ingrid(self, X: np.ndarray, Y: np.ndarray) -> np.ndarray:
         """Returns True for points inside the subgrid"""
-        return (self.xmin < X) & (X < self.xmax) & (self.ymin < Y) & (Y < self.ymax)
+        return (
+            (self.xmin + 0.5 < X)
+            & (X < self.xmax - 0.5)
+            & (self.ymin + 0.5 < Y)
+            & (Y < self.ymax - 0.5)
+        )
 
     def onland(self, X, Y):
         """Returns True for points on land"""
@@ -661,10 +666,10 @@ def z2s(z_rho, X, Y, Z):
 
     # Vectorized searchsorted
     K = np.sum(z_rho[:, J, I] < -Z, axis=0)
-    K = K.clip(1, kmax-1)
+    K = K.clip(1, kmax - 1)
 
-    A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K-1, J, I])
-    A = A.clip(0, 1)   # Extend constantly
+    A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K - 1, J, I])
+    A = A.clip(0, 1)  # Extend constantly
 
     return K, A
 

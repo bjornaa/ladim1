@@ -38,7 +38,7 @@ def main(config_stream, loglevel=logging.INFO):
     releaser = ParticleReleaser(config, grid)
 
     #  --- Initiate the model state ---
-    state = State(config)
+    state = State(config, grid)
 
     # --- Initiate the output ---
     out = OutPut(config, releaser)

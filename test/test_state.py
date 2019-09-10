@@ -15,7 +15,9 @@ config = dict(
     diffusion=False,
 )
 
-state = State(config)
+grid = None
+
+state = State(config, grid)
 
 state["pid"] = np.array([0])
 state["X"] = np.array([10.2])

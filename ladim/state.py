@@ -20,7 +20,7 @@ Config = Dict[str, Any]
 class State(Sized):
     """The model variables at a given time"""
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, grid: Grid) -> None:
 
         logging.info("Initializing the model state")
 
@@ -61,7 +61,7 @@ class State(Sized):
         self.nnew = 0  # Modify with warm start?
 
         if config["warm_start_file"]:
-            self.warm_start(config)
+            self.warm_start(config, grid)
 
     def __getitem__(self, name: str) -> None:
         return getattr(self, name)
@@ -87,7 +87,8 @@ class State(Sized):
         """Update the model state to the next timestep"""
 
         # From physics all particles are alive
-        self.alive = np.ones(len(self), dtype="bool")
+        # self.alive = np.ones(len(self), dtype="bool")
+        self.alive = grid.ingrid(self.X, self.Y)
 
         self.timestep += 1
         self.timestamp += np.timedelta64(self.dt, "s")
@@ -116,7 +117,7 @@ class State(Sized):
         for key in self.instance_variables:
             self[key] = self[key][self.alive]
 
-    def warm_start(self, config: Config) -> None:
+    def warm_start(self, config: Config, grid: Grid) -> None:
         """Perform a warm (re)start"""
 
         warm_start_file = config["warm_start_file"]
@@ -144,3 +145,9 @@ class State(Sized):
         for var in config["warm_start_variables"]:
             logging.debug(f"Reading {var} from warm start file")
             self[var] = f.variables[var][pstart : pstart + pcount]
+
+        # Remove particles near edge of grid
+        I = grid.ingrid(self["X"], self["Y"])
+        self.pid = self.pid[I]
+        for var in config["warm_start_variables"]:
+            self[var] = self[var][I]

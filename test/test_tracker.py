@@ -58,7 +58,7 @@ def test_out_of_area():
         diffusion=False,
     )
     grid = Grid()
-    state = State(config)
+    state = State(config, grid)
     forcing = Forcing()
 
     state.pid = np.array([0, 1, 2])
