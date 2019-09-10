@@ -2,6 +2,7 @@
 
 # import argparse
 import logging
+
 # import datetime
 # import os.path
 from pathlib import Path
@@ -22,7 +23,8 @@ def main(config_stream, loglevel=logging.INFO):
     logging.basicConfig(
         # level=loglevel,
         level=logging.DEBUG,
-        format='%(levelname)s:%(module)s - %(message)s')
+        format="%(levelname)s:%(module)s - %(message)s",
+    )
 
     # --- Configuration ---
 
@@ -36,7 +38,7 @@ def main(config_stream, loglevel=logging.INFO):
     releaser = ParticleReleaser(config, grid)
 
     #  --- Initiate the model state ---
-    state = State(config)
+    state = State(config, grid)
 
     # --- Initiate the output ---
     out = OutPut(config, releaser)
@@ -47,7 +49,7 @@ def main(config_stream, loglevel=logging.INFO):
     # ==============
 
     logging.info("Starting time loop")
-    for step in range(config['numsteps'] + 1):
+    for step in range(config["numsteps"] + 1):
 
         # --- Update forcing ---
         forcing.update(step)
@@ -59,7 +61,7 @@ def main(config_stream, loglevel=logging.INFO):
 
         # --- Save to file ---
         # Save before or after update ???
-        if step % config['output_period'] == 0:
+        if step % config["output_period"] == 0:
             out.write(state, grid)
 
         # --- Update the model state ---
