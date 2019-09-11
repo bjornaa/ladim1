@@ -28,8 +28,8 @@ class State(Sized):
         self.timestamp = config["start_time"].astype("datetime64[s]")
         self.dt = np.timedelta64(config["dt"], "s")
         self.position_variables = ["X", "Y", "Z"]
-        if "ibm" in config and "variables" in config["ibm"]:
-            self.ibm_variables = config["ibm"]["variables"]
+        if "ibm_variables" in config:
+            self.ibm_variables = config["ibm_variables"]
         else:
             self.ibm_variables = []
         self.particle_variables = config["particle_variables"]
