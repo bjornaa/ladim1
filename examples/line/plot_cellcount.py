@@ -15,9 +15,10 @@ pfile = "line.nc"  # LADiM particle file
 grid_file = "../data/ocean_avg_0014.nc"
 
 tframe0 = 20  # Start time frame
-tframe1 = 95
+tframe1 = 71
+#tframe1 = 21
 
-# Subgrid definition
+# Subgrid limits
 i0, i1 = 58, 150
 j0, j1 = 60, 140
 
@@ -40,11 +41,9 @@ Yb = np.arange(j0 - 0.5, j1)
 # ---------------------------
 
 pf = ParticleFile(pfile)
-C = np.zeros_like(M)
-for t in range(tframe0, tframe1):
-    X, Y = pf.position(t)
-    C += cellcount(X, Y, gridspec=(i0, i1, j0, j1))
-C = np.ma.masked_where(C == 0, C)
+X = pf.X[tframe0: tframe1].da
+Y = pf.Y[tframe0: tframe1].da
+C = cellcount(X, Y, grid_limits=(i0, i1, j0, j1))
 
 # ------------------------- ---
 # Plot particle concentration

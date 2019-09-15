@@ -1,8 +1,8 @@
 from collections import namedtuple
 import datetime
 from typing import Any, List, Dict, Union, Optional
-import numpy as np
-import xarray as xr
+import numpy as np     # type: ignore
+import xarray as xr    # type: ignore
 
 Timetype = Union[str, np.datetime64, datetime.datetime]
 
@@ -62,7 +62,6 @@ class InstanceVariable:
         idx = self.time.get_index("time").get_loc(time_val)
         return self._sel_time_index(idx)
 
-
     def _sel_pid_value(self, pid: int) -> xr.DataArray:
         """Selection based on single pid value"""
         # Burde få en pid-koordinat også
@@ -95,7 +94,6 @@ class InstanceVariable:
             return self._sel_time_value(time)
         if time is not None and pid is not None:
             return self._sel_time_value(time).sel(pid=pid)
-
 
     # Do something like dask if the array gets to big
     def full(self) -> xr.DataArray:
@@ -223,7 +221,7 @@ class ParticleFile:
 
     # For backwards compability
     # should it be a DataSet
-    def position(self, n : int) -> Position:
+    def position(self, n: int) -> Position:
         return Position(self.X[n], self.Y[n])
 
     # For backwards compability

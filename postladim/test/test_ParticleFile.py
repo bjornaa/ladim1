@@ -127,7 +127,7 @@ def test_getX(particle_file):
     with ParticleFile(particle_file) as pf:
         X = pf.X
         assert X == pf["X"]
-        assert X == pf.variables["X"]   # Obsolete
+        assert X == pf.variables["X"]  # Obsolete
         assert X.isel(time=0) == 0
         assert X[0] == 0
         assert X[0] == 0
@@ -145,12 +145,11 @@ def test_X_slice(particle_file):
         assert all(V[0] == X[1])
         assert all(V[1] == X[2])
         assert all(V.da == [1, 11, 2, 22])
-        assert all(V.count == [2, 2])
+        assert all(V.count == X.count[1:3])
         assert all(V.time == X.time[1:3])
         assert all(V.pid == [0, 1, 0, 2])
         V = X[:]
-        for n in range(len(X)):
-            assert all(V[n] == X[n])
+        assert (V.da == X.da).all()
         with pytest.raises(IndexError):
             pf.X[::2]  # Do not accept strides != 1
 
@@ -178,7 +177,6 @@ def test_sel(particle_file):
         assert X.sel(pid=2, time="1970-01-01 03") == X[3, 2]
         # Determine what to do
         # assert np.isnan(X.sel(pid=1, time="1970-01-01 03"))
-
 
 
 def test_full(particle_file):

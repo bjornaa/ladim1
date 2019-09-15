@@ -1,8 +1,16 @@
-import numpy as np
-import xarray as xr
+import numpy as np     # type:ignore
+import xarray as xr    # type: ignore
+from typing import Union, Optional, Tuple, List
 
+Array = Union[List[float], np.ndarray, xr.DataArray]
+Limits = Union[Tuple[int, int], Tuple[int, int, int, int]]
 
-def cellcount(X, Y, W=None, gridspec=None):
+def cellcount(
+    X: Array,
+    Y: Array,
+    W: Optional[Array] = None,
+    grid_limits: Optional[Limits] = None,
+) -> xr.DataArray:
     """Count the (weighted) number of particles in grid cells
 
     Parameters
@@ -11,35 +19,45 @@ def cellcount(X, Y, W=None, gridspec=None):
         Particle position in grid coordinates
     W : 1D array, length = n
         Weight of particles, default=None for unweighted
-    gridspec : 4-tuple (i0, i1, j0, j1)
+    grid_limits : 4-tuple (i0, i1, j0, j1) or 2-tuple (i1, j1)
         Limitation of grid to consider,
-        Default=None gives the bounding box of the particles
+        If 2-tuple, i0 and j0 default to zero.
+        Default=None gives the bounding box of the particle positions
 
     Returns
     -------
     C : 2D xarray.DataArray, shape = (j1-j0, i1-i0)
         Particle counts
 
-    Note: particles outside the gridspec are silently ignored
+    Note: particles outside the grid limits are silently ignored
 
     """
 
     # Possible improvement.
     #   If xarray is not installed, return a numpy.ndarray
 
-    X = np.asarray(X)
-    Y = np.asarray(Y)
+    # X = np.asarray(X)
+    # Y = np.asarray(Y)
 
     # Subgrid specification
-    if gridspec is None:
-        i0 = int(round(X.min()))
-        i1 = int(round(X.max())) + 1
-        j0 = int(round(Y.min()))
-        j1 = int(round(Y.max())) + 1
+
+    i0: int
+    i1: int
+    j0: int
+    j1: int
+
+    if grid_limits is None:
+        i0 = int(round(np.min(X)))
+        i1 = int(round(np.max(X))) + 1
+        j0 = int(round(np.min(Y)))
+        j1 = int(round(np.max(Y))) + 1
+    elif len(grid_limits) == 2:
+        i1, j1 = grid_limits
+        i0, j0 = 0, 0
+    elif len(grid_limits) == 4:
+        i0, i1, j0, j1 = grid_limits
     else:
-        i0, i1, j0, j1 = gridspec
-    imax = i1 - i0
-    jmax = j1 - j0
+        raise TypeError("Illegal grid_limits")
 
     # Count
     x_edges = np.arange(i0 - 0.5, i1)
