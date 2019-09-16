@@ -40,11 +40,14 @@ Yb = np.arange(j0 - 0.5, j1)
 # ---------------------------
 
 pf = ParticleFile(pfile)
-C = np.zeros_like(M)
-for t in range(tframe0, tframe1):
-    X, Y = pf.position(t)
-    C += cellcount(X, Y, gridspec=(i0, i1, j0, j1))
-C = np.ma.masked_where(C == 0, C)
+# C = np.zeros_like(M)
+# for t in range(tframe0, tframe1):
+#     X, Y = pf.position(t)
+#     C += cellcount(X, Y, grid_limits=(i0, i1, j0, j1))
+# C = np.ma.masked_where(C == 0, C)
+X = pf.X[tframe0: tframe1].da
+Y = pf.Y[tframe0: tframe1].da
+C = cellcount(X, Y, grid_limits=(i0, i1, j0, j1))
 
 # ------------------------- ---
 # Plot particle concentration
