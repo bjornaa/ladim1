@@ -233,6 +233,10 @@ class ParticleFile:
         Y = self["Y"].sel(pid=pid)
         return Trajectory(X, Y)
 
+    # Obsolete
+    def particle_count(self, n: int) -> int:
+        return self.count[n]
+
     def __len__(self) -> int:
         return len(self.time)
 

@@ -2,7 +2,7 @@ Post processing
 ===============
 
 LADiM comes with a simple python package ``postladim`` that can be used
-for visualisation and analysis of LADiM output.
+for visualisation and analysis of LADiM output. It is based on the ``xarray`` package http://xarray.pydata.org/en/stable/.
 
 The basic class is ``postladim.ParticleFile``, it is initiated
 by the following lines::
@@ -16,17 +16,25 @@ by the following lines::
 
    It has the following **attributes**:
 
-  .. attribute:: nc
+  .. attribute:: ds
 
-     The underlying netCDF4 Dataset.
+     The underlying xarray Dataset.
 
   .. attribute:: num_times
 
      Number of time frames in the file.
 
-  .. attribute:: variables
+  .. attribure:: count
 
-     Dictionary of variables
+     Numpy ndarray of particle counts at different time steps
+
+  .. attribute:: start
+
+     ndarray of start indices at different time step
+
+  .. attribute:: end
+
+     ndarray of end indices, short hand for  pf.start + pf.count
 
   .. attribute:: instance_variables
 
@@ -36,25 +44,33 @@ by the following lines::
 
      List of particle variables.
 
-  .. method:: time(n)
+  .. attribute:: time
 
-     Timestamp (yyyy-mm-hh hh:mm:ss) of the n-th time frame.
-
-  .. method:: particle_count(n)
-
-     Number of particles at n-th time frame.
+     xarray DataArray of time stamps
 
   .. method:: position(n)
 
-     Position (X and Y) of particle-distribution at n-th time time.
-     pf.position(n) = (pf.variables['X'][n], pf.variables['Y'][n])
+     Tuple with position (X and Y) of particle-distribution at n-th time time.
+     pf.position(n) = (pf['X'][n], pf['Y'][n])
 
-**Item notation** with pf as a ParticleFile instance:
+  .. method:: trajectory(pid)
 
-- name = instance variable
+     Returns a tuple of X and Y coordinates of the particle with identifier pid.
+     trajectory(pid) = (pf['X'].sel(pid=pid), pf['Y'].sel(pid=pid))
 
-  - pf.variables[name][n] returns values at time frame n
+  .. attribute:: variables
 
-- name = particle variable
+     Deprecated, dictionary of variables, pf.variables['X'] = pf['X'] = pf.X
 
-  - pf.variables[name][pid] returns the particle variable value
+  .. method:: time(n)
+
+     Deprecated, pf.time(n) = pf.time[n].values
+
+  .. method:: particle_count(n)
+
+     Deprecated, pf.particle_count(n) = pf.count[n]
+
+
+.. class InstanceVariable
+
+.. class ParticleVariable
