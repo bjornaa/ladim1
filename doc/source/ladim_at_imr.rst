@@ -32,7 +32,7 @@ your ``.zshrc`` (of ``.bashrc``) to use the correct python environment.
   export MKL_NUM_THREADS=1
 
 This prevents the MKL (Intel's Math Kernel Library) used by python from
-capturing all cores, effective blocking all other (including your own) activity
+capturi ng all cores, effective blocking all other (including your own) activity
 at the machine. You may get a slight speed-up with 2 instead of 1.
 
 Exit the shell and log in again. The modified configuration is common for all three
