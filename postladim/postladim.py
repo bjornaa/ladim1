@@ -1,8 +1,8 @@
 from collections import namedtuple
 import datetime
 from typing import Any, List, Dict, Union, Optional
-import numpy as np     # type: ignore
-import xarray as xr    # type: ignore
+import numpy as np  # type: ignore
+import xarray as xr  # type: ignore
 
 Timetype = Union[str, np.datetime64, datetime.datetime]
 
@@ -124,6 +124,15 @@ class InstanceVariable:
                 raise IndexError(f"pid={pid} is out of bound={self.num_particles}")
             return v
 
+    def __array__(self) -> np.ndarray:
+        return np.array(self.da)
+
+    def __repr__(self) -> str:
+        s = "<postladim.InstanceVariable>\n"
+        s += f"num_times: {self.num_times}, particle_instance: {len(self.da)}\n"
+        s += np.array2string(self.da, threshold=5, edgeitems=2)
+        return s
+
     def __len__(self) -> int:
         return len(self.time)
 
@@ -142,6 +151,18 @@ class ParticleVariable:
         """Get the value of particle with pid = p
         """
         return self.da[p]
+
+    def __array__(self) -> np.ndarray:
+        return np.array(self.da)
+
+    def __repr__(self) -> str:
+        s = "<postladim.ParticleVariable>\n"
+        s += f"particle: {len(self.da)}\n"
+        s += np.array2string(self.da, threshold=5, edgeitems=2)
+        return s
+
+    def __len__(self) -> int:
+        return len(self.da)
 
 
 # --------------------------------------------
@@ -171,23 +192,23 @@ class Time:
     """
 
     def __init__(self, ptime):
-        self._time = ptime
+        self.da = ptime
 
     def __call__(self, n: int) -> np.datetime64:
         """Prettier version of self[n]"""
-        return self._time[n].values.astype("M8[s]")
+        return self.da[n].values.astype("M8[s]")
 
     def __getitem__(self, arg):
-        return self._time[arg]
+        return self.da[arg]
 
     def __repr__(self) -> str:
-        return repr(self._time)
+        return repr(self.da)
 
     def __str__(self) -> str:
-        return repr(self._time)
+        return str(self.da)
 
     def __len__(self) -> int:
-        return len(self._time)
+        return len(self.da)
 
 
 # --------------------------------------
@@ -246,6 +267,23 @@ class ParticleFile:
     def __getitem__(self, var: str) -> Union[InstanceVariable, ParticleVariable]:
         return self.variables[var]
 
+    # Handle 0, 1 or 2 particles
+    # Add global attributes
+    def __repr__(self):
+
+        s = "<postladim.ParticleFile>\n"
+        s += f"num_times: {self.num_times}, num_particles: {self.num_particles}\n"
+        s += f"time: {itemstr(self.time[0])} ... {itemstr(self.time[-1])}\n"
+        s += f"count: {self.count[0]} {self.count[1]} ... {self.count[-1]}\n"
+        s += "Instance variables:\n"
+        for var in self.instance_variables:
+            s += f"  {var:16s} {np.array2string(self[var].da, threshold=5, edgeitems=2)}\n"
+        s += "Particle variables:\n"
+        for var in self.particle_variables:
+            s += f"  {var:16s} {np.array2string(self[var].da, threshold=5, edgeitems=2)}\n"
+
+        return s
+
     def close(self) -> None:
         self.ds.close()
 
@@ -255,3 +293,19 @@ class ParticleFile:
 
     def __exit__(self, atype, value, traceback):
         self.close()
+
+
+# ----------------------
+# Utility functions
+# ---------------------
+
+
+def itemstr(v):
+    """Pretty print array item"""
+
+    # Date
+    if str(v.dtype).startswith("datetime64"):
+        return str(v.__array__()).split(".")[0]
+
+    # Number
+    return f"{v:g}"

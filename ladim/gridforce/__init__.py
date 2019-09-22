@@ -2,7 +2,7 @@
 
 import os
 import sys
-import importlib.util
+import importlib
 
 # from ladim.configuration import config
 
@@ -10,17 +10,10 @@ import importlib.util
 class Grid:
     def __init__(self, config):
         # Allow gridforce module in current directory
-        # sys.path.insert(0, os.getcwd())
+        sys.path.insert(0, os.getcwd())
         # Import correct gridforce_module
         # gridforce_module = importlib.import_module(config["gridforce_module"])
-        #gridforce_module = importlib.import_module(config["gridforce"]["module"])
-
-        name = config["gridforce"].
-        spec = importlib.util.spec_from_file_location(config["gridforce"], "/path/to/file.py")
-        foo = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(foo)
-
-
+        gridforce_module = importlib.import_module(config["gridforce"]["module"])
         self.grid = gridforce_module.Grid(config)
         self.xmin = self.grid.xmin
         self.xmax = self.grid.xmax

@@ -1,15 +1,13 @@
-import numpy as np     # type:ignore
-import xarray as xr    # type: ignore
+import numpy as np  # type:ignore
+import xarray as xr  # type: ignore
 from typing import Union, Optional, Tuple, List
 
 Array = Union[List[float], np.ndarray, xr.DataArray]
 Limits = Union[Tuple[int, int], Tuple[int, int, int, int]]
 
+
 def cellcount(
-    X: Array,
-    Y: Array,
-    W: Optional[Array] = None,
-    grid_limits: Optional[Limits] = None,
+    X: Array, Y: Array, W: Optional[Array] = None, grid_limits: Optional[Limits] = None
 ) -> xr.DataArray:
     """Count the (weighted) number of particles in grid cells
 
