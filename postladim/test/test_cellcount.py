@@ -32,7 +32,7 @@ def test_grid_limits():
 
     C = cellcount(X, Y, grid_limits=(12, 3))
     assert C.shape == (3, 12)
-    assert C.sum() == 1     # Three points outside
+    assert C.sum() == 1  # Three points outside
     assert C.sel(X=11, Y=1) == 1
     assert C.sel(X=11, Y=0) == 0
 
