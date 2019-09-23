@@ -5,6 +5,7 @@ import numpy as np  # type: ignore
 import xarray as xr  # type: ignore
 
 Timetype = Union[str, np.datetime64, datetime.datetime]
+Array = Union[np.ndarray, xr.DataArray]
 
 
 class InstanceVariable:
@@ -130,7 +131,7 @@ class InstanceVariable:
     def __repr__(self) -> str:
         s = "<postladim.InstanceVariable>\n"
         s += f"num_times: {self.num_times}, particle_instance: {len(self.da)}\n"
-        s += np.array2string(self.da, threshold=5, edgeitems=2)
+        s += arraystr(self.da)
         return s
 
     def __len__(self) -> int:
@@ -158,7 +159,8 @@ class ParticleVariable:
     def __repr__(self) -> str:
         s = "<postladim.ParticleVariable>\n"
         s += f"particle: {len(self.da)}\n"
-        s += np.array2string(self.da, threshold=5, edgeitems=2)
+        s += arraystr(self.da)
+
         return s
 
     def __len__(self) -> int:
@@ -202,10 +204,7 @@ class Time:
         return self.da[arg]
 
     def __repr__(self) -> str:
-        return repr(self.da)
-
-    def __str__(self) -> str:
-        return str(self.da)
+        return arraystr(self.da)
 
     def __len__(self) -> int:
         return len(self.da)
@@ -267,22 +266,23 @@ class ParticleFile:
     def __getitem__(self, var: str) -> Union[InstanceVariable, ParticleVariable]:
         return self.variables[var]
 
-    # Handle 0, 1 or 2 particles
     # Add global attributes
     def __repr__(self):
-
         s = "<postladim.ParticleFile>\n"
         s += f"num_times: {self.num_times}, num_particles: {self.num_particles}\n"
-        s += f"time: {itemstr(self.time[0])} ... {itemstr(self.time[-1])}\n"
-        s += f"count: {self.count[0]} {self.count[1]} ... {self.count[-1]}\n"
+        s += f"time: {arraystr(self.time.da)}\n"
+        s += f"count: {arraystr(self.count)}\n"
         s += "Instance variables:\n"
         for var in self.instance_variables:
-            s += f"  {var:16s} {np.array2string(self[var].da, threshold=5, edgeitems=2)}\n"
+            s += f"  {var:16s} {arraystr(self[var].da)}\n"
         s += "Particle variables:\n"
         for var in self.particle_variables:
-            s += f"  {var:16s} {np.array2string(self[var].da, threshold=5, edgeitems=2)}\n"
-
+            s += f"  {var:16s} {arraystr(self[var].da)}\n"
+        s += "Attributes:\n"
+        for a, v in self.ds.attrs.items():
+            s += f"  {a:16s} {v}\n"
         return s
+
 
     def close(self) -> None:
         self.ds.close()
@@ -300,12 +300,20 @@ class ParticleFile:
 # ---------------------
 
 
-def itemstr(v):
+def itemstr(v: Array) -> str:
     """Pretty print array item"""
 
     # Date
     if str(v.dtype).startswith("datetime64"):
-        return str(v.__array__()).split(".")[0]
+        #return str(v.__array__()).split(".")[0]
+        return str(v.__array__()).rstrip("0.:T")
 
     # Number
     return f"{v:g}"
+
+def arraystr(A: Array) -> str:
+    """Pretty print array"""
+    B = np.asarray(A).ravel()
+    if len(B) <= 3:
+        return " ".join([itemstr(v) for v in B])
+    return " ".join([itemstr(B[0]), itemstr(B[1]), "...", itemstr(B[-1])])
