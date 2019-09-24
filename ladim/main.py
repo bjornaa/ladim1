@@ -1,11 +1,6 @@
 #! /usr/bin/env python
 
-# import argparse
 import logging
-
-# import datetime
-# import os.path
-from pathlib import Path
 
 from .configuration import configure
 from .gridforce import Grid, Forcing

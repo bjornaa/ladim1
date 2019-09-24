@@ -39,7 +39,7 @@ def configure_ibm(conf: Dict[str, Any]) -> Config:
         return {}
 
     # Mandatory: module name (or obsolete ibm_module)
-    if not "module" in D:
+    if "module" not in D:
         if "ibm_module" in D:
             D["module"] = D.pop("ibm_module")
         else:
@@ -48,7 +48,7 @@ def configure_ibm(conf: Dict[str, Any]) -> Config:
     logging.info(f'    {"module":15s}: {D["module"]}')
 
     # The variables item
-    if not "variables" in D:
+    if "variables" not in D:
         if "ibm_variables" in D:
             D["variables"] = D.pop("ibm_variables")
         # ibm_variables may live under state (obsolete)
@@ -104,6 +104,7 @@ def configure_gridforce(conf: Dict[str, Any]) -> Config:
             logging.info(f"    {key:15s}: {D[key]}")
 
     return D
+
 
 # ---------------------------------------
 

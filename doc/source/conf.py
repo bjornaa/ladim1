@@ -117,8 +117,8 @@ latex_elements = {
     # 'preamble': '',   # Needed for readthedocs
     "preamble": "".join(
         (
-            "\DeclareUnicodeCharacter{F8}{\o}",  # ø
-            "\DeclareUnicodeCharacter{C5}{\AA}",  # Å
+            r"\DeclareUnicodeCharacter{F8}{\o}",  # ø
+            r"\DeclareUnicodeCharacter{C5}{\AA}",  # Å
         )
     ),
     # Latex figure (float) alignment

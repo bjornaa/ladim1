@@ -2,8 +2,6 @@
 # Instantaneous release along the 59 degN parallel.
 
 import numpy as np
-from netCDF4 import Dataset
-from ladim.gridforce.ROMS import Grid
 
 # End points of line, lon, lat
 lon0, lat0 = -2.5, 59.0

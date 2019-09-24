@@ -283,7 +283,6 @@ class ParticleFile:
             s += f"  {a:16s} {v}\n"
         return s
 
-
     def close(self) -> None:
         self.ds.close()
 
@@ -305,11 +304,11 @@ def itemstr(v: Array) -> str:
 
     # Date
     if str(v.dtype).startswith("datetime64"):
-        #return str(v.__array__()).split(".")[0]
         return str(v.__array__()).rstrip("0.:T")
 
     # Number
     return f"{v:g}"
+
 
 def arraystr(A: Array) -> str:
     """Pretty print array"""

@@ -59,6 +59,7 @@ particle_dist, = ax.plot(X, Y, ".", color="red", markeredgewidth=0, lw=0.5)
 # title = ax.set_title(pf.time(0))
 timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15, transform=ax.transAxes)
 
+
 # Update function
 def animate(t):
     X, Y = pf.position(t)
@@ -90,7 +91,6 @@ anim = FuncAnimation(
     repeat_delay=500,
     blit=True,
 )
-
 
 # anim.save('gosouth.gif',  writer='imagemagick')
 
