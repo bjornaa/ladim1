@@ -47,8 +47,8 @@ def particle_file():
         v.units = "seconds since 1970-01-01 00:00:00"
         v = nc.createVariable("position", "i", ("particle",))
         v = nc.createVariable("pid", "i", ("particle_instance",))
-        v = nc.createVariable("X", "f4", ("particle_instance"))
-        v = nc.createVariable("Y", "f4", ("particle_instance"))
+        v = nc.createVariable("X", "f4", ("particle_instance",))
+        v = nc.createVariable("Y", "f4", ("particle_instance",))
         # Data
         nc.variables["time"][:] = time
         nc.variables["particle_count"][:] = count

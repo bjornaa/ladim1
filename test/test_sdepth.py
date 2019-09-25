@@ -12,6 +12,7 @@ import numpy as np
 
 from ladim.gridforce.ROMS import sdepth, s_stretch, z2s
 
+
 # ------------------------------------
 
 
@@ -164,10 +165,3 @@ class test_Vstretching4(unittest.TestCase):
         self.assertEqual(C[-1], 0.0)
         # Length
         self.assertEqual(len(C), N + 1)
-
-
-
-
-# --------------------------------------
-if __name__ == "__main__":
-    unittest.main()

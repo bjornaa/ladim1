@@ -95,7 +95,7 @@ class Grid(object):
 
     def lonlat(self, X, Y):
         """Return the longitude and latitude from grid coordinates"""
-        return (sample2D(self.lon, X, Y), sample2D(self.lat, X, Y))
+        return sample2D(self.lon, X, Y), sample2D(self.lat, X, Y)
 
     def ingrid(self, X, Y):
         # Hva med endepunkyrt i C-grid, er her konservativ
