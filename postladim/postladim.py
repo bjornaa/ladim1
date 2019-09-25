@@ -1,7 +1,8 @@
 from collections import namedtuple
 import datetime
-from typing import Any, List, Dict, Union, Optional
-import numpy as np  # type: ignore
+from typing import Any, Dict, List, Optional, Union
+
+import numpy as np
 import xarray as xr  # type: ignore
 
 Timetype = Union[str, np.datetime64, datetime.datetime]
