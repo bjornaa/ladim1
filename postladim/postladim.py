@@ -26,6 +26,11 @@ class InstanceVariable:
         self.particles = np.unique(self.pid)
         self.num_particles = len(self.particles)  # Number of distinct particles
 
+    @property
+    def values(self) -> np.ndarray:
+        # Same as self.da.values
+        return np.array(self.da)
+
     def _sel_time_index(self, n: int) -> xr.DataArray:
         """Select by time index, return xarray."""
         start = self.start[n]
@@ -84,6 +89,8 @@ class InstanceVariable:
     def isel(self, *, time: Optional[int] = None) -> xr.DataArray:
         if time is not None:
             return self._sel_time_index(time)
+        else:
+            raise ValueError("Need one argument")
 
     def sel(
         self, *, pid: Optional[int] = None, time: Optional[Timetype] = None
@@ -95,6 +102,8 @@ class InstanceVariable:
             return self._sel_time_value(time)
         if time is not None and pid is not None:
             return self._sel_time_value(time).sel(pid=pid)
+        # No arguments
+        raise ValueError("Need 1 or 2 arguments")
 
     # Do something like dask if the array gets to big
     def full(self) -> xr.DataArray:
@@ -103,12 +112,16 @@ class InstanceVariable:
         data[:, :] = np.nan
         for n in range(self.num_times):
             data[n, self.pid[self.start[n] : self.end[n]]] = self._sel_time_index(n)
-        coords = dict(time=self.time, pid=self.particles)
+        # coords = dict(time=self.time, pid=self.particles)
+        coords = [("time", self.time), ("pid", self.particles)]
         V = xr.DataArray(data=data, coords=coords, dims=("time", "pid"))
         return V
 
     # More complicated typing
-    def __getitem__(self, index: Union[int, slice]) -> xr.DataArray:
+    # def __getitem__(self, index: Union[int, slice]) -> xr.DataArray:
+    def __getitem__(
+        self, index: Union[int, slice]
+    ) -> Union[xr.DataArray, 'InstanceVariable']:
         if isinstance(index, int):  # index = time_idx
             return self._sel_time_index(index)
         if isinstance(index, slice):
@@ -125,8 +138,10 @@ class InstanceVariable:
                 raise IndexError(f"pid={pid} is out of bound={self.num_particles}")
             return v
 
+
     def __array__(self) -> np.ndarray:
         return np.array(self.da)
+
 
     def __repr__(self) -> str:
         s = "<postladim.InstanceVariable>\n"
@@ -173,8 +188,23 @@ class ParticleVariable:
 Position = namedtuple("Position", "X Y")
 
 
-class Trajectory(namedtuple("Trajectory", "X Y")):
+class Trajectory:
     """Single particle trajectory"""
+
+    def __init__(self, X: xr.DataArray, Y: xr.DataArray):
+        self._data = X, Y
+
+    # For unpacking: X, Y = pf.trajectory(pid=4)
+    def __getitem__(self, n):
+        return self._data[n]
+
+    @property
+    def X(self) -> xr.DataArray:
+        return self._data[0]
+
+    @property
+    def Y(self) -> xr.DataArray:
+        return self._data[1]
 
     @property
     def time(self) -> np.datetime64:
@@ -249,8 +279,14 @@ class ParticleFile:
     # This could slice and take trajectories og that
     # Could improve speed by computing X and Y at same time
     def trajectory(self, pid: int) -> Trajectory:
-        X = self["X"].sel(pid=pid)
-        Y = self["Y"].sel(pid=pid)
+        # X = self["X"].sel(pid=pid)
+        # Y = self["Y"].sel(pid=pid)
+        X = InstanceVariable(self.ds["X"], self.ds.pid, self.ds.time, self.count).sel(
+            pid=pid
+        )
+        Y = InstanceVariable(self.ds["Y"], self.ds.pid, self.ds.time, self.count).sel(
+            pid=pid
+        )
         return Trajectory(X, Y)
 
     # Obsolete

@@ -135,6 +135,10 @@ def test_getX(particle_file):
         assert all(X[2] == [2, 22])
         assert X[3] == 23
 
+def test_values(particle_file):
+    with ParticleFile(particle_file) as pf:
+        X = pf.X
+        assert all(X.values == X.da.values)
 
 def test_X_slice(particle_file):
     """Can read variables with time slices"""
