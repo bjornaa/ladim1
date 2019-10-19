@@ -94,6 +94,13 @@ def test_values(particle_file):
         X = pf.X
         assert all(X.values == X.da.values)
 
+def test_array(particle_file):
+    with ParticleFile(particle_file) as pf:
+        X = pf.X
+        assert all(np.array(X) == X.da.values)
+        assert all(np.array(X[1]) == X[1])
+        assert all(np.array(X[0:2]) == X[0:2])
+
 
 def test_X_slice(particle_file):
     """Can read variables with time slices"""

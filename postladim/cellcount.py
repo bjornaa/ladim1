@@ -31,12 +31,6 @@ def cellcount(
 
     """
 
-    # Possible improvement.
-    #   If xarray is not installed, return a numpy.ndarray
-
-    # X = np.asarray(X)
-    # Y = np.asarray(Y)
-
     # Subgrid specification
 
     i0: int
@@ -61,13 +55,13 @@ def cellcount(
     x_edges = np.arange(i0 - 0.5, i1)
     y_edges = np.arange(j0 - 0.5, j1)
     if W is None:
-        C = np.histogram2d(Y, X, bins=[y_edges, x_edges])
+        C = np.histogram2d(np.asarray(Y), np.asarray(X), bins=[y_edges, x_edges])
     else:
-        C = np.histogram2d(Y, X, weights=W, bins=[y_edges, x_edges])
+        C = np.histogram2d(np.asarray(Y), np.asarray(X), weights=np.asarray(W), bins=[y_edges, x_edges])
 
     coords = dict(Y=np.arange(j0, j1), X=np.arange(i0, i1))
     C = xr.DataArray(C[0], coords=list(coords.items()), dims=coords.keys())
-    # mypy does not like the one below
+    # mypy does not like the line below
     # C = xr.DataArray(C[0], coords=coords, dims=coords.keys())
 
     return C
