@@ -45,7 +45,7 @@ def particle_file():
         v = nc.createVariable("particle_count", "i", ("time",))
         v = nc.createVariable("start_time", "f8", ("particle",))
         v.units = "seconds since 1970-01-01 00:00:00"
-        v = nc.createVariable("position", "i", ("particle",))
+        v = nc.createVariable("location_id", "i", ("particle",))
         v = nc.createVariable("pid", "i", ("particle_instance",))
         v = nc.createVariable("X", "f4", ("particle_instance",))
         v = nc.createVariable("Y", "f4", ("particle_instance",))
@@ -53,7 +53,7 @@ def particle_file():
         nc.variables["time"][:] = time
         nc.variables["particle_count"][:] = count
         nc.variables["start_time"][:] = time[:nparticles]
-        nc.variables["position"][:] = [10000, 10001, 10002]
+        nc.variables["location_id"][:] = [10000, 10001, 10002]
         nc.variables["pid"][:] = [v for v in pid.flat if v >= 0]
         nc.variables["X"][:] = [v for v in X.flat if not np.isnan(v)]
         nc.variables["Y"][:] = [v for v in Y.flat if not np.isnan(v)]
@@ -95,7 +95,7 @@ def test_variables(particle_file):
     """Indentifies the variables to correct category"""
     with ParticleFile(particle_file) as pf:
         assert pf.instance_variables == ["pid", "X", "Y"]
-        assert pf.particle_variables == ["start_time", "position"]
+        assert pf.particle_variables == ["start_time", "location_id"]
 
 
 def test_pid(particle_file):
@@ -162,9 +162,13 @@ def test_isel(particle_file):
     with ParticleFile(particle_file) as pf:
         X = pf.X
         assert all(X.isel(time=2) == X[2])
+        with pytest.raises(TypeError):
+            # Need an argument
+            X.isel()
+        with pytest.raises(TypeError):
+            # Only keyword arguments
+            X.isel(2)
 
-
-# Ta med noen tester med feil input
 def test_sel(particle_file):
     with ParticleFile(particle_file) as pf:
         X = pf.X
@@ -179,8 +183,14 @@ def test_sel(particle_file):
 
         assert X.sel(time="1970-01-01 02", pid=0) == X[2, 0]
         assert X.sel(pid=2, time="1970-01-01 03") == X[3, 2]
-        # Determine what to do
-        # assert np.isnan(X.sel(pid=1, time="1970-01-01 03"))
+        with pytest.raises(KeyError):
+            X.sel(time="1980-01-01")
+        with pytest.raises(KeyError):
+            X.sel(pid=-1)
+        with pytest.raises(ValueError):
+            X.sel()
+        with pytest.raises(TypeError):
+            X.sel("1970-01-01 02")
 
 
 def test_full(particle_file):
@@ -203,12 +213,13 @@ def test_full(particle_file):
 
 def test_position(particle_file):
     with ParticleFile(particle_file) as pf:
-        pos = pf.position(1)
-        assert all(pos.X == pf.X[1])
-        assert all(pos.Y == pf.Y[1])
+        X, Y = pf.position(time=1)
+        assert all(X == pf.X[1])
+        assert all(Y == pf.Y[1])
         X, Y = pf.position(2)
         assert all(X == pf.X[2])
         assert all(Y == pf.Y[2])
+
 
 
 def test_trajectory(particle_file):
@@ -224,13 +235,11 @@ def test_trajectory(particle_file):
 
 
 def test_particle_variable(particle_file):
-    """Two particle variables, start_time and position"""
+    """Two particle variables, start_time and location_id"""
     with ParticleFile(particle_file) as pf:
         assert pf.start_time[0] == np.datetime64("1970-01-01")
         assert pf["start_time"][1] == np.datetime64("1970-01-01 01")
-        assert pf["position"][0] == 10000
-        assert pf["position"][1] == 10001
-        assert pf["position"][2] == 10002
-        # pf.position is a method, therefore not a particle variable
-        with pytest.raises(TypeError):
-            pf.position[2]
+        assert all(pf.location_id == np.array([10000, 10001, 10002]))
+        assert all(pf.location_id == pf["location_id"][:])
+        # Not working (but should?)
+        # assert all(pf.location_id == pf["location_id"])

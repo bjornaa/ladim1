@@ -45,10 +45,17 @@ pf = ParticleFile(pfile)
 #     X, Y = pf.position(t)
 #     C += cellcount(X, Y, grid_limits=(i0, i1, j0, j1))
 # C = np.ma.masked_where(C == 0, C)
-X = pf.X[tframe0:tframe1].da
-Y = pf.Y[tframe0:tframe1].da
-C = cellcount(X, Y, grid_limits=(i0, i1, j0, j1))
 
+# Terrible slow on slices,
+# Do something
+#X = pf.X[tframe0:tframe1]
+#Y = pf.Y[tframe0:tframe1]
+X = pf.X.values[:]
+Y = pf.Y.values[:]
+
+print("foran")
+C = cellcount(X, Y, grid_limits=(i0, i1, j0, j1))
+print("etter")
 # ------------------------- ---
 # Plot particle concentration
 # -----------------------------
