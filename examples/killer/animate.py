@@ -45,13 +45,13 @@ cmap = plt.get_cmap("Blues")
 ax.contourf(Xcell, Ycell, H, cmap=cmap, alpha=0.3)
 
 # Lon/lat lines
-ax.contour(Xcell, Ycell, lat, levels=range(57, 64), colors="black", linestyles=":")
-ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2), colors="black", linestyles=":")
+# ax.contour(Xcell, Ycell, lat, levels=range(57, 64), colors="black", linestyles=":")
+# ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2), colors="black", linestyles=":")
 
 # Landmask
-constmap = plt.matplotlib.colors.ListedColormap([0.2, 0.6, 0.4])
-M = np.ma.masked_where(M > 0, M)
-plt.pcolormesh(Xb, Yb, M, cmap=constmap)
+# constmap = plt.matplotlib.colors.ListedColormap([0.2, 0.6, 0.4])
+# M[M > 0] = np.nan
+# plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 
 # Plot initial particle distribution
 X, Y = pf.position(0)

@@ -54,22 +54,20 @@ M = np.ma.masked_where(M > 0, M)
 plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 
 # Plot initial particle distribution
-X, Y = pf.position(0)
+X, Y = pf.position(time=0)
 Z = pf["Z"][0]
-# particle_dist, = ax.plot(X, Y, '.', color='red', markeredgewidth=0, lw=0.5)
 particle_dist = ax.scatter(X, Y, c=Z, cmap=plt.get_cmap("plasma_r"))
-# title = ax.set_title(pf.time(0))
+# Colorbar
 cb = plt.colorbar(particle_dist)
 cb.ax.invert_yaxis()
 cb.set_label("Particle depth", fontsize=14)
-
-
+# Time stamp
 timestamp = ax.text(0.01, 0.96, pf.time(0), fontsize=15, transform=ax.transAxes)
 
 
 # Update function
 def animate(t):
-    X, Y = pf.position(t)
+    X, Y = pf.position(time=t)
     particle_dist.set_offsets(np.vstack((X, Y)).T)
     timestamp.set_text(pf.time(t))
     return particle_dist, timestamp
