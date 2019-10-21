@@ -62,6 +62,7 @@ def particle_file():
     # tear down
     os.remove(pfile)
 
+
 # --- InstanceVariable tests ---
 
 # Detemine how this should work
@@ -93,6 +94,7 @@ def test_values(particle_file):
     with ParticleFile(particle_file) as pf:
         X = pf.X
         assert all(X.values == X.da.values)
+
 
 def test_array(particle_file):
     with ParticleFile(particle_file) as pf:
@@ -172,16 +174,6 @@ def test_full(particle_file):
         assert np.isnan(V[3, 0])
         assert np.isnan(V[3, 1])
         assert V[3, 2] == 23
-
-
-def test_position(particle_file):
-    with ParticleFile(particle_file) as pf:
-        X, Y = pf.position(time=1)
-        assert all(X == pf.X[1])
-        assert all(Y == pf.Y[1])
-        X, Y = pf.position(2)
-        assert all(X == pf.X[2])
-        assert all(Y == pf.Y[2])
 
 
 def test_particle_variable(particle_file):
