@@ -14,6 +14,14 @@ from pathlib import Path
 
 from ladim import main
 
+# ===========
+# Logging
+# ===========
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s:%(module)s - %(message)s')
+
 # ====================
 # Parse command line
 # ====================
@@ -30,23 +38,22 @@ parser.add_argument(
     help='Show less information',
     action="store_const", dest="loglevel", const=logging.WARNING)
 parser.add_argument('config_file', nargs='?', default='ladim.yaml')
+
+logging.info("Parsing command line")
 args = parser.parse_args()
+logging.info(f"  Configuration file: {args.config_file}")
+logging.info(f"  loglevel = {logging.getLevelName(args.loglevel)}")
+
+# Set log level
+#logging.getLogger().setLevel(args.loglevel)
 
 # =============
 # Sanity check
 # =============
 
 if not Path(args.config_file).exists():
-    raise SystemExit(
-        f'ERROR: Configuration file {args.config_file} not found')
-
-# =========
-# Logging
-# =========
-
-logging.basicConfig(
-    level=args.loglevel,
-    format='%(levelname)s:%(module)s - %(message)s')
+    logging.critical(f'Configuration file {args.config_file} not found')
+    raise SystemExit(1)
 
 # ===================
 # Run the simulation
@@ -58,5 +65,7 @@ logging.info(f'LADiM simulation starting, wall time={now}')
 fp = open(args.config_file, encoding='utf8')
 main(config_stream=fp, loglevel=args.loglevel)
 
+# Reset logging and print final message
+logging.getLogger().setLevel(logging.INFO)
 now = datetime.datetime.now().replace(microsecond=0)
 logging.info(f'LADiM simulation finished, wall time={now}')
