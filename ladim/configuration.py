@@ -1,5 +1,5 @@
 """
-Configuration class for ladim
+Configuration module for ladim
 """
 
 # ----------------------------------
@@ -121,12 +121,10 @@ def configure(config_stream) -> Config:
     config: Config = dict()
 
     # --- Read the configuration file ---
-    # TODO: use logging.ERROR instead of print
-
     try:
         conf = yaml.safe_load(config_stream)
     except yaml.parser.ParserError:
-        print("ERROR: ", f"Can not parse configuration")
+        logging.critical("Can not parse configuration")
         raise SystemExit(2)
 
     # ----------------
@@ -259,10 +257,7 @@ def configure(config_stream) -> Config:
     try:
         skip_initial = conf["output_variables"]["skip_initial_output"]
     except KeyError:
-        if config["start"] == "warm":
-            skip_initial = True
-        else:
-            skip_initial = False
+        skip_initial = config["start"] == "warm"
     config["skip_initial"] = skip_initial
     logging.info(f"    {'Skip inital output':15s}: {skip_initial}")
 

@@ -1,4 +1,7 @@
-# Surface ligth module
+"""
+Surface ligth module
+"""
+
 # After A. Skartveit & J.A. Olseth,1988
 # Varighetstabeller for timevis belysning mot 5 flater
 # på 16 norske stasjoner
@@ -7,9 +10,9 @@
 
 import numpy as np
 
-pi = np.pi
-rad = pi / 180.0
-deg = 180 / pi
+PI = np.pi
+RAD = PI / 180.0
+DEG = 180 / PI
 sin = np.sin
 cos = np.cos
 
@@ -29,12 +32,12 @@ def surface_light(dtime, lon, lat):
     # hours in UTC (as output from oceanographic model)
     hours = time_tuple.tm_hour
 
-    phi = lat * rad
+    phi = lat * RAD
 
     # Compute declineation = delta
     a0 = 0.3979
-    a1 = 0.9856 * rad  # day-1
-    a2 = 1.9171 * rad
+    a1 = 0.9856 * RAD  # day-1
+    a2 = 1.9171 * RAD
     a3 = 0.98112
     sindelta = a0 * sin(a1 * (yday - 80) + a2 * (sin(a1 * yday) - a3))
     cosdelta = (1 - sindelta ** 2) ** 0.5
@@ -55,8 +58,8 @@ def surface_light(dtime, lon, lat):
 
     # Sun height  [degrees]
     # sinheight = sindelta*sin(phi) - cosdelta*cos(phi)*cos(15*hours*rad)
-    sinheight = sindelta * sin(phi) - cosdelta * cos(phi) * cos(TST * rad)
-    height = np.arcsin(sinheight) * deg
+    sinheight = sindelta * sin(phi) - cosdelta * cos(phi) * cos(TST * RAD)
+    height = np.arcsin(sinheight) * DEG
 
     # sine of sun height at noon, h12
     sinh12 = sindelta * sin(phi) + cosdelta * cos(phi)

@@ -1,3 +1,7 @@
+"""
+General utilities for LADiM
+"""
+
 from typing import Any, Dict, List
 import numpy as np
 
@@ -9,6 +13,7 @@ def timestep2stamp(config: Dict[str, Any], n: int) -> np.datetime64:
 
 
 def timestamp2step(config: Dict[str, Any], timestamp: np.datetime64) -> int:
+    """Convert from timestamp to time step number"""
     # mtime = np.datetime64(timestamp)
     dtime = np.timedelta64(timestamp - config["start_time"], "s").astype(int)
     step = dtime // config["dt"]

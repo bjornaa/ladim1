@@ -67,6 +67,7 @@ def sample2D2(F: np.ndarray, X, Y) -> np.ndarray:
 
 
 def sample2DUV(U, V, X, Y) -> Tuple[np.ndarray, np.ndarray]:
+    """2D interpolation of velocity"""
     return sample2D(U, X + 0.5, Y), sample2D(V, X, Y + 0.5)
 
 

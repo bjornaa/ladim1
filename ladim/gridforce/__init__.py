@@ -1,4 +1,6 @@
-# Main gridforce controller
+"""
+Main gridforce controller
+"""
 
 import os
 import sys

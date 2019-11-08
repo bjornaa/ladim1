@@ -181,10 +181,10 @@ class Grid:
         """Return the longitude and latitude from grid coordinates"""
         if method == "bilinear":  # More accurate
             return self.xy2ll(X, Y)
-        else:  # containing grid cell, less accurate
-            I = X.round().astype("int") - self.i0
-            J = Y.round().astype("int") - self.j0
-            return self.lon[J, I], self.lat[J, I]
+        # else: containing grid cell, less accurate
+        I = X.round().astype("int") - self.i0
+        J = Y.round().astype("int") - self.j0
+        return self.lon[J, I], self.lat[J, I]
 
     def ingrid(self, X: np.ndarray, Y: np.ndarray) -> np.ndarray:
         """Returns True for points inside the subgrid"""
@@ -549,20 +549,20 @@ def s_stretch(N, theta_s, theta_b, stagger="rho", Vstretching=1):
             cff2 * np.tanh(theta_s * (S + 0.5)) - 0.5
         )
 
-    elif Vstretching == 2:
+    if Vstretching == 2:
         a, b = 1.0, 1.0
         Csur = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
         Cbot = np.sinh(theta_b * (S + 1)) / np.sinh(theta_b) - 1
         mu = (S + 1) ** a * (1 + (a / b) * (1 - (S + 1) ** b))
         return mu * Csur + (1 - mu) * Cbot
 
-    elif Vstretching == 4:
+    if Vstretching == 4:
         C = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
         C = (np.exp(theta_b * C) - 1) / (1 - np.exp(-theta_b))
         return C
 
-    else:
-        raise ValueError("Unknown Vstretching")
+    # else:
+    raise ValueError("Unknown Vstretching")
 
 
 def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
@@ -613,13 +613,13 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
         B = np.outer(C, H)
         return (A + B).reshape(outshape)
 
-    elif Vtransform == 2:  # New transform by Shchepetkin
+    if Vtransform == 2:  # New transform by Shchepetkin
         N = Hc * S[:, None] + np.outer(C, H)
         D = 1.0 + Hc / H
         return (N / D).reshape(outshape)
 
-    else:
-        raise ValueError("Unknown Vtransform")
+    # else:
+    raise ValueError("Unknown Vtransform")
 
 
 # ------------------------
@@ -720,10 +720,10 @@ def sample3D(F, X, Y, K, A, method="bilinear"):
             + W111 * F[K - 1, J + 1, I + 1]
         )
 
-    else:  # method == 'nearest'
-        I = X.round().astype("int")
-        J = Y.round().astype("int")
-        return F[K, J, I]
+    # else:  method == 'nearest'
+    I = X.round().astype("int")
+    J = Y.round().astype("int")
+    return F[K, J, I]
 
 
 def sample3DUV(U, V, X, Y, K, A, method="bilinear"):

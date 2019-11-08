@@ -44,9 +44,6 @@ args = parser.parse_args()
 logging.info(f"  Configuration file: {args.config_file}")
 logging.info(f"  loglevel = {logging.getLevelName(args.loglevel)}")
 
-# Set log level
-#logging.getLogger().setLevel(args.loglevel)
-
 # =============
 # Sanity check
 # =============
@@ -59,6 +56,7 @@ if not Path(args.config_file).exists():
 # Run the simulation
 # ===================
 
+# Start message
 now = datetime.datetime.now().replace(microsecond=0)
 logging.info(f'LADiM simulation starting, wall time={now}')
 

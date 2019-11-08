@@ -1,5 +1,16 @@
 #! /usr/bin/env python
 
+"""Main program for running LADiM
+
+Lagrangian Advection and Diffusion Model
+
+"""
+
+# ---------------------------------
+# Bjørn Ådlandsvik <bjorn@imr.no>
+# Institute of Marine Research
+# ---------------------------------
+
 import logging
 
 from .configuration import configure
@@ -10,21 +21,16 @@ from .output import OutPut
 
 
 def main(config_stream, loglevel=logging.INFO):
+    """Main function for LADiM"""
+
     # ==================
     # Initiate the model
     # ==================
 
-    # --- Logging ---
-    #logging.basicConfig(
-    #    # level=loglevel,
-    #    level=logging.DEBUG,
-    #    format="%(levelname)s:%(module)s - %(message)s",
-    #)
-
+    # Logging
     logging.getLogger().setLevel(loglevel)
 
     # --- Configuration ---
-
     config = configure(config_stream)
 
     # --- Initiate the grid and the forcing ---
@@ -67,9 +73,6 @@ def main(config_stream, loglevel=logging.INFO):
     # ========
     # Clean up
     # ========
-
-    # now = datetime.datetime.now().replace(microsecond=0)
-    # logging.info(f'End of simulation, time={now}')
 
     # TODO: should also close the releaser
     forcing.close()

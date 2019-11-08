@@ -31,10 +31,11 @@ def mylen(df: pd.DataFrame) -> int:
     A workaround for len() which does not
     have the expected behaviour with itemizing,
     """
-    if df.ndim == 1:
-        return 1
-    else:
-        return df.shape[0]
+    return df.shape[0] if df.ndim > 1 else 1
+    # if df.ndim == 1:
+    #     return 1
+    # else:
+    #     return df.shape[0]
 
 
 class ParticleReleaser(Iterator):
@@ -65,20 +66,20 @@ class ParticleReleaser(Iterator):
         # Conversion from longitude, latitude to grid coordinates
         if "X" not in A.columns or "Y" not in A.columns:
             if "lon" not in A.columns or "lat" not in A.columns:
-                logging.error("Particle release mush have position")
-                raise SystemExit
-            else:
-                X, Y = grid.ll2xy(A["lon"], A["lat"])
-                A["lon"] = X
-                A["lat"] = Y
-                A.rename(columns={"lon": "X", "lat": "Y"}, inplace=True)
+                logging.critical("Particle release mush have position")
+                raise SystemExit(3)
+            # else
+            X, Y = grid.ll2xy(A["lon"], A["lat"])
+            A["lon"] = X
+            A["lat"] = Y
+            A.rename(columns={"lon": "X", "lat": "Y"}, inplace=True)
 
         # Remove everything after simulation stop time
         # A = A[A['release_time'] <= stop_time]   # Use < ?
         A = A[A.index <= stop_time]  # Use < ?
         if len(A) == 0:  # All release after simulation time
-            logging.error("All particles released after similation stop")
-            raise SystemExit
+            logging.critical("All particles released after similation stop")
+            raise SystemExit(3)
 
         # Optionally, remove everything outside a subgrid
         try:

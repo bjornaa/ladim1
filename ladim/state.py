@@ -1,4 +1,6 @@
-# Classes for Particle and State variables
+"""
+Class for the state of the model
+"""
 
 import sys
 import os
@@ -124,7 +126,7 @@ class State(Sized):
         try:
             f = Dataset(warm_start_file)
         except FileNotFoundError:
-            logging.error("Can not open warm start file: " + warm_start_file)
+            logging.critical(f"Can not open warm start file: {warm_start_file}")
             raise SystemExit(1)
 
         logging.info("Reading warm start file")
