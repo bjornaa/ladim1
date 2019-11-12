@@ -27,7 +27,9 @@ class State(Sized):
         logging.info("Initializing the model state")
 
         self.timestep = 0
-        self.timestamp = config["start_time"].astype("datetime64[s]")
+        # self.timestamp = config["start_time"].astype("datetime64[s]")
+        # self.timestamp = config["time_control"]["start_time"]
+        self.timestamp = config["time_control"]["start_time"].astype("datetime64[s]")
         self.dt = np.timedelta64(config["dt"], "s")
         self.position_variables = ["X", "Y", "Z"]
         if "ibm" in config and "variables" in config["ibm"]:

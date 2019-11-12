@@ -28,12 +28,12 @@ class OutPut:
         logging.info("Initializing output")
 
         self.filename = config["output_file"]
-        self.instance_variables = config["output_instance"]
+        self.instance_variables = config["output"]["instance"]
         self.instance_count = 0
         self.outcount = -1  # No output yet
         self.file_counter = -1  # No file yer
-        self.skip_output = config["skip_initial"]
-        self.numrec = config["output_numrec"]
+        self.skip_output = config["output"]["skip_initial"]
+        self.numrec = config["output"]["numrec"]
         if self.numrec == 0:
             self.multi_file = False
             self.numrec = 999999  # A large number
@@ -53,7 +53,7 @@ class OutPut:
         self.dt = config["dt"]
         self.config = config  # Better to extract the things needed
         self.release = release
-        self.num_output = config["num_output"]
+        self.num_output = config["output"]["num_output"]
         self.nc = None  # No open netCD file yet
         # Indicator for lon/lat output
         self.lonlat = (
@@ -93,7 +93,7 @@ class OutPut:
 
         logging.debug(f"Writing {pcount} particles")
 
-        tdelta = state.timestamp - self.config["reference_time"]
+        tdelta = state.timestamp - self.config["time_control"]["reference_time"]
         seconds = tdelta.astype("m8[s]").astype("int")
         self.nc.variables["time"][t] = float(seconds)
 
@@ -137,7 +137,7 @@ class OutPut:
             fname = f"{fname0}_{self.file_counter:04d}{ext}"
 
         logging.debug(f"Defining output netCDF file: {fname}")
-        nc = Dataset(fname, mode="w", format=self.config["output_format"])
+        nc = Dataset(fname, mode="w", format=self.config["output"]["format"])
         # --- Dimensions
         nc.createDimension("particle", self.release.total_particle_count)
         nc.createDimension("particle_instance", None)  # unlimited
@@ -151,7 +151,7 @@ class OutPut:
         v = nc.createVariable("time", "f8", ("time",))
         v.long_name = "time"
         v.standard_name = "time"
-        timeref = str(self.config["reference_time"]).replace("T", " ")
+        timeref = str(self.config["time_control"]["reference_time"]).replace("T", " ")
         v.units = f"seconds since {timeref}"
 
         # instance_offset
@@ -164,8 +164,8 @@ class OutPut:
         v.ragged_row_count = "particle count at nth timestep"
 
         # Particle variables
-        for name in self.config["output_particle"]:
-            confname = self.config["nc_attributes"][name]
+        for name in self.config["output"]["particle"]:
+            confname = self.config["output"]["variables"][name]
             if confname["ncformat"][0] == "S":  # text
                 length = int(confname["ncformat"][1:])
                 lendimname = "len_" + name
@@ -179,24 +179,24 @@ class OutPut:
             else:  # Numeric
                 v = nc.createVariable(
                     varname=name,
-                    datatype=self.config["nc_attributes"][name]["ncformat"],
+                    datatype=self.config["output"]["variables"][name]["ncformat"],
                     dimensions=("particle",),
                     zlib=True,
                 )
-            for attr, value in self.config["nc_attributes"][name].items():
+            for attr, value in self.config["output"]["variables"][name].items():
                 if attr != "ncformat":
                     setattr(v, attr, value)
 
         # Instance variables
-        for name in self.config["output_instance"]:
+        for name in self.config["output"]["instance"]:
             v = nc.createVariable(
                 varname=name,
-                datatype=self.config["nc_attributes"][name]["ncformat"],
+                datatype=self.config["output"]["variables"][name]["ncformat"],
                 dimensions=("particle_instance",),
                 zlib=True,
             )
 
-            for attr, value in self.config["nc_attributes"][name].items():
+            for attr, value in self.config["output"]["variables"][name].items():
                 if attr != "ncformat":
                     setattr(v, attr, value)
 
@@ -212,7 +212,7 @@ class OutPut:
         logging.debug("Netcdf output file defined")
 
         # Save particle variables
-        for name in self.config["output_particle"]:
+        for name in self.config["output"]["particle"]:
             var = nc.variables[name]
             if var.datatype == np.dtype("S1"):  # Text
                 n = len(nc.dimensions[var.dimensions[-1]])

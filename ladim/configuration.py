@@ -106,6 +106,121 @@ def configure_gridforce(conf: Dict[str, Any]) -> Config:
     return D
 
 
+def configure_time(conf: Dict[str, Any]) -> Config:
+    """Parse time configuration"""
+
+    # Times are returned with dtype M8[s]
+
+    logging.info("Configuration: Time Control")
+
+    D0 = conf.get("time_control")
+    if D0 is None:
+        logging.critical("No time_control section in configuration file")
+        raise SystemExit(1)
+    if len(D0) is None:
+        logging.critical("Empty time_control section in configuration file")
+        raise SystemExit(1)
+
+    D = dict()
+    for name in ["start_time", "stop_time"]:
+        val = D0.get(name)
+        if not val:
+            logging.critical(f"No {name} in time_control")
+            raise SystemExit(1)
+        D[name] = np.datetime64(val).astype("M8[s]")
+        logging.info(f"    {name.replace('_', ' '):15s}: {D[name]}")
+    # reference_time, default = start_time
+    D["reference_time"] = np.datetime64(
+        D0.get("reference_time", D["start_time"])
+    ).astype("M8[s]")
+    logging.info(f'    {"reference time":15s}: {D["reference_time"]}')
+
+    # D['simulation_time'] = D['start_time'] - D['stop_time']
+    # D['simulation_time'] = int(sim_time / np.timedelta64(1, 's'))
+
+    return D
+
+
+def configure_output(
+    conf: Dict[str, Any], time_config: Dict[str, np.datetime64]
+) -> Config:
+    """Parse output related info and pass on
+
+    Input: conf = raw configuration dictionary
+           time_config = parsed time_control configuration
+
+    Return: D = output configuration dictionary
+
+    NOTE: time_control should be parsed before output
+
+    """
+
+    logging.info("Configuration: Output Control")
+
+    if conf is None:
+        logging.error("No output section in configuration file")
+        raise SystemExit(1)
+    D0 = conf.get("output") or conf.get("output_variables")
+    if D0 is None:
+        logging.error("Empty output section in configuration file")
+        raise SystemExit(1)
+
+    D = {}
+    # Set in defaults
+    D["format"] = D0.get("format", "NETCDF3_64BIT_OFFSET")
+    logging.info(f'    {"format":15s}: {D["format"]}')
+
+    # Skip output of initial state, useful for restart
+    # with cold start the default is False
+    # with warm start, the default is true
+    D["skip_initial"] = D0.get("skip_initial_output", bool(conf.get("warm_start_file")))
+    logging.info(f"    {'Skip inital output':15s}: {D['skip_initial']}")
+
+    D["numrec"] = D0.get("numrec", 0)
+    logging.info(f'    {"numrec":15s}: {D["numrec"]}')
+
+    # Time info
+    dt = np.timedelta64(*(conf["numerics"]["dt"]))
+    simulation_time = time_config["stop_time"] - time_config["start_time"]
+
+    outper = np.timedelta64(*D0["outper"])  # raw output period
+    logging.info(
+        f'    {"output_period":15s}: {outper.item().total_seconds()/3600} hours'
+    )
+
+    D["num_output"] = 1 + simulation_time // outper  # Add 1 ??
+    logging.info(f'    {"num_output":15s}: {D["num_output"]}')
+
+    period, remainder = divmod(outper, dt)
+    if remainder != np.timedelta64(0, "s"):
+        logging.error("Output period not divisible by time step")
+        raise SystemExit(1)
+    D["output_period"] = period  # output period in timesteps
+
+    D["particle"] = D0["particle"]
+    D["instance"] = D0["instance"]
+    D["variables"] = dict()
+    for name in D["particle"] + D["instance"]:
+        # value = D0[name]
+        value = D0[name]
+        if "units" in value:
+            if value["units"] == "seconds since reference_time":
+                value["units"] = f"seconds since {time_config['reference_time']}"
+        D["variables"][name] = D0[name]
+    logging.info("    particle variables")
+    for name in D["particle"]:
+        logging.info(8 * " " + name)
+        for item in D["variables"][name].items():
+            logging.info(12 * " " + "{:11s}: {:s}".format(*item))
+    logging.info("    particle instance variables")
+    for name in D["instance"]:
+        logging.info(8 * " " + name)
+        for item in D["variables"][name].items():
+            logging.info(12 * " " + "{:11s}: {:s}".format(*item))
+
+    return D
+
+
 # ---------------------------------------
 
 
@@ -130,15 +245,7 @@ def configure(config_stream) -> Config:
     # ----------------
     # Time control
     # ----------------
-    logging.info("Configuration: Time Control")
-    for name in ["start_time", "stop_time"]:
-        config[name] = np.datetime64(conf["time_control"][name]).astype("M8[s]")
-        logging.info(f"    {name.replace('_', ' '):15s}: {config[name]}")
-    # reference_time, default = start_time
-    config["reference_time"] = np.datetime64(
-        conf["time_control"].get("reference_time", config["start_time"])
-    ).astype("M8[s]")
-    logging.info(f'    {"reference time":15s}: {config["reference_time"]}')
+    config["time_control"] = configure_time(conf)
 
     # -------------
     # Files
@@ -168,7 +275,7 @@ def configure(config_stream) -> Config:
         # Use last record in restart file
         warm_start_time = np.datetime64(num2date(tvar[-1], tvar.units))
         warm_start_time = warm_start_time.astype("M8[s]")
-        config["start_time"] = warm_start_time
+        config["time_control"]["start_time"] = warm_start_time
         logging.info(f"    Warm start at {warm_start_time}")
 
         # Variables needed by restart, mightwarm_ be changed
@@ -185,7 +292,7 @@ def configure(config_stream) -> Config:
     dt = np.timedelta64(*tuple(conf["numerics"]["dt"]))
     config["dt"] = int(dt.astype("m8[s]").astype("int"))
     config["simulation_time"] = np.timedelta64(
-        config["stop_time"] - config["start_time"], "s"
+        config["time_control"]["stop_time"] - config["time_control"]["start_time"], "s"
     ).astype("int")
     config["numsteps"] = config["simulation_time"] // config["dt"]
     logging.info(f'    {"dt":15s}: {config["dt"]} seconds')
@@ -243,57 +350,7 @@ def configure(config_stream) -> Config:
     # -----------------
     # Output control
     # -----------------
-    logging.info("Configuration: Output Control")
-    try:
-        output_format = conf["output_variables"]["format"]
-    except KeyError:
-        output_format = "NETCDF3_64BIT_OFFSET"
-    config["output_format"] = output_format
-    logging.info(f'    {"output_format":15s}: {config["output_format"]}')
-
-    # Skip output of initial state, useful for restart
-    # with cold start the default is False
-    # with warm start, the default is true
-    try:
-        skip_initial = conf["output_variables"]["skip_initial_output"]
-    except KeyError:
-        skip_initial = config["start"] == "warm"
-    config["skip_initial"] = skip_initial
-    logging.info(f"    {'Skip inital output':15s}: {skip_initial}")
-
-    try:
-        numrec = conf["output_variables"]["numrec"]
-    except KeyError:
-        numrec = 0
-    config["output_numrec"] = numrec
-    logging.info(f'    {"output_numrec":15s}: {config["output_numrec"]}')
-
-    outper = np.timedelta64(*tuple(conf["output_variables"]["outper"]))
-    outper = outper.astype("m8[s]").astype("int") // config["dt"]
-    config["output_period"] = outper
-    logging.info(f'    {"output_period":15s}: {config["output_period"]} timesteps')
-    config["num_output"] = 1 + config["numsteps"] // config["output_period"]
-    logging.info(f'    {"numsteps":15s}: {config["numsteps"]}')
-    config["output_particle"] = conf["output_variables"]["particle"]
-    config["output_instance"] = conf["output_variables"]["instance"]
-    config["nc_attributes"] = dict()
-    for name in config["output_particle"] + config["output_instance"]:
-        value = conf["output_variables"][name]
-        if "units" in value:
-            if value["units"] == "seconds since reference_time":
-                timeref = str(config["reference_time"]).replace("T", " ")
-                value["units"] = f"seconds since {timeref}"
-        config["nc_attributes"][name] = conf["output_variables"][name]
-    logging.info("    particle variables")
-    for name in config["output_particle"]:
-        logging.info(8 * " " + name)
-        for item in config["nc_attributes"][name].items():
-            logging.info(12 * " " + "{:11s}: {:s}".format(*item))
-    logging.info("    particle instance variables")
-    for name in config["output_instance"]:
-        logging.info(8 * " " + name)
-        for item in config["nc_attributes"][name].items():
-            logging.info(12 * " " + "{:11s}: {:s}".format(*item))
+    config["output"] = configure_output(conf, config["time_control"])
 
     # --- Numerics ---
 

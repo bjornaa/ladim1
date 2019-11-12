@@ -49,7 +49,7 @@ def test_out_of_area():
 
     config = dict(
         warm_start_file="",
-        start_time=np.datetime64("2017-02-10 20"),
+        time_control=dict(start_time=np.datetime64("2017-02-10 20:00:00")),
         dt=600,
         particle_variables=[],
         ibm_module="ladim.ibms.ibm_salmon_lice",

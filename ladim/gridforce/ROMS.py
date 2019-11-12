@@ -298,7 +298,8 @@ class Forcing:
         time1 = num2date(times[-1], time_units)
         logging.info("time0 = {}".format(str(time0)))
         logging.info("time1 = {}".format(str(time1)))
-        start_time = np.datetime64(config["start_time"])
+        # start_time = np.datetime64(config["time_control"]["start_time"])
+        start_time = config["time_control"]["start_time"]
         # self.time = start_time
         self.dt = np.timedelta64(int(config["dt"]), "s")  # or use
 
@@ -309,7 +310,7 @@ class Forcing:
         if time0 > start_time:
             logging.error("No forcing at start time")
             raise SystemExit(3)
-        if time1 < config["stop_time"]:
+        if time1 < config["time_control"]["stop_time"]:
             logging.error("No forcing at stop time")
             raise SystemExit(3)
 

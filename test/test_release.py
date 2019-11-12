@@ -10,8 +10,10 @@ def test_discrete() -> None:
     # Make a minimal config object
     config = {
         "start": "cold",
-        "start_time": np.datetime64("2015-03-31 12"),
-        "stop_time": np.datetime64("2015-04-04"),
+        "time_control": {
+            "start_time": np.datetime64("2015-03-31 12"),
+            "stop_time": np.datetime64("2015-04-04"),
+        },
         "dt": 3600,
         "particle_release_file": "release.rls",
         "release_format": ["mult", "release_time", "X", "Y"],
@@ -58,8 +60,10 @@ def test_continuous() -> None:
 
     config = {
         "start": "cold",
-        "start_time": np.datetime64("2015-03-31 12"),
-        "stop_time": np.datetime64("2015-04-04"),
+        "time_control": {
+            "start_time": np.datetime64("2015-03-31 12"),
+            "stop_time": np.datetime64("2015-04-04"),
+        },
         "dt": 3600,
         "particle_release_file": "release.rls",
         "release_format": ["mult", "release_time", "X", "Y"],
@@ -105,8 +109,10 @@ def test_late_start() -> None:
 
     config = {
         "start": "cold",
-        "start_time": np.datetime64("2015-04-03 00"),
-        "stop_time": np.datetime64("2015-04-05 13"),
+        "time_control": {
+            "start_time": np.datetime64("2015-04-03 00"),
+            "stop_time": np.datetime64("2015-04-05 13"),
+        },
         "dt": 3600,
         "particle_release_file": "release.rls",
         "release_format": ["mult", "release_time", "X", "Y"],
@@ -167,8 +173,10 @@ def test_too_late_start() -> None:
 
     config = {
         "start": "cold",
-        "start_time": np.datetime64("2015-05-02 12"),
-        "stop_time": np.datetime64("2015-05-03 12"),
+        "time_control": {
+            "start_time": np.datetime64("2015-05-02 12"),
+            "stop_time": np.datetime64("2015-05-03 12"),
+        },
         "particle_release_file": "release.rls",
         "release_format": ["mult", "release_time", "X", "Y"],
         "release_dtype": dict(mult=int, release_time=np.datetime64, X=float, Y=float),
@@ -194,8 +202,10 @@ def test_early_stop() -> None:
 
     config = {
         "start": "cold",
-        "start_time": np.datetime64("2015-04-02"),
-        "stop_time": np.datetime64("2015-04-05"),
+        "time_control": {
+            "start_time": np.datetime64("2015-04-02"),
+            "stop_time": np.datetime64("2015-04-05"),
+        },
         "dt": 3600,
         "particle_release_file": "release.rls",
         "release_format": ["mult", "release_time", "X", "Y"],
@@ -244,8 +254,10 @@ def test_too_early_stop() -> None:
 
     config = {
         "start": "cold",
-        "start_time": np.datetime64("2015-03-02"),
-        "stop_time": np.datetime64("2015-03-05"),
+        "time_control": {
+            "start_time": np.datetime64("2015-03-02"),
+            "stop_time": np.datetime64("2015-03-05"),
+        },
         "dt": 3600,
         "particle_release_file": "release.rls",
         "release_format": ["mult", "release_time", "X", "Y"],
@@ -273,8 +285,10 @@ def test_subgrid() -> None:
 
     config = {
         "start": "cold",
-        "start_time": np.datetime64("2015-03-01"),
-        "stop_time": np.datetime64("2015-03-03"),
+        "time_control": {
+            "start_time": np.datetime64("2015-03-01"),
+            "stop_time": np.datetime64("2015-03-03"),
+        },
         "dt": 3600,
         "particle_release_file": "release.rls",
         "release_format": ["mult", "release_time", "X", "Y"],

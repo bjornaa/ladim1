@@ -64,7 +64,7 @@ def main(config_stream, loglevel=logging.INFO):
 
         # --- Save to file ---
         # Save before or after update ???
-        if step % config["output_period"] == 0:
+        if step % config["output"]["output_period"] == 0:
             out.write(state, grid)
 
         # --- Update the model state ---

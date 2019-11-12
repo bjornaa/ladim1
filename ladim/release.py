@@ -43,8 +43,8 @@ class ParticleReleaser(Iterator):
 
     def __init__(self, config: Config, grid) -> None:
 
-        start_time = pd.to_datetime(config["start_time"])
-        stop_time = pd.to_datetime(config["stop_time"])
+        start_time = pd.to_datetime(config["time_control"]["start_time"])
+        stop_time = pd.to_datetime(config["time_control"]["stop_time"])
 
         logging.info("Initializing the particle releaser")
 
@@ -167,8 +167,8 @@ class ParticleReleaser(Iterator):
         logging.info("Number of release times = {}".format(len(self.times)))
 
         # Compute the release time steps
-        rel_time = self.times - config["start_time"]
-        rel_time = rel_time.astype("m8[s]").astype("int")
+        rel_time = self.times - start_time.to_numpy()
+        rel_time = rel_time / np.timedelta64(1, 's')     # Convert to seconds
         self.steps = rel_time // config["dt"]
 
         # Make dataframes for each timeframe
@@ -212,7 +212,7 @@ class ParticleReleaser(Iterator):
                 dtype = config["release_dtype"][name]
                 if dtype == np.datetime64:
                     g = np.array(V[name]).astype("M8[s]")
-                    rtimes = g - config["reference_time"]
+                    rtimes = g - config["time_control"]["reference_time"]
                     rtimes = rtimes.astype(np.float64)
                     pvars[name] = np.concatenate((pvars[name], rtimes))
                 else:
@@ -268,6 +268,7 @@ class ParticleReleaser(Iterator):
 
         # Add the new pids
         nnew = len(V)
+        logging.debug(f"Releasing {nnew} new particles")
 
         pids = pd.Series(
             range(self._particle_count, self._particle_count + nnew), name="pid"
