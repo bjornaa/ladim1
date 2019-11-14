@@ -221,6 +221,41 @@ def configure_output(
     return D
 
 
+def configure_release(conf: Dict[str, Any]) -> Config:
+    """Parse time configuration"""
+
+    # Times are returned with dtype M8[s]
+
+    logging.info("Configuration: Release")
+
+    D0 = conf["particle_release"]
+    D = dict()
+
+    # Release file (may be in obsolete files section)
+    D["release_file"] = (
+        D0.get("particle_release_file") or conf["files"]["particle_release_file"]
+    )
+
+    # Default release type is discrete
+    D["release_type"] = D0.get("release_type") or "discrete"
+    logging.info(f'    {"release_type":15s}: {D["release_type"]}')
+
+    if D["release_type"] == "continuous":
+        D["release_frequency"] = np.timedelta64(*D0["release_frequency"])
+        logging.info(f'    {"release_frequency":11s}: {str(D["release_frequency"])}')
+
+    D["release_format"] = D0["variables"]
+    D["release_dtype"] = dict()
+    # Map from str to converter
+    type_mapping = dict(int=int, float=float, time=np.datetime64, str=str)
+    for name in D["release_format"]:
+        D["release_dtype"][name] = type_mapping[D0.get(name, "float")]
+        logging.info(f'    {name:15s}: {D["release_dtype"][name]}')
+        D["particle_variables"] = D0["particle_variables"]
+
+    return D
+
+
 # ---------------------------------------
 
 
@@ -252,7 +287,10 @@ def configure(config_stream) -> Config:
     # -------------
     logging.info("Configuration: Files")
     logging.info(f'    {"config_stream":15s}: {config_stream}')
-    for name in ["particle_release_file", "output_file"]:
+    #for name in ["particle_release_file", "output_file"]:
+    #    config[name] = conf["files"][name]
+    #    logging.info(f"    {name:15s}: {config[name]}")
+    for name in ["output_file"]:
         config[name] = conf["files"][name]
         logging.info(f"    {name:15s}: {config[name]}")
 
@@ -319,30 +357,33 @@ def configure(config_stream) -> Config:
     config["ibm_module"] = config["ibm"].get("module")
 
     # --- Particle release ---
-    logging.info("Configuration: Particle Releaser")
-    prelease = conf["particle_release"]
-    try:
-        config["release_type"] = prelease["release_type"]
-    except KeyError:
-        config["release_type"] = "discrete"
-    logging.info(f'    {"release_type":15s}: {config["release_type"]}')
-    if config["release_type"] == "continuous":
-        config["release_frequency"] = np.timedelta64(
-            *tuple(prelease["release_frequency"])
-        )
-        logging.info(
-            f'    {"release_frequency":11s}: {str(config["release_frequency"])}'
-        )
-    config["release_format"] = conf["particle_release"]["variables"]
-    config["release_dtype"] = dict()
-    # Map from str to converter
-    type_mapping = dict(int=int, float=float, time=np.datetime64, str=str)
-    for name in config["release_format"]:
-        config["release_dtype"][name] = type_mapping[
-            conf["particle_release"].get(name, "float")
-        ]
-        logging.info(f'    {name:15s}: {config["release_dtype"][name]}')
-    config["particle_variables"] = prelease["particle_variables"]
+    config["release"] = configure_release(conf)
+
+
+    # logging.info("Configuration: Particle Releaser")
+    # prelease = conf["particle_release"]
+    # try:
+    #     config["release_type"] = prelease["release_type"]
+    # except KeyError:
+    #     config["release_type"] = "discrete"
+    # logging.info(f'    {"release_type":15s}: {config["release_type"]}')
+    # if config["release_type"] == "continuous":
+    #     config["release_frequency"] = np.timedelta64(
+    #         *tuple(prelease["release_frequency"])
+    #     )
+    #     logging.info(
+    #         f'    {"release_frequency":11s}: {str(config["release_frequency"])}'
+    #     )
+    # config["release_format"] = conf["particle_release"]["variables"]
+    # config["release_dtype"] = dict()
+    # # Map from str to converter
+    # type_mapping = dict(int=int, float=float, time=np.datetime64, str=str)
+    # for name in config["release_format"]:
+    #     config["release_dtype"][name] = type_mapping[
+    #         conf["particle_release"].get(name, "float")
+    #     ]
+    #     logging.info(f'    {name:15s}: {config["release_dtype"][name]}')
+    # config["particle_variables"] = prelease["particle_variables"]
 
     # --- Model state ---
     # logging.info("Configuration: Model State Variables")

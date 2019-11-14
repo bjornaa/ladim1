@@ -50,14 +50,14 @@ class ParticleReleaser(Iterator):
 
         # Read the particle release file
         A = pd.read_csv(
-            config["particle_release_file"],
-            names=config["release_format"],
-            converters=config["release_dtype"],
+            config["release"]["release_file"],
+            names=config["release"]["release_format"],
+            converters=config["release"]["release_dtype"],
             delim_whitespace=True,
         )
 
         # If no mult column, add a column of ones
-        if "mult" not in config["release_format"]:
+        if "mult" not in config["release"]["release_format"]:
             A["mult"] = 1
 
         # Use release_time as index
@@ -96,7 +96,7 @@ class ParticleReleaser(Iterator):
 
         # TODO: Make a function of continuous -> discrete
         # Fill out if continuous release
-        if config["release_type"] == "continuous":
+        if config["release"]["release_type"] == "continuous":
 
             # Find first effective release time
             # i.e. the last time <= start_time
@@ -122,7 +122,7 @@ class ParticleReleaser(Iterator):
             time0 = A.index[0]
             time1 = max(A.index[-1], pd.Timestamp(stop_time))
             # time1 = max(A['release_time'][-1], stop_time)
-            times = np.arange(time0, time1, config["release_frequency"])
+            times = np.arange(time0, time1, config["release"]["release_frequency"])
             # A = A.reindex(times, method='pad')
             # A['release_time'] = A.index
             # Reindex does not work with non-unique index
@@ -168,7 +168,7 @@ class ParticleReleaser(Iterator):
 
         # Compute the release time steps
         rel_time = self.times - start_time.to_numpy()
-        rel_time = rel_time / np.timedelta64(1, 's')     # Convert to seconds
+        rel_time = rel_time / np.timedelta64(1, "s")  # Convert to seconds
         self.steps = rel_time // config["dt"]
 
         # Make dataframes for each timeframe
@@ -182,8 +182,8 @@ class ParticleReleaser(Iterator):
         # Handle the particle variables initially
         # TODO: Need a test to check that this iw working properly
         pvars = dict()
-        for name in config["particle_variables"]:
-            dtype = config["release_dtype"][name]
+        for name in config["release"]["particle_variables"]:
+            dtype = config["release"]["release_dtype"][name]
             if dtype == np.datetime64:
                 dtype = np.float64
             pvars[name] = np.array([], dtype=dtype)
@@ -208,8 +208,8 @@ class ParticleReleaser(Iterator):
         for t in self.times:
             V = next(self)
             particles_released.append(particles_released[-1] + len(V))
-            for name in config["particle_variables"]:
-                dtype = config["release_dtype"][name]
+            for name in config["release"]["particle_variables"]:
+                dtype = config["release"]["release_dtype"][name]
                 if dtype == np.datetime64:
                     g = np.array(V[name]).astype("M8[s]")
                     rtimes = g - config["time_control"]["reference_time"]

@@ -10,7 +10,7 @@ config = dict(
     dt=600,
     ibm_module="ladim.ibms.ibm_salmon_lice",
     ibm=dict(variables=["super", "age"]),
-    particle_variables=[],
+    release=dict(particle_variables=[]),
     advection="RK4",
     diffusion=False,
 )

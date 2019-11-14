@@ -36,7 +36,7 @@ class State(Sized):
             self.ibm_variables = config["ibm"]["variables"]
         else:
             self.ibm_variables = []
-        self.particle_variables = config["particle_variables"]
+        self.particle_variables = config["release"]["particle_variables"]
         self.instance_variables = self.position_variables + [
             var for var in self.ibm_variables if var not in self.particle_variables
         ]
@@ -46,7 +46,7 @@ class State(Sized):
             setattr(self, name, np.array([], dtype=float))
 
         for name in self.particle_variables:
-            setattr(self, name, np.array([], dtype=config["release_dtype"][name]))
+            setattr(self, name, np.array([], dtype=config["release"]["release_dtype"][name]))
 
         self.track = Tracker(config)
         self.dt = config["dt"]

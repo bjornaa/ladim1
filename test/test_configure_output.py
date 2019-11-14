@@ -44,8 +44,8 @@ def test_divible_by_timestep():
     """
     )
     time_control = {
-            "start_time": np.datetime64("2015-04-02"),
-            "stop_time": np.datetime64("2015-04-05"),
+        "start_time": np.datetime64("2015-04-02"),
+        "stop_time": np.datetime64("2015-04-05"),
     }
     conf = yaml.safe_load(raw)
     with pytest.raises(SystemExit):

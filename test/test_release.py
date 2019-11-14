@@ -15,11 +15,15 @@ def test_discrete() -> None:
             "stop_time": np.datetime64("2015-04-04"),
         },
         "dt": 3600,
-        "particle_release_file": "release.rls",
-        "release_format": ["mult", "release_time", "X", "Y"],
-        "release_dtype": dict(mult=int, release_time=np.datetime64, X=float, Y=float),
-        "release_type": "discrete",
-        "particle_variables": [],
+        "release": {
+            "release_file": "release.rls",
+            "release_format": ["mult", "release_time", "X", "Y"],
+            "release_dtype": dict(
+                mult=int, release_time=np.datetime64, X=float, Y=float
+            ),
+            "release_type": "discrete",
+            "particle_variables": [],
+        },
     }
 
     # Make a release file
@@ -65,12 +69,16 @@ def test_continuous() -> None:
             "stop_time": np.datetime64("2015-04-04"),
         },
         "dt": 3600,
-        "particle_release_file": "release.rls",
-        "release_format": ["mult", "release_time", "X", "Y"],
-        "release_dtype": dict(mult=int, release_time=np.datetime64, X=float, Y=float),
-        "release_type": "continuous",
-        "release_frequency": np.timedelta64(12, "h"),
-        "particle_variables": [],
+        "release": {
+            "release_file": "release.rls",
+            "release_format": ["mult", "release_time", "X", "Y"],
+            "release_dtype": dict(
+                mult=int, release_time=np.datetime64, X=float, Y=float
+            ),
+            "release_type": "continuous",
+            "release_frequency": np.timedelta64(12, "h"),
+            "particle_variables": [],
+        },
     }
 
     # Make a release file
@@ -93,7 +101,7 @@ def test_continuous() -> None:
         assert np.all(S["pid"] == [3 * t, 1 + 3 * t, 2 + 3 * t])
         assert (
             S["release_time"][0]
-            == np.datetime64("2015-04-01") + t * config["release_frequency"]
+            == np.datetime64("2015-04-01") + t * config["release"]["release_frequency"]
         )
         if t < 2:
             assert np.all(S["X"] == [100, 100, 111])
@@ -107,20 +115,22 @@ def test_continuous() -> None:
 def test_late_start() -> None:
     """Model start after first release in file"""
 
-    config = {
-        "start": "cold",
-        "time_control": {
-            "start_time": np.datetime64("2015-04-03 00"),
-            "stop_time": np.datetime64("2015-04-05 13"),
-        },
-        "dt": 3600,
-        "particle_release_file": "release.rls",
-        "release_format": ["mult", "release_time", "X", "Y"],
-        "release_dtype": dict(mult=int, release_time=np.datetime64, X=float, Y=float),
-        "release_type": "continuous",
-        "release_frequency": np.timedelta64(12, "h"),
-        "particle_variables": [],
-    }
+    config = dict(
+        start="cold",
+        time_control=dict(
+            start_time=np.datetime64("2015-04-03 00"),
+            stop_time=np.datetime64("2015-04-05 13"),
+        ),
+        dt=3600,
+        release=dict(
+            release_file="release.rls",
+            release_format=["mult", "release_time", "X", "Y"],
+            release_dtype=dict(mult=int, release_time=np.datetime64, X=float, Y=float),
+            release_type="continuous",
+            release_frequency=np.timedelta64(12, "h"),
+            particle_variables=[],
+        ),
+    )
 
     # Release file: create, read and remove
     with open("release.rls", mode="w") as f:
@@ -177,10 +187,14 @@ def test_too_late_start() -> None:
             "start_time": np.datetime64("2015-05-02 12"),
             "stop_time": np.datetime64("2015-05-03 12"),
         },
-        "particle_release_file": "release.rls",
-        "release_format": ["mult", "release_time", "X", "Y"],
-        "release_dtype": dict(mult=int, release_time=np.datetime64, X=float, Y=float),
-        "release_type": "discrete",
+        "release": {
+            "release_file": "release.rls",
+            "release_format": ["mult", "release_time", "X", "Y"],
+            "release_dtype": dict(
+                mult=int, release_time=np.datetime64, X=float, Y=float
+            ),
+            "release_type": "discrete",
+        },
         "dt": 3600,
         "particle_variables": [],
     }
@@ -207,12 +221,16 @@ def test_early_stop() -> None:
             "stop_time": np.datetime64("2015-04-05"),
         },
         "dt": 3600,
-        "particle_release_file": "release.rls",
-        "release_format": ["mult", "release_time", "X", "Y"],
-        "release_dtype": dict(mult=int, release_time=np.datetime64, X=float, Y=float),
-        "release_type": "continuous",
-        "release_frequency": np.timedelta64(12, "h"),
-        "particle_variables": [],
+        "release": {
+            "release_file": "release.rls",
+            "release_format": ["mult", "release_time", "X", "Y"],
+            "release_dtype": dict(
+                mult=int, release_time=np.datetime64, X=float, Y=float
+            ),
+            "release_type": "continuous",
+            "release_frequency": np.timedelta64(12, "h"),
+            "particle_variables": [],
+        },
     }
 
     # Release file: create, read and remove
@@ -259,12 +277,16 @@ def test_too_early_stop() -> None:
             "stop_time": np.datetime64("2015-03-05"),
         },
         "dt": 3600,
-        "particle_release_file": "release.rls",
-        "release_format": ["mult", "release_time", "X", "Y"],
-        "release_dtype": dict(mult=int, release_time=np.datetime64, X=float, Y=float),
-        "release_type": "continuous",
-        "release_frequency": np.timedelta64(12, "h"),
-        "particle_variables": [],
+        "release": {
+            "release_file": "release.rls",
+            "release_format": ["mult", "release_time", "X", "Y"],
+            "release_dtype": dict(
+                mult=int, release_time=np.datetime64, X=float, Y=float
+            ),
+            "release_type": "continuous",
+            "release_frequency": np.timedelta64(12, "h"),
+            "particle_variables": [],
+        },
     }
 
     # Release file: create, read and remove
@@ -290,12 +312,16 @@ def test_subgrid() -> None:
             "stop_time": np.datetime64("2015-03-03"),
         },
         "dt": 3600,
-        "particle_release_file": "release.rls",
-        "release_format": ["mult", "release_time", "X", "Y"],
-        "release_dtype": dict(mult=int, release_time=np.datetime64, X=float, Y=float),
-        "release_type": "continuous",
-        "release_frequency": np.timedelta64(12, "h"),
-        "particle_variables": [],
+        "release": {
+            "release_file": "release.rls",
+            "release_format": ["mult", "release_time", "X", "Y"],
+            "release_dtype": dict(
+                mult=int, release_time=np.datetime64, X=float, Y=float
+            ),
+            "release_type": "continuous",
+            "release_frequency": np.timedelta64(12, "h"),
+            "particle_variables": [],
+        },
         "grid_args": dict(subgrid=[100, 120, 10, 20]),
     }
 
