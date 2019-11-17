@@ -27,7 +27,7 @@ class OutPut:
 
         logging.info("Initializing output")
 
-        self.filename = config["output_file"]
+        self.filename = config["output"]["output_file"]
         self.instance_variables = config["output"]["instance"]
         self.instance_count = 0
         self.outcount = -1  # No output yet

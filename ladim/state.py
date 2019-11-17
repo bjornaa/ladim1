@@ -46,7 +46,9 @@ class State(Sized):
             setattr(self, name, np.array([], dtype=float))
 
         for name in self.particle_variables:
-            setattr(self, name, np.array([], dtype=config["release"]["release_dtype"][name]))
+            setattr(
+                self, name, np.array([], dtype=config["release"]["release_dtype"][name])
+            )
 
         self.track = Tracker(config)
         self.dt = config["dt"]

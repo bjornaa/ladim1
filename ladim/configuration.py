@@ -18,7 +18,7 @@ from netCDF4 import Dataset, num2date
 
 Config = Dict[str, Any]  # type of the config dictionary
 
-
+# ---------------------------------
 def configure_ibm(conf: Dict[str, Any]) -> Config:
     """Configure the IBM module
 
@@ -65,6 +65,7 @@ def configure_ibm(conf: Dict[str, Any]) -> Config:
     return D
 
 
+# -------------------------------------------------------
 def configure_gridforce(conf: Dict[str, Any]) -> Config:
     """Parse gridforce related info and pass on
 
@@ -106,6 +107,7 @@ def configure_gridforce(conf: Dict[str, Any]) -> Config:
     return D
 
 
+# --------------------------------------
 def configure_time(conf: Dict[str, Any]) -> Config:
     """Parse time configuration"""
 
@@ -141,6 +143,7 @@ def configure_time(conf: Dict[str, Any]) -> Config:
     return D
 
 
+# ----------------------------------------------
 def configure_output(
     conf: Dict[str, Any], time_config: Dict[str, np.datetime64]
 ) -> Config:
@@ -157,6 +160,9 @@ def configure_output(
 
     logging.info("Configuration: Output Control")
 
+    # for name in ["output_file"]:
+    #    config[name] = conf["files"][name]
+
     if conf is None:
         logging.error("No output section in configuration file")
         raise SystemExit(1)
@@ -166,6 +172,15 @@ def configure_output(
         raise SystemExit(1)
 
     D = {}
+
+    # Output file (may be in obsolete files section)
+    # Default = out.nc
+    try:
+        D["output_file"] = D0.get("output_file", D0["files"]["output_file"])
+    except KeyError:
+        D["output_file"] = "out.nc"
+    logging.info(f'    {"output file":15s}: {D["output_file"]}')
+
     # Set in defaults
     D["format"] = D0.get("format", "NETCDF3_64BIT_OFFSET")
     logging.info(f'    {"format":15s}: {D["format"]}')
@@ -221,6 +236,7 @@ def configure_output(
     return D
 
 
+# --------------------------------------------------
 def configure_release(conf: Dict[str, Any]) -> Config:
     """Parse time configuration"""
 
@@ -232,26 +248,39 @@ def configure_release(conf: Dict[str, Any]) -> Config:
     D = dict()
 
     # Release file (may be in obsolete files section)
-    D["release_file"] = (
-        D0.get("particle_release_file") or conf["files"]["particle_release_file"]
-    )
+    try:
+        D["release_file"] = (
+            D0.get("particle_release_file") or conf["files"]["particle_release_file"]
+        )
+    except KeyError:
+        logging.critical("No particle release file")
+        raise SystemExit(1)
+    logging.info(f'    {"particle release file":15s}: {D["release_file"]}')
 
     # Default release type is discrete
-    D["release_type"] = D0.get("release_type") or "discrete"
+    D["release_type"] = D0.get("release_type", "discrete")
     logging.info(f'    {"release_type":15s}: {D["release_type"]}')
 
     if D["release_type"] == "continuous":
         D["release_frequency"] = np.timedelta64(*D0["release_frequency"])
         logging.info(f'    {"release_frequency":11s}: {str(D["release_frequency"])}')
 
-    D["release_format"] = D0["variables"]
+    try:
+        D["release_format"] = D0["variables"]
+    except KeyError:
+        logging.critical("No variables keyword")
+        raise SystemExit(1)
+    logging.info(f'    {"variables":15s}: {D["release_format"]}')
+
+    D["particle_variables"] = D0.get("particle_variables", [])
+    logging.info(f'    {"particle_variables":15s}: {D["particle_variables"]}')
+
     D["release_dtype"] = dict()
     # Map from str to converter
     type_mapping = dict(int=int, float=float, time=np.datetime64, str=str)
     for name in D["release_format"]:
         D["release_dtype"][name] = type_mapping[D0.get(name, "float")]
         logging.info(f'    {name:15s}: {D["release_dtype"][name]}')
-        D["particle_variables"] = D0["particle_variables"]
 
     return D
 
@@ -287,12 +316,9 @@ def configure(config_stream) -> Config:
     # -------------
     logging.info("Configuration: Files")
     logging.info(f'    {"config_stream":15s}: {config_stream}')
-    #for name in ["particle_release_file", "output_file"]:
+    # for name in ["particle_release_file", "output_file"]:
     #    config[name] = conf["files"][name]
     #    logging.info(f"    {name:15s}: {config[name]}")
-    for name in ["output_file"]:
-        config[name] = conf["files"][name]
-        logging.info(f"    {name:15s}: {config[name]}")
 
     try:
         config["warm_start_file"] = conf["files"]["warm_start_file"]
@@ -352,50 +378,17 @@ def configure(config_stream) -> Config:
     # --- IBM ---
 
     config["ibm"] = configure_ibm(conf)
-    # Make obsolete
+    # Make obsolete keys
     config["ibm_variables"] = config["ibm"].get("variables", [])
     config["ibm_module"] = config["ibm"].get("module")
 
     # --- Particle release ---
     config["release"] = configure_release(conf)
 
-
-    # logging.info("Configuration: Particle Releaser")
-    # prelease = conf["particle_release"]
-    # try:
-    #     config["release_type"] = prelease["release_type"]
-    # except KeyError:
-    #     config["release_type"] = "discrete"
-    # logging.info(f'    {"release_type":15s}: {config["release_type"]}')
-    # if config["release_type"] == "continuous":
-    #     config["release_frequency"] = np.timedelta64(
-    #         *tuple(prelease["release_frequency"])
-    #     )
-    #     logging.info(
-    #         f'    {"release_frequency":11s}: {str(config["release_frequency"])}'
-    #     )
-    # config["release_format"] = conf["particle_release"]["variables"]
-    # config["release_dtype"] = dict()
-    # # Map from str to converter
-    # type_mapping = dict(int=int, float=float, time=np.datetime64, str=str)
-    # for name in config["release_format"]:
-    #     config["release_dtype"][name] = type_mapping[
-    #         conf["particle_release"].get(name, "float")
-    #     ]
-    #     logging.info(f'    {name:15s}: {config["release_dtype"][name]}')
-    # config["particle_variables"] = prelease["particle_variables"]
-
-    # --- Model state ---
-    # logging.info("Configuration: Model State Variables")
-
-    # -----------------
-    # Output control
-    # -----------------
+    # --- Output control ---
     config["output"] = configure_output(conf, config["time_control"])
 
     # --- Numerics ---
-
-    # dt belongs here, but is already read
     logging.info("Configuration: Numerics")
     try:
         config["advection"] = conf["numerics"]["advection"]

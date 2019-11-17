@@ -5,10 +5,37 @@ import yaml
 import pytest
 from ladim.configuration import configure_release
 
-# Ha en del sjekk på ting som mangler
+
+def test_missing():
+    """Test that missing keywords are handled properly"""
+    raw = StringIO(
+        """
+        particle_release:
+            particle_release_file : line.rls
+            variables: [X, Y, Z]
+            release_time: time
+            particle_variables: [release_time]
+    """
+    )
+    conf0 = yaml.safe_load(raw)
+
+    # Missing file name
+    A = dict(conf0["particle_release"])
+    A.pop("particle_release_file")
+    conf = dict(particle_release=A)
+    with pytest.raises(SystemExit):
+        D = configure_release(conf)
+
+    # Missing variables
+    A = dict(conf0["particle_release"])
+    A.pop("variables")
+    conf = dict(particle_release=A)
+    with pytest.raises(SystemExit):
+        D = configure_release(conf)
 
 
 def test_discrete():
+    """Test a discrete release configuration"""
     raw = StringIO(
         """
         files:
@@ -16,7 +43,7 @@ def test_discrete():
         particle_release:
             variables: [X, Y, Z]
             release_time: time
-            particle_variables: [release_time]
+            #particle_variables: [release_time]
     """
     )
     conf = yaml.safe_load(raw)
@@ -24,11 +51,12 @@ def test_discrete():
     assert D["release_file"] == "line.rls"
     assert D["release_type"] == "discrete"
     assert D["release_format"] == ["X", "Y", "Z"]
-    assert D["release_dtype"] == {"X": float, "Y": float, "Z": float}
-    assert D["particle_variables"] == ["release_time"]
+    assert D["release_dtype"] == dict(X=float, Y=float, Z=float)
+    assert D["particle_variables"] == []
 
 
 def test_continuous():
+    """Test a continuous release configuratio"""
     raw = StringIO(
         """
         particle_release:
@@ -46,10 +74,7 @@ def test_continuous():
     assert D["release_type"] == "continuous"
     assert D["release_frequency"] == np.timedelta64(30, "m")
     assert D["release_format"] == ["release_time", "X", "Y", "Z"]
-    assert D["release_dtype"] == {
-        "release_time": np.datetime64,
-        "X": float,
-        "Y": float,
-        "Z": float,
-    }
+    assert D["release_dtype"] == dict(
+        release_time=np.datetime64, X=float, Y=float, Z=float
+    )
     assert D["particle_variables"] == ["release_time"]

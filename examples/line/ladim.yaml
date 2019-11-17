@@ -13,12 +13,8 @@ time_control:
     # this is optional, by default equal to start_time
     reference_time: 1970-01-01 00
 
-files:
-    particle_release_file : line.rls
-    output_file           : line.nc
-    # With warm start, warm_start_file goes here
-
 particle_release:
+    particle_release_file : line.rls
     variables: [release_time, X, Y, Z]
     # Converters (if not float)
     release_time: time
@@ -32,9 +28,10 @@ gridforce:
     # The grid file is now optional, defaults to first input file
     input_file            : ../data/ocean_avg_*.nc
 
-output_variables:
+output:
+    # Name of output file, optional, default = "out.nc"
+    output_file           : line.nc
     # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET
-    # format: NETCDF3_64BIT_DATA
     format: NETCDF3_CLASSIC
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
