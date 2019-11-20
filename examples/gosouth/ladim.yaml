@@ -7,27 +7,26 @@
 time_control:
     start_time: 1989-05-24 12:00:00
     stop_time:  1989-06-05T12
-    reference_time: 1970-01-01 00
+    reference_time: 1970-01-01
 
 files:
-    particle_release_file : line.rls
     output_file           : gosouth.nc
 
 ibm:
     ibm_module: gosouth_ibm
 
 particle_release:
+    particle_release_file : line.rls
     variables: [release_time, X, Y, Z]
     # Converters (if not float)
     release_time: time
-    particle_variables: [release_time]
 
 gridforce:
     # Gridforce module
     module: ladim.gridforce.ROMS
     input_file            : ../data/ocean_avg_*.nc
 
-output_variables:
+output:
     # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET
     # format: NETCDF3_64BIT_DATA
     format: NETCDF3_CLASSIC
@@ -39,14 +38,10 @@ output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Variable names
-    particle: [release_time]
+    # particle: [release_time]
+    particle: []
     instance: [pid, X, Y, Z]
     # NetCDF arguments
-    release_time:
-        ncformat: f8
-        long_name: particle release time
-        units: seconds since reference_time
-    # Få til template over
     pid: {ncformat: i4, long_name: particle identifier}
     X: {ncformat: f4, long_name: particle X-coordinate}
     Y: {ncformat: f4, long_name: particle Y-coordinate}

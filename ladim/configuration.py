@@ -18,7 +18,10 @@ from netCDF4 import Dataset, num2date
 
 Config = Dict[str, Any]  # type of the config dictionary
 
+
 # ---------------------------------
+
+
 def configure_ibm(conf: Dict[str, Any]) -> Config:
     """Configure the IBM module
 
@@ -66,6 +69,8 @@ def configure_ibm(conf: Dict[str, Any]) -> Config:
 
 
 # -------------------------------------------------------
+
+
 def configure_gridforce(conf: Dict[str, Any]) -> Config:
     """Parse gridforce related info and pass on
 
@@ -108,6 +113,8 @@ def configure_gridforce(conf: Dict[str, Any]) -> Config:
 
 
 # --------------------------------------
+
+
 def configure_time(conf: Dict[str, Any]) -> Config:
     """Parse time configuration"""
 
@@ -144,6 +151,8 @@ def configure_time(conf: Dict[str, Any]) -> Config:
 
 
 # ----------------------------------------------
+
+
 def configure_output(
     conf: Dict[str, Any], time_config: Dict[str, np.datetime64]
 ) -> Config:
@@ -175,11 +184,13 @@ def configure_output(
 
     # Output file (may be in obsolete files section)
     # Default = out.nc
-    try:
-        D["output_file"] = D0.get("output_file", D0["files"]["output_file"])
-    except KeyError:
-        D["output_file"] = "out.nc"
-    logging.info(f'    {"output file":15s}: {D["output_file"]}')
+    D["output_file"]= D0.get("output_file", "out.nc")
+    if D["output_file"] == "out.nc":
+        try:
+            D["output_file"] = conf["files"]["output_file"]
+        except KeyError:
+            pass
+    # logging.info(f'    {"output file":15s}: {D["output_file"]}')
 
     # Set in defaults
     D["format"] = D0.get("format", "NETCDF3_64BIT_OFFSET")
@@ -212,7 +223,7 @@ def configure_output(
         raise SystemExit(1)
     D["output_period"] = period  # output period in timesteps
 
-    D["particle"] = D0["particle"]
+    D["particle"] = D0.get("particle", [])
     D["instance"] = D0["instance"]
     D["variables"] = dict()
     for name in D["particle"] + D["instance"]:
@@ -237,6 +248,8 @@ def configure_output(
 
 
 # --------------------------------------------------
+
+
 def configure_release(conf: Dict[str, Any]) -> Config:
     """Parse time configuration"""
 

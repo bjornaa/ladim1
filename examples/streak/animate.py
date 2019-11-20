@@ -52,8 +52,8 @@ cmap = plt.get_cmap("Blues")
 ax.contourf(Xcell, Ycell, H, cmap=cmap, alpha=0.3)
 
 # Lon/lat lines
-ax.contour(Xcell, Ycell, lat, levels=range(57, 64), colors="black", linestyles=":")
-ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2), colors="black", linestyles=":")
+ax.contour(Xcell, Ycell, lat, levels=range(57, 64), colors="grey", linestyles=":")
+ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2), colors="grey", linestyles=":")
 
 # Landmask
 constmap = plt.matplotlib.colors.ListedColormap([0.2, 0.6, 0.4])
@@ -70,7 +70,7 @@ vmax = pf.num_times / 6  # Maximum particle age in days
 pdistr = ax.scatter(X, Y, c=C, vmin=0, vmax=vmax, cmap=plt.get_cmap("plasma_r"))
 cb = plt.colorbar(pdistr)
 cb.set_label("Particle age [days]", fontsize=14)
-timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15, transform=ax.transAxes)
+timestamp = ax.text(0.01, 0.95, pf.time(0), fontsize=15, transform=ax.transAxes)
 
 
 # Update function

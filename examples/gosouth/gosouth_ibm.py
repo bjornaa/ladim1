@@ -9,7 +9,7 @@ class IBM:
 
         # Azimuthal direction, 0 = N, 90 = E, 180 = S, 270 = W
         self.direction = 180  # [clockwise degree from North]
-        self.speed = 0.02  # [m/s]
+        self.speed = 0.10  # [m/s]
         self.first = True  # Flag for first time
 
     def update_ibm(self, grid, state, forcing):
