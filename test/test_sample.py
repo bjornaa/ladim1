@@ -3,7 +3,7 @@
 import numpy as np
 from pytest import approx
 
-from ladim.sample import *
+from ladim.sample import sample2D, sample2DUV
 
 
 def test_sample2D():

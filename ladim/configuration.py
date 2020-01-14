@@ -184,7 +184,7 @@ def configure_output(
 
     # Output file (may be in obsolete files section)
     # Default = out.nc
-    D["output_file"]= D0.get("output_file", "out.nc")
+    D["output_file"] = D0.get("output_file", "out.nc")
     if D["output_file"] == "out.nc":
         try:
             D["output_file"] = conf["files"]["output_file"]

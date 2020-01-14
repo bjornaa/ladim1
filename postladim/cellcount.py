@@ -57,7 +57,9 @@ def cellcount(
     if W is None:
         C = np.histogram2d(np.asarray(Y), np.asarray(X), bins=[y_edges, x_edges])
     else:
-        C = np.histogram2d(np.asarray(Y), np.asarray(X), weights=np.asarray(W), bins=[y_edges, x_edges])
+        C = np.histogram2d(
+            np.asarray(Y), np.asarray(X), weights=np.asarray(W), bins=[y_edges, x_edges]
+        )
 
     coords = dict(Y=np.arange(j0, j1), X=np.arange(i0, i1))
     C = xr.DataArray(C[0], coords=list(coords.items()), dims=coords.keys())

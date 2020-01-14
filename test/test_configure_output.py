@@ -70,7 +70,7 @@ def test_default():
     time_config = {
         "start_time": np.datetime64("2019-01-01 00:00:00"),
         "stop_time": np.datetime64("2019-09-30 23:00:00"),
-        #"reference_time": np.datetime64("2019-01-01 00:00:00"),
+        # "reference_time": np.datetime64("2019-01-01 00:00:00"),
     }
     conf = yaml.safe_load(raw)
     D = configure_output(conf, time_config)
