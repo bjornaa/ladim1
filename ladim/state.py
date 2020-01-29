@@ -104,6 +104,13 @@ class State(Sized):
         if self.ibm:
             self.ibm.update_ibm(grid, self, forcing)
 
+        # Extension, allow inactive particles (not moved next time)
+        if 'active' in self.ibm_variables:
+            pass
+            # self.active = self.ibm_variables['active']
+        else:  # Default = active
+            self.active = np.ones_like(self.pid)
+
         # Surface/bottom boundary conditions
         #     Reflective  at surface
         I = self.Z < 0

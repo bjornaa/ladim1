@@ -35,6 +35,7 @@ class Tracker:
         self.diffusion = config["diffusion"]
         if self.diffusion:
             self.D = config["diffusion_coefficient"]  # [m2.s-1]
+        self.active_check = 'active' in config['ibm_variables']
 
     def move_particles(self, grid: Grid, forcing: Forcing, state: State) -> None:
         """Move the particles"""
@@ -78,6 +79,12 @@ class Tracker:
         Y1[I] = Y[I]
         # Kill particles trying to move out of the grid
         state.alive[I] = False
+
+        if self.active_check:
+            # Do not move inactive particles
+            I = state.active < 1
+            X1[I] = X[I]
+            Y1[I] = Y[I]
 
         # Land, boundary treatment. Do not move the particles
         # Consider a sequence of different actions
