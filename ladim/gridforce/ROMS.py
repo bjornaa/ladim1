@@ -230,21 +230,23 @@ class Forcing:
 
     """
 
+
+
+
     def __init__(self, config, grid):
 
         logging.info("Initiating forcing")
 
         self._grid = grid  # Get the grid object, make private?
+        # self.config = config["gridforce"]
         self.ibm_forcing = config["ibm_forcing"]
 
-        # Forcing file(s)
-        files = glob.glob(config["gridforce"]["input_file"])
-        files.sort()
+        files = self.find_files(config["gridforce"])
         numfiles = len(files)
         if numfiles == 0:
             logging.error("No input file: {}".format(config["gridforce"]["input_file"]))
             raise SystemExit(3)
-        logging.info("Number of available forcing files = {}".format(numfiles))
+        logging.info("Number of forcing files = {}".format(numfiles))
 
         # ----------------------------------------
         # Open first file for some general info
@@ -388,6 +390,19 @@ class Forcing:
 
         self.steps = steps
         self._files = files
+
+    # ===================================================
+    @staticmethod
+    def find_files(config):
+        """Find (and sort) the forcing file(s)"""
+        files = glob.glob(config["input_file"])
+        files.sort()
+        if config.get("first_file", None):
+            files = [f for f in files if f >= config["first_file"]]
+        if config.get("last_file", None):
+            files = [f for f in files if f <= config["last_file"]]
+        return files
+
 
     # ==============================================
 
