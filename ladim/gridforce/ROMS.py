@@ -283,6 +283,7 @@ class Forcing:
 
         all_frames, time_frames = self.scan_file_times(files)
 
+
         # Find first/last forcing times
         # -----------------------------
         #time0 = num2date(time_frames[0], time_units)
@@ -321,12 +322,12 @@ class Forcing:
         step_counter = -1
         #for i, fname in enumerate(files):
         for fname in files:
-            for fno, frame in enumerate(time_frames[fname]):
+            for i, frame in enumerate(time_frames[fname]):
                 step_counter += 1
                 step = steps[step_counter]
                 # print(step_counter, step, i, frame)
                 file_idx[step] = fname
-                frame_idx[step] = frame
+                frame_idx[step] = i
 
         self._files = files
         self.stepdiff = np.diff(steps)
@@ -397,6 +398,9 @@ class Forcing:
             files = [f for f in files if f <= config["last_file"]]
         return files
 
+
+    # Funker nå, men trenger ikke time_frames,
+    # bare antall frames per fil.
     #TODO: time_frames -> frame_idx indeks i fil
     @staticmethod
     def scan_file_times(files):
@@ -412,7 +416,7 @@ class Forcing:
                 time_frames[fname] = new_frames
 
         # Check that time frames are strictly sorted
-        all_frames = np.array(all_frames)
+        all_frames = np.array(all_frames, dtype=np.datetime64)
         I = all_frames[1:] <= all_frames[:-1]
         if np.any(I):
             print(all_frames[1:][I])
