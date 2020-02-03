@@ -281,55 +281,13 @@ class Forcing:
         # Overview of all the files
         # ---------------------------
 
-        all_frames, time_frames = self.scan_file_times(files)
-
-
-        # Find first/last forcing times
-        # -----------------------------
-        #time0 = num2date(time_frames[0], time_units)
-        #time1 = num2date(time_frames[-1], time_units)
-        time0 = all_frames[0]
-        time1 = all_frames[-1]
-        #logging.info("time0 = {}".format(str(time0)))
-        print(time0)
-        logging.info(f"time0 = {time0}")
-        logging.info(f"time1 = {time1}")
-        start_time = np.datetime64(config["start_time"])
-        # self.time = start_time
-        self.dt = np.timedelta64(int(config["dt"]), "s")  # or use
-
-        # Check that forcing period covers the simulation period
-        # ------------------------------------------------------
-        # Use logging module for this
-
-        if time0 > start_time:
-            logging.error("No forcing at start time")
-            raise SystemExit(3)
-        if time1 < config["stop_time"]:
-            logging.error("No forcing at stop time")
-            raise SystemExit(3)
-
-        # Make a list steps of the forcing time steps
-        # --------------------------------------------
-        steps = []  # Model time step of forcing
-        for t in all_frames:
-            #otime = np.datetime64(num2date(t, time_units))
-            dtime = np.timedelta64(np.datetime64(t) - start_time, "s").astype(int)
-            steps.append(int(dtime / config["dt"]))
-
-        file_idx = dict()
-        frame_idx = dict()
-        step_counter = -1
-        #for i, fname in enumerate(files):
-        for fname in files:
-            for i, frame in enumerate(time_frames[fname]):
-                step_counter += 1
-                step = steps[step_counter]
-                # print(step_counter, step, i, frame)
-                file_idx[step] = fname
-                frame_idx[step] = i
+        all_frames, num_frames = self.scan_file_times(files)
+        steps, file_idx, frame_idx = self.forcing_steps(
+            config, files, all_frames, num_frames
+        )
 
         self._files = files
+        # self.stepdiff = stepdiff
         self.stepdiff = np.diff(steps)
         self.file_idx = file_idx
         self.frame_idx = frame_idx
@@ -340,6 +298,7 @@ class Forcing:
         # --------------
         # prestep = last forcing step < 0
         #
+
         V = [step for step in steps if step < 0]
         if V:  # Forcing available before start time
             prestep = max(V)
@@ -388,45 +347,85 @@ class Forcing:
 
     # ===================================================
     @staticmethod
-    def find_files(config):
+    def find_files(force_config):
         """Find (and sort) the forcing file(s)"""
-        files = glob.glob(config["input_file"])
+        files = glob.glob(force_config["input_file"])
         files.sort()
-        if config.get("first_file", None):
-            files = [f for f in files if f >= config["first_file"]]
-        if config.get("last_file", None):
-            files = [f for f in files if f <= config["last_file"]]
+        if force_config.get("first_file", None):
+            files = [f for f in files if f >= force_config["first_file"]]
+        if force_config.get("last_file", None):
+            files = [f for f in files if f <= force_config["last_file"]]
         return files
 
-
-    # Funker nå, men trenger ikke time_frames,
-    # bare antall frames per fil.
-    #TODO: time_frames -> frame_idx indeks i fil
     @staticmethod
     def scan_file_times(files):
-        """Check files and scan the times"""
-        all_frames = []     # All time frames
-        time_frames = {}    # Time frames in each file
+        """Check files and scan the times
+
+        Returns:
+          all_frames: List of all time frames
+          num_frames: Mapping: filename -> number of time frames in file
+
+        """
+        all_frames = []  # All time frames
+        num_frames = {}  # Number of time frames in each file
         for fname in files:
             with Dataset(fname) as nc:
                 new_times = nc.variables["ocean_time"][:]
+                num_frames[fname] = len(new_times)
                 units = nc.variables["ocean_time"].units
                 new_frames = num2date(new_times, units)
                 all_frames.extend(new_frames)
-                time_frames[fname] = new_frames
 
         # Check that time frames are strictly sorted
         all_frames = np.array(all_frames, dtype=np.datetime64)
         I = all_frames[1:] <= all_frames[:-1]
         if np.any(I):
-            print(all_frames[1:][I])
+            # print(all_frames[1:][I])
             logging.info(f"Time frames out of order: {all_frames[1:][I]}")
             logging.critical("Time frames not strictly sorted")
             raise SystemExit(4)
 
         logging.info(f"Number of available forcing times = {len(all_frames)}")
-        return all_frames, time_frames
+        return all_frames, num_frames
 
+    @staticmethod
+    def forcing_steps(config, files, all_frames, num_frames):
+
+        time0 = all_frames[0]
+        time1 = all_frames[-1]
+        logging.info(f"First forcing time = {time0}")
+        logging.info(f"Last forcing time = {time1}")
+        start_time = np.datetime64(config["start_time"])
+        dt = np.timedelta64(int(config["dt"]), "s")
+
+        # Check that forcing period covers the simulation period
+        # ------------------------------------------------------
+
+        if time0 > start_time:
+            logging.error("No forcing at start time")
+            raise SystemExit(3)
+        if time1 < config["stop_time"]:
+            logging.error("No forcing at stop time")
+            raise SystemExit(3)
+
+        # Make a list steps of the forcing time steps
+        # --------------------------------------------
+        steps = []  # Model time step of forcing
+        for t in all_frames:
+            dtime = np.timedelta64(t - start_time, "s").astype(int)
+            steps.append(int(dtime / config["dt"]))
+
+        file_idx = dict()  # Dårlig navn
+        frame_idx = dict()
+        step_counter = -1
+        # for i, fname in enumerate(files):
+        for fname in files:
+            for i in range(num_frames[fname]):
+                step_counter += 1
+                step = steps[step_counter]
+                file_idx[step] = fname
+                frame_idx[step] = i
+        return steps, file_idx, frame_idx
 
     # ==============================================
 
@@ -479,19 +478,18 @@ class Forcing:
         logging.info("Reading velocity for time step = {}".format(n))
         first = True
         if first:  # Open file initiallt
-            #self._nc = Dataset(self._files[self.file_idx[n]])
+            # self._nc = Dataset(self._files[self.file_idx[n]])
             self._nc = Dataset(self.file_idx[n])
             self._nc.set_auto_maskandscale(False)
             first = False
         else:
             if self.frame_idx[n] == 0:  # New file
                 self._nc.close()  # Close previous file
-                #self._nc = Dataset(self._files[self.file_idx[n]])
+                # self._nc = Dataset(self._files[self.file_idx[n]])
                 self._nc = Dataset(self.file_idx[n])
                 self._nc.set_auto_maskandscale(False)
 
         frame = self.frame_idx[n]
-        print("----", frame)
 
         # Read the velocity
         U = self._nc.variables["u"][frame, :, self._grid.Ju, self._grid.Iu]
