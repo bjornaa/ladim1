@@ -245,38 +245,6 @@ class Forcing:
             raise SystemExit(3)
         logging.info("Number of forcing files = {}".format(numfiles))
 
-        # ----------------------------------------
-        # Open first file for some general info
-        # must be valid for all the files
-        # ----------------------------------------
-
-        with Dataset(files[0]) as nc:
-
-            time_units = nc.variables["ocean_time"].units
-
-            self.scaled = dict()
-            self.scale_factor = dict()
-            self.add_offset = dict()
-
-            if hasattr(nc.variables["u"], "scale_factor"):
-                self.scaled["U"] = True
-                self.scale_factor["U"] = np.float32(nc.variables["u"].scale_factor)
-                self.add_offset["U"] = np.float32(nc.variables["u"].add_offset)
-                self.scaled["V"] = True
-                self.scale_factor["V"] = np.float32(self.scale_factor["U"])
-                self.add_offset["V"] = np.float32(self.add_offset["U"])
-            else:
-                self.scaled["U"] = False
-                self.scaled["V"] = False
-
-            for key in self.ibm_forcing:
-                if hasattr(nc.variables[key], "scale_factor"):
-                    self.scaled[key] = True
-                    self.scale_factor[key] = np.float32(nc.variables[key].scale_factor)
-                    self.add_offset[key] = np.float32(nc.variables[key].add_offset)
-                else:
-                    self.scaled[key] = False
-
         # ---------------------------
         # Overview of all the files
         # ---------------------------
@@ -291,6 +259,7 @@ class Forcing:
         self.stepdiff = np.diff(steps)
         self.file_idx = file_idx
         self.frame_idx = frame_idx
+        self._nc = None
 
         # Read old input
         # requires at least one input before start
@@ -468,6 +437,28 @@ class Forcing:
 
     # --------------
 
+    def open_forcing_file(self, n):
+        """Open forcing file at time step = n"""
+        nc = self._nc
+        nc = Dataset(self.file_idx[n])
+        nc.set_auto_maskandscale(False)
+
+        self.scaled = dict()
+        self.scale_factor = dict()
+        self.add_offset = dict()
+
+        # Åpne for alias til navn
+        forcing_variables = ["u", "v"] + self.ibm_forcing
+        for key in forcing_variables:
+            if hasattr(nc.variables[key], "scale_factor"):
+                self.scaled[key] = True
+                self.scale_factor[key] = np.float32(nc.variables[key].scale_factor)
+                self.add_offset[key] = np.float32(nc.variables[key].add_offset)
+            else:
+                self.scaled[key] = False
+
+        self._nc = nc
+
     def _read_velocity(self, n):
         """Read fields at time step = n"""
         # Need a switch for reading W
@@ -476,18 +467,13 @@ class Forcing:
         # Handle file opening/closing
         # Always read velocity before other fields
         logging.info("Reading velocity for time step = {}".format(n))
-        first = True
-        if first:  # Open file initiallt
-            # self._nc = Dataset(self._files[self.file_idx[n]])
-            self._nc = Dataset(self.file_idx[n])
-            self._nc.set_auto_maskandscale(False)
-            first = False
-        else:
-            if self.frame_idx[n] == 0:  # New file
-                self._nc.close()  # Close previous file
-                # self._nc = Dataset(self._files[self.file_idx[n]])
-                self._nc = Dataset(self.file_idx[n])
-                self._nc.set_auto_maskandscale(False)
+
+        # If finished a file or first read (self._nc == "")
+        if not self._nc:  # First read
+            self.open_forcing_file(n)
+        elif self.frame_idx[n] == 0:  # Just finished a forcing file
+            self._nc.close()
+            self.open_forcing_file(n)
 
         frame = self.frame_idx[n]
 
@@ -497,11 +483,11 @@ class Forcing:
 
         # Scale if needed
         # Assume offset = 0 for velocity
-        if self.scaled["U"]:
-            U = self.scale_factor["U"] * U
-            V = self.scale_factor["U"] * V
-            # U = self.add_offset['U'] + self.scale_factor['U']*U
-            # V = self.add_offset['U'] + self.scale_factor['U']*V
+        if self.scaled["u"]:
+            U = self.scale_factor["u"] * U
+            V = self.scale_factor["v"] * V
+            # U = self.add_offset['u'] + self.scale_factor['u']*U
+            # V = self.add_offset['v'] + self.scale_factor['v']*V
 
         # If necessary put U,V = zero on land and land boundaries
         # Stay as float32
