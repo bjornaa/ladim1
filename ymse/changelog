@@ -1,0 +1,8 @@
+2020-02-04
+
+Improved the ROMS gridforce module.
+
+Fixed a bug where files in a sequence of forcing files
+were not closed properly.
+NetCDF attributes scale_factor and add_offset are now
+read individually for forcing files in a sequence.

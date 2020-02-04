@@ -1,0 +1,24 @@
+Starter ny branch for forcing
+
+Steg:
+
+1: Finn filer
+   Lag files, sortert liste
+   FEIL, hvis ingen filer
+   Ta hensyn til evt. first/last for å begrense antall
+   OK 2020-01-29
+
+2: Scan filene
+   Er alle netCDF?  FEIL hvis ikke
+   Kronologisk ordnet?  FEIL hvis ikke
+   Noen hull?   Advarsel hvis ikke
+   Forcing filer dekker hele perioden?
+     FEIL hvis ikke ved start, ADVARSEL? hvis ikke slutt
+     Åpner for å simulere 30 dager med et fast strømfelt
+   Lag times-liste og num_frames-liste
+   Lag dictionarys file_idx[n], frame_idx[n]
+   der n = tidskritt nummer
+
+3: Update, ha selvstendig åpning av fil
+   inkludert finne evt. add_offset og scale_factor
+       (evt. ta dette med i 2)
