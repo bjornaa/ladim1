@@ -3,7 +3,7 @@
 time_control:
     # Start and stop of simulation
     start_time     : 2015-04-01 00:00:00
-    stop_time      : 2015-04-01 12:00:00
+    stop_time      : 2015-04-03 12:00:00
     # reference_time is optional. default = start_time
     reference_time : 2015-01-01
 
