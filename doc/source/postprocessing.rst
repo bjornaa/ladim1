@@ -1,83 +1,90 @@
 Post processing
 ===============
 
-Under reconstruction
---------------------
-
 LADiM comes with a simple python package ``postladim`` that can be used for
 visualisation and analysis of LADiM output. It is based on the ``xarray`` package
 http://xarray.pydata.org/en/stable/.
 
 
-.. class:: InstanceVariable
+Usage
+-----
 
-  .. attribute:: da
+The basic class is ``ParticleFile`` giving access to the content
+of a LADiM output file.
 
-    The underlying xarray DataArray
+.. code-block:: python
 
-  .. attribute:: count
+    from postladim import ParticleFile
+    pf = ParticleFile("output.nc")
 
-    Number of particles at given time
+The ``ds`` method shows the underlying xarray Dataset, which is useful for a quick
+overview of the content and for more advenced data processing.
 
-  .. attribute:: time
+The time at a given time step n is given by:
 
-    The time steps
+.. code-block:: python
 
-  .. attribute:: num_particles
+  pf.time[n]
 
-    The number of distinct particles
+The output may be a bit verbose, ``pf.time(n)`` is syntactic sugar for the more concise``pf.time[n].values``.
 
-  .. method:: isel(time=n)
+The number of particles at time step n is given by:
 
-    Select by time index, V.isel(time=n) = V[n]
+.. code-block:: python
 
-  .. method:: sel(time=t, pid=p)
+  pf.count[n]
 
-    Select by time value and/or pid value
+For use in indexing ``pf.count`` is an integer array instead of an xarray DataArray.
+The DataArray is avaiable as ``pf.ds.particle_count``.
 
-    V.sel(time='2019-09-19 12') selects particles at that time value
-    V.sel(pid=23) selects the time history of particle with that pid value
-    V.sel(time='2019-09-19 12', pid=23) selects the unique particle instance
+Following pandas and xarray, an instance variable, like X,  is given both by
+attribute ``pf.X`` and item ``pf['X']`` notation. The NetCDF inspired notation
+``pf.variables['X']`` is obsolete.
 
-  .. method:: full()
+The most basic operation for an instance variable is to get the values at time step n as
+a xarray DataArray:
 
-     Return the full 2D DataArray. May become vary large.
+.. code-block:: python
 
-The InstanceVariable class support item notation::
+  pf.X[n]
 
-  V[n] = V.isel(time=n)
-  V[n, p] = V.isel(time=n).sel(pid=p)
+An alternative notation is ``pf.X.isel(time=n)``. The time stamp can be used instead of
+the time index:
 
-  len(V) == len(V.time) is the length of the time axis
+.. code-block:: python
 
-Note that V[n, p] may be different from V[n][p] if particles have been removed.
+  pf.X.sel(time='2020-02-05 12')
+
+The format is optimized for particle distributions at a given time. Trajectories and
+other time series for a given particle may take longer time to extract. For the particle
+with identifier `pid=p`, the X-coordinate of the trajectory is given
+by:
+
+.. code-block:: python
+
+  pf.X.sel(pid=p)
+
+If many trajectories are needed, it may be useful to turn the dataset into a full (i.e.
+non-sparse) 2D DataArray, indexed by time and particle identifier.
+
+.. code-block:: python
+
+  pf.X.full()
+
+Note that for long simulations with particles of limited life span, this array may
+become much larger than the ParticleFile.
 
 
-.. class:: ParticleVariable
 
-This class represents a variable that depends on the particle, but is independent of
-time.
+Reference
+---------
 
-  .. attribute:: da
-
-  Underlying xarray DataArray
-
-Supports item notation::
-
-  V[p] is value of particle with pid = p
-
-
-The basic class is ``postladim.ParticleFile``, it is initiated
-by the following lines::
-
-  from postladim import ParticleFile
-  ...
-  pf = ParticleFile('ladim-output.nc')
-
+ParticleFile
+............
 
 .. class:: ParticleFile(particle_file)
 
-   It has the following **attributes**:
+   Class for LADiM result files.
 
   .. attribute:: ds
 
@@ -87,9 +94,13 @@ by the following lines::
 
      Number of time frames in the file.
 
+.. attribute:: num_particles
+
+    The number of distinct particles
+
   .. attribute:: count
 
-     Numpy ndarray of particle counts at different time steps
+     Integer numpy ndarray of particle counts at different time steps
 
   .. attribute:: start
 
@@ -113,27 +124,89 @@ by the following lines::
 
   .. method:: position(n)
 
-     Tuple with position (X and Y) of particle-distribution at n-th time time.
-     pf.position(n) = (pf['X'][n], pf['Y'][n])
+     Tuple with position (X, Y) of particle-distribution at n-th time time,
+     ``pf.position(n) = (pf.X[n], pf.Y[n])``
 
   .. method:: trajectory(pid)
 
-     Returns a tuple of X and Y coordinates of the particle with identifier pid.
-     trajectory(pid) = (pf['X'].sel(pid=pid), pf['Y'].sel(pid=pid))
+     Returns a tuple of X and Y coordinates of the particle with identifier pid,
+     ``trajectory(pid) = (pf.X.sel(pid=pid), pf.Y.sel(pid=pid))``.
 
   .. attribute:: variables
 
-     Deprecated, dictionary of variables, pf.variables['X'] = pf['X'] = pf.X
+     Deprecated, dictionary of variables, ``pf.variables['X'] = pf['X'] = pf.X``.
 
   .. method:: time(n)
 
-     Deprecated, pf.time(n) = pf.time[n].values
+     Syntactic sugar, ``pf.time(n) = pf.time[n].values``
 
   .. method:: particle_count(n)
 
-     Deprecated, pf.particle_count(n) = pf.count[n]
+     Deprecated, ``pf.particle_count(n) = pf.count[n]``
+
+InstanceVariable
+................
+
+.. class:: InstanceVariable
+
+  .. attribute:: da
+
+    The underlying xarray DataArray
+
+  .. attribute:: count
+
+    Number of particles at given time
+
+  .. attribute:: time
+
+    The time steps
+
+  .. attribute:: num_particles
+
+    The number of distinct particles
+
+  .. method:: isel(time=n)
+
+    Select by time index, ``V.isel(time=n) = V[n]``.
+
+  .. method:: sel(time=t, pid=p)
+
+    Select by time value and/or pid value
+
+    ``V.sel(time='2019-09-19 12')`` selects particles at that time value
+    ``V.sel(pid=23)`` selects the time history of particle with that pid value
+    ``V.sel(time='2019-09-19 12', pid=23)`` selects the unique particle instance
+
+  .. method:: full()
+
+     Return the full (non-sparse) 2D DataArray. May become vary large.
 
 
-.. class InstanceVariable
 
-.. class ParticleVariable
+The InstanceVariable class support item notation:
+
+.. code-block:: `python`
+
+  V[n] = V.isel(time=n)
+  V[n, p] = V.isel(time=n).sel(pid=p)
+
+Note that ``V[n, p]`` may be different from ``V[n][p]`` if particles have been removed.
+
+The `length` of an instance variable is the number of time steps,
+``len(V) == len(V.time)``.
+
+ParticleVariable
+................
+
+.. class:: ParticleVariable
+
+This class represents a variable that depends on the particle, but is independent of
+time.
+
+  .. attribute:: da
+
+  Underlying xarray DataArray
+
+Supports item notation::
+
+  ``V[p]`` is value of particle with ``pid = p``.
