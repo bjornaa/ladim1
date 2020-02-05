@@ -33,7 +33,7 @@ class State(Sized):
         if "ibm" in config and "variables" in config["ibm"]:
             self.ibm_variables = config["ibm"]["variables"]
         else:
-            self.ibm_variables = []
+            self.ibm_variables = config.get('ibm_variables', [])
         self.particle_variables = config["particle_variables"]
         self.instance_variables = self.position_variables + [
             var for var in self.ibm_variables if var not in self.particle_variables

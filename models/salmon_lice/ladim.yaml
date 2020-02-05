@@ -23,7 +23,8 @@ gridforce:
     # subgrid format [i0, i1, j0, j1]
     subgrid: [200, 750, 300, 900]
     # Any extra forcing besides horizontal velocity
-    ibm_forcing: [temp, salt]
+    # ibm_forcing: [temp, salt]
+    ibm_forcing: {'temp': 'temp', 'salt': 'salt'}
 
 # IBM section is optional
 # When using an IBM the module name is mandatory

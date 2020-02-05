@@ -202,6 +202,9 @@ def configure(config_stream) -> Config:
         config["ibm_forcing"] = conf["gridforce"]["ibm_forcing"]
     except (KeyError, TypeError):
         config["ibm_forcing"] = []
+    # ibm_forcing used to be a dictionary
+    if isinstance(config["ibm_forcing"], dict):
+        config["ibm_forcing"] = list(config["ibm_forcing"].keys())
     logging.info(f'    {"ibm_forcing":15s}: {config["ibm_forcing"]}')
 
     # --- IBM ---
