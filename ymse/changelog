@@ -6,3 +6,13 @@ Fixed a bug where files in a sequence of forcing files
 were not closed properly.
 NetCDF attributes scale_factor and add_offset are now
 read individually for forcing files in a sequence.
+
+2020-01-29
+
+Added active flag for particles.
+
+Particles have logical flags alive and active.
+If alive is False, the particle is not moved, and will be removed.
+If alive is True and active is False, the particle is not moved
+but will remain and can be activated later.
+TODO: clear up about output.
