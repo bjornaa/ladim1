@@ -2,7 +2,7 @@ Programming language
 ====================
 
 The LADiM code is written in `python <https://www.python.org>`_, more
-specific python 3. It has been tested with versions 3.5 and 3.6.
+specific it requires python 3.6 or newer.
 
 Dependencies
 ------------
@@ -15,9 +15,11 @@ release module depend on the data analysis package
 `pandas <http://pandas.pydata.org>`_. All these packages are available in the
 `anaconda <https://www.continuum.io/anaconda-overview>`_ bundle.
 
-Testing is done using the `pytest <http://doc.pytest.org>`_-framework. The
-examples use the plotting package `matplotlib <http://matplotlib.org>`_ for the
-post processing.
+The postprocessing library, :ref:`postladim<postladim>`, uses the `xarray
+<http://xarray.pydata.org>`_ framework. In addition the examples use the plotting
+package `matplotlib <http://matplotlib.org>`_ for visualisation.
+
+Testing is done using the `pytest <http://doc.pytest.org>`_-framework.
 
 This documentation uses the `Sphinx <http://www.sphinx-doc.org>`_
 documentation system to generate html and pdf documentation. To produce the

@@ -11,4 +11,5 @@ User Manual
   workflow
   postprocessing
   examples
-  ladim_at_imr
+
+.. ladim_at_imr

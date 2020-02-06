@@ -50,20 +50,20 @@ Output variable
   A variable that is written to the output file
 
 
-Some particle variables, for instance location number, has no influence on the
-dynamics and are simply written to output for extra information. Other particle
-variables may store initial information, like release time or release position,
-and has no further influence. Other particle variables may influence the
-dynamics throughout  the simulation. Examples are diameter or sinking velocity
-of non-organic sediment particles. The last category are counted as
-IBM-variables.
+Some particle variables, for instance release site code, has no influence on
+the dynamics and are simply written to output for extra information. Other particle
+variables may store initial information, like release time or release position, and has
+no further influence. Other particle variables may influence the dynamics throughout
+the simulation. Examples are diameter or sinking velocity of non-organic sediment
+particles. The last category are counted as IBM-variables.
 
-Some variables have predefined names. For the state these are the position
-variables, ``X``, ``Y``, ``Z`` and the particle identifier ``pid``.  Similarly,
-the derived longitude and latitude have names ``lon`` and ``lat``  respectively.
-For the forcing variables it is the horizontal velocity components ``U`` and
-``V`` in the grid directions. IBM variables are referenced indirectly like
-state.temp or state[name] where state is a State object.
+Some variables have predefined names. For the state these are the position variables,
+``X``, ``Y``, ``Z``, the particle identifier ``pid``, and the logical flags ``alive``
+and ``active``.  Similarly, the derived longitude and latitude have names ``lon`` and
+``lat``  respectively. For the forcing variables it is the horizontal velocity
+components ``U`` and ``V`` in the grid directions and the vertical velocity ``W``
+(positive upwards). IBM variables are referenced indirectly like state.temp or
+state['temp'] where state is a State object.
 
 The particle identifier, ``pid`` is per definition a particle variable. However,
 it "lives" on particle instances, identifying the particle the instance belongs to.

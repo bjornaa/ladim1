@@ -16,14 +16,11 @@ cases.
 Coordinate system in LADiM
 --------------------------
 
-The coordinate system should be curvilinear orthogonal. Grids as used by
-ROMS for instance are suitable. The coordinates should have integer values at
-the grid cell centers. [Necessary, or a detail left to the implementation?]
-Particle release and movements are referred to this coordinate system.
+The coordinate system should be orthogonal, and may be curvilinear. Grids as used by
+ROMS for instance are suitable.
 
 The grid spacing is given by horizontal arrays of metric coefficients
-:math:`\Delta x` and :math:`\Delta y`
-(sjekk at de brukes rett).
+:math:`\Delta x` and :math:`\Delta y`.
 
 The vertical coordinate system is simply the depth in meters, with positive
 values downwards.
@@ -54,7 +51,7 @@ values downwards.
 
    .. method:: sample_depth(X, Y)
 
-      Returns the depth at the positions.
+      Returns the bottom depth at the positions.
 
    .. method:: lonlat(X, Y)
 

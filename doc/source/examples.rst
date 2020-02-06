@@ -28,16 +28,16 @@ Alphabetic list of examples:
   The latlon example shows how to release particles at positions given in
   geographical coordinates and how to get longitude and latitude into the
   output file. It also shows how to visualize the results on a map using the
-  mapping extensions  :mod:`basemap` and :mod:`cartopy` to _mod:`matplotlib`.
+  mapping extensions  :mod:`basemap` and :mod:`cartopy` to :mod:`matplotlib`.
 
 :file:`line`
   This is the basic example. Particles are released instantaneously from a line
   across the North Sea from Scotland to Norway. The particle distribution is
-  followed for a period xx days.
+  followed for a period twelve days.
 
 :file:`logo`
   This example generates the LADiM logo. The text LADiM is written with
-  particles in the North Sea and deformed by the current for xx days.
+  particles in the North Sea and deformed by the current for six days.
 
 :file:`nested`
   This examples shows how use two nested model grids and let particles move

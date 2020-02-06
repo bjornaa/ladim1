@@ -8,10 +8,15 @@ An IBM (Individual Based Model) for biological behaviour or similar
 can be added to LADiM. As they may be very different, it is difficult to
 be general enough.
 
-The IBM variables are named by the configuration, and some get initial
-values in the particle release. The rest must be initialized.
-[This is not done properly yet, age = 0 initially so lakselus is OK,
-need perhaps an append method, to be called by state.append]
+The IBM variables are named by the configuration. Initial values may be
+provided by the particle release file. Alternatively values may
+given or derived from the IBM forcing fields. If none of the above, the
+values are initially set to zero. [Check if correct, may change to error
+if uninitialized]
+
+The IBM module has the responsibility for updating the required extra
+forcing (besides velocity) by calling the ``forcing.field`` method.
+
 
 Requirements for an IBM module:
 

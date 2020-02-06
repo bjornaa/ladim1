@@ -43,7 +43,8 @@ Z
 .. note::
   Using (lon, lat) requires a ``ll2xy`` method in the :class:`gridforce.Grid`.
 
-Additional variables should be specified in the configuration file. If their type is not ``float``, their type
+Additional variables should be specified in the configuration file. If their type is not
+``float``, the type (``int``, ``bool``, ``time``) should be specified. [How about strings?]
 
 Example:
 
@@ -66,13 +67,13 @@ A typical line in the release file may look like this:
 
 .. code-block:: none
 
-  5 2015-07-06T12 379.12 539.23 5.0 10041 1243.4
+  5 2015-07-06T12 379.12 539.23 5.0 10041 1243.2
 
 This means that 5 particles are released at time ``2015-07-06 12:00:00``, at a
 location with ``farmid``-label 10041, with grid coordinates (379.12, 539.23) at
 5 meters depth. Each particle is a superindividual with weight 1243.2 so the
 particle release corresponds to a total of 6216 individuals. The release is
-repeated every hour until a newer release time in the file (or the end of the
+repeated every hour until a later particle release anywhere (or the end of the
 simulation).
 
 .. warning::
@@ -95,8 +96,7 @@ simulation).
 .. note::
   Particles released on land are retained in the simulation, but do not move.
   In particular check that particles released by longitude and latitude near
-  the coast is in a sea cell. TODO: Handle particles on land similar to out of
-  grid.
+  the coast is in a sea cell. TODO: Provide a warning for particles initially on land.
 
 .. seealso::
   Module :mod:`release`
