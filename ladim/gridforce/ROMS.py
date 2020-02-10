@@ -349,9 +349,10 @@ class Forcing:
         all_frames = np.array(all_frames, dtype=np.datetime64)
         I = all_frames[1:] <= all_frames[:-1]
         if np.any(I):
-            # print(all_frames[1:][I])
-            logging.info(f"Time frames out of order: {all_frames[1:][I]}")
-            logging.critical("Time frames not strictly sorted")
+            i = I.nonzero()[0][0] + 1   # Index of first out-of-order frame
+            oooframe = str(all_frames[i]).split('.')[0]  # Remove microseconds
+            logging.info(f"Time frame {i} = {oooframe} out of order")
+            logging.critical("Forcing time frames not strictly sorted")
             raise SystemExit(4)
 
         logging.info(f"Number of available forcing times = {len(all_frames)}")
