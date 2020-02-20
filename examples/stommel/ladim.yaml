@@ -1,0 +1,50 @@
+
+# Configuration file for ladim
+#
+# Stommel example
+#
+
+time_control:
+    # Start and stop of simulation
+    start_time: 2000-01-01 00:00:00
+    stop_time:  2009-12-31 23:00:00
+
+files:
+    particle_release_file : stommel.rls
+    output_file           : stommel.nc
+
+particle_release:
+    variables: [release_time, X, Y, Z]
+    # Converters (if not float)
+    release_time: time
+    particle_variables: [release_time]
+
+gridforce:
+    module: gridforce_stommel
+
+output_variables:
+    # Output period, format [value, unit], unit = s, m, h, or d
+    outper: [86400, s]   # daily
+    # Variable names
+    particle: [release_time]
+    instance: [pid, X, Y]
+    # NetCDF arguments
+    release_time:
+        ncformat: f8
+        long_name: particle release time
+        units: seconds since reference_time
+    # Få til template over
+    pid: {ncformat: i4, long_name: particle identifier}
+    X: {ncformat: f4, long_name: particle X-coordinate}
+    Y: {ncformat: f4, long_name: particle Y-coordinate}
+
+numerics:
+    # Model time step, [value, unit]
+    dt: [10800, s]   # 3 hours
+    # Advection method: options =
+    #        EF = Euler-Forward,
+    #        RK2, RK4 = Runge-Kutta 2nd or 4th order
+    advection: RK4
+    # Horizontal diffusion coefficient [m2.s-1]
+    #         zero = no diffusion
+    diffusion: 0.0
