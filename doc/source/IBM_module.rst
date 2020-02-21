@@ -17,6 +17,8 @@ if uninitialized]
 The IBM module has the responsibility for updating the required extra
 forcing (besides velocity) by calling the ``forcing.field`` method.
 
+A repository of IBM modules are maintained by Pål N. Sævik on `github
+<https://github.com/pnsaevik/ladim_plugins>`_.
 
 Requirements for an IBM module:
 

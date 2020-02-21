@@ -12,7 +12,7 @@ y0 = grd.b / 3.0
 r1 = 800 * km  # Radius inner circle
 r2 = 1600 * km  # Radius outer circle
 
-N = 1000  # Number of particles per circle
+N = 2500  # Number of particles per circle
 T = np.linspace(0, 2 * np.pi, N)
 X1 = x0 + r1 * np.cos(T)
 Y1 = y0 + r1 * np.sin(T)

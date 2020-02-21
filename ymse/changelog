@@ -16,3 +16,21 @@ If alive is False, the particle is not moved, and will be removed.
 If alive is True and active is False, the particle is not moved
 but will remain and can be activated later.
 TODO: clear up about output.
+
+2020-02-07
+
+Refactored file processing in ROMS gridforce.
+Checks that forcing records are ordered properly.
+Forcing files may have independent scale_factors.
+
+2020-02-07
+
+Updated documentation, in particular for postladim
+
+2020-02-20
+
+Added Stommel example
+
+2020-02-21
+
+Updated model example to new salmon lice ibm

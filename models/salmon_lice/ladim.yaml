@@ -1,5 +1,3 @@
-# Configuration file for salmon lice model using ROMS output
-
 time_control:
     # Start and stop of simulation
     start_time     : 2015-03-31 00:00:00
@@ -10,78 +8,117 @@ time_control:
 files:
     particle_release_file : salmon_lice.rls
     output_file           : out.nc
-    # For warm start, the warm_start_file goes here
+
 
 gridforce:
-    # Module name is mandatory.
-    # The other items are module dependent
     module: ladim.gridforce.ROMS
-    # An optional grid_file name can be given
-    # Here using the default = first input file
-    # grid_file: /scratch/Data/NK800/file_0000.nc
-    input_file: /scratch/Data/NK800/file_????.nc
-    # subgrid format [i0, i1, j0, j1]
-    subgrid: [200, 750, 300, 900]
-    # Any extra forcing besides horizontal velocity
+    input_file: /scratch/Data/NK800/file_*.nc
     ibm_forcing: [temp, salt]
 
-# IBM section is optional
-# When using an IBM the module name is mandatory
-# The optional item variables is standardized, default = []
-# Other items are module dependent
+
 ibm:
-    module: ladim.ibms.ibm_salmon_lice
-    variables: [super, age]
+    module: ladim.ibms.salmon_lice
+    variables:
+    - super       # Number of actual salmon lice per simulation particle
+    - age         # Age of particle [degree*days]
+    - days        # Age of particle [days]
+    - temp        # Particle ambient temperature [Celcius]
+    - salt        # Particle ambient salinity [1]
+
+    salinity_model: new  # 'old' or 'new'
+    vertical_mixing: 0.001  # [m^2/s]
+
 
 particle_release:
-    # Discrete or continuous release in time
     release_type: continuous
-    # Frequency of continuous particle release, ignored if discrete
-    release_frequency: [1, h]   # Hourly release
-    # List of variables in the release file
-    variables: [mult, release_time, X, Y, Z, farmid, super]
-    # Converters (for variables that are not float)
+    release_frequency: [60, s]  # Normally: [1, h]
+    variables:
+    - mult           # Number of particles released
+    - release_time   # Time of release, formatted as yyyy-mm-ddThh:mm:ss
+    - X              # X coordinate of release location
+    - Y              # Y coordinate of release location
+    - Z              # Depth of release location
+    - farmid         # Custom id used to group particles in post processing
+    - super          # Number of actual salmon lice per simulation particle
+
+    # Converters (if not float)
     mult: int
-    release_time: time   # np.datetime64[s]
+    release_time: time
     farmid: int
-    # Mark variables as time independent
     particle_variables: [release_time, farmid]
 
+
 output_variables:
-    # Frequency of output
-    outper: [1, h]    # Output every hour
-    # Variables included in output
+    # Output period, format [value, unit], unit = s, m, h, or d
+    outper: [60, s]  # Normally: [1, h]
+    # Uncomment the entry below to split output file into daily files
+    # numrec: 24
+
+    # Variable names
     particle: [release_time, farmid]
-    instance: [pid, X, Y, Z, super, age]
-    # NetCDF arguments
-    # format string and attributes
+    instance: [pid, X, Y, Z, super, age, days, temp, salt]
+
+    # --- Output format for standard variables ---
+
     release_time:
-        ncformat: f8   # 64 bit float
+        ncformat: f8
         long_name: particle release time
-        # Reference_time becomes substituted with value set above
         units: seconds since reference_time
-    farmid: {ncformat: i4, long_name: fish farm location number}
-    pid: {ncformat: i4, long_name: particle identifier}
-    X: {ncformat: f4, long_name: particle X-coordinate}
-    Y: {ncformat: f4, long_name: particle Y-coordinate}
+
+    pid:
+        ncformat: i4
+        long_name: particle identifier
+
+    X:
+        ncformat: f4
+        long_name: particle X-coordinate
+
+    Y:
+        ncformat: f4
+        long_name: particle Y-coordinate
+
     Z:
         ncformat: f4
         long_name: particle depth
         standard_name: depth_below_surface
         units: m
         positive: down
+
+    # --- Output format for IBM-specific variables ---
+
+    temp:
+        ncformat: f4
+        long_name: temperature
+        standard_name: sea_water_temperature
+        units: Celcius
+
+    farmid:
+        ncformat: i4
+        long_name: fish farm location number
+
     age:
         ncformat: f4
         long_name: particle age in degree-days
         units: Celcius days
         standard_name: integral_of_sea_water_temperature_wrt_time
-    super: {ncformat: f4, long_name: number of individuals in instance}
+
+    super:
+        ncformat: f4
+        long_name: number of individuals in instance
+
+    salt:
+        ncformat: f4
+        long_name: salinity
+        standard_name: sea_water_salinity
+
+    days:
+        ncformat: f4
+        long_name: Days after haching
+        units: days
+
 
 numerics:
-    # Model time step
-    dt: [600, s]     # Format = [value, unit]
-    # Advection method, EF, RK2, or RK4
-    advection: RK2   # Second order Runge Kutta
-    # Horizontal random walk diffusion coefficient
-    # omit or set to zero if no diffusion
-    diffusion: 10    # [m/s**2]
+    # Model time step, [value, unit]
+    dt: [60, s]     # usually 120 on 160m NorFjords, 600 NorKyst, 1800 SVIM
+    advection: RK4  # either EF, RK2 or RK4 (recommended)
+    diffusion: 1.0  # [m*2/s]

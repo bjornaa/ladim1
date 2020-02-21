@@ -7,12 +7,13 @@
 # Institute of Marine Research
 # ----------------------------------
 
+import sys
 import argparse
 import logging
 import datetime
 from pathlib import Path
 
-from ladim import main
+import ladim
 
 # ===========
 # Logging
@@ -39,6 +40,13 @@ parser.add_argument(
     action="store_const", dest="loglevel", const=logging.WARNING)
 parser.add_argument('config_file', nargs='?', default='ladim.yaml')
 
+logging.info(" ================================================")
+logging.info(" === Lagrangian Advection and Diffusion Model ===")
+logging.info(" ================================================\n")
+
+logging.info(f"LADiM version {ladim.__version__}")
+logging.info(f"LADiM path: {ladim.__file__.strip('__init.py__')}")
+logging.info(f"python version:  {sys.version.split()[0]}\n")
 logging.info("Parsing command line")
 args = parser.parse_args()
 logging.info(f"  Configuration file: {args.config_file}")
@@ -61,7 +69,7 @@ now = datetime.datetime.now().replace(microsecond=0)
 logging.info(f'LADiM simulation starting, wall time={now}')
 
 fp = open(args.config_file, encoding='utf8')
-main(config_stream=fp, loglevel=args.loglevel)
+ladim.main(config_stream=fp, loglevel=args.loglevel)
 
 # Reset logging and print final message
 logging.getLogger().setLevel(logging.INFO)

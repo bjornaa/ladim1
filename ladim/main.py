@@ -11,8 +11,10 @@ Lagrangian Advection and Diffusion Model
 # Institute of Marine Research
 # ---------------------------------
 
+import sys
 import logging
 
+import ladim
 from .configuration import configure
 from .gridforce import Grid, Forcing
 from .release import ParticleReleaser

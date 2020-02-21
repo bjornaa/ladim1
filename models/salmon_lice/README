@@ -1,0 +1,9 @@
+Salmon lice – full model example
+================================
+
+An adaptation of the salmon lice plugin from
+https://github.com/pnsaevik/ladim_plugins/tree/master/ladim_plugins/salmon_lice
+
+Original IBM by Ingrid Askeland Johnsen, 2014
+Adaptation to python LADiM by B. Ådlandsvik,
+New salintiy formulation by A.D. Sandvik and P.N. Sævik
