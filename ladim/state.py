@@ -33,7 +33,8 @@ class State(Sized):
         if "ibm" in config and "variables" in config["ibm"]:
             self.ibm_variables = config["ibm"]["variables"]
         else:
-            self.ibm_variables = config.get('ibm_variables', [])
+            self.ibm_variables = config.get("ibm_variables", [])
+        self.ibm_forcing = config.get("ibm_forcing", [])
         self.particle_variables = config["particle_variables"]
         self.instance_variables = self.position_variables + [
             var for var in self.ibm_variables if var not in self.particle_variables
@@ -74,13 +75,18 @@ class State(Sized):
     def __len__(self) -> int:
         return len(getattr(self, "X"))
 
-    def append(self, new: Dict[str, Any]) -> None:
+    def append(self, new: Dict[str, Any], forcing: Forcing) -> None:
         """Append new particles to the model state"""
         nnew = len(new["pid"])
         self.pid = np.concatenate((self.pid, new["pid"]))
         for name in self.instance_variables:
             if name in new:
                 self[name] = np.concatenate((self[name], new[name]))
+            elif name in self.ibm_forcing:
+                # Take values as Z must be a numpy array
+                self[name] = np.concatenate(
+                    (self[name], forcing.field(new["X"], new["Y"], new["Z"].values, name))
+                )
             else:  # Initialize to zero
                 self[name] = np.concatenate((self[name], np.zeros(nnew)))
         self.nnew = nnew
@@ -105,7 +111,7 @@ class State(Sized):
             self.ibm.update_ibm(grid, self, forcing)
 
         # Extension, allow inactive particles (not moved next time)
-        if 'active' in self.ibm_variables:
+        if "active" in self.ibm_variables:
             pass
             # self.active = self.ibm_variables['active']
         else:  # Default = active

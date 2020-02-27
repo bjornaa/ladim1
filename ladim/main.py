@@ -56,13 +56,14 @@ def main(config_stream, loglevel=logging.INFO):
     logging.info("Starting time loop")
     for step in range(config["numsteps"] + 1):
 
-        # --- Update forcing ---
-        forcing.update(step)
 
         # --- Particle release ---
         if step in releaser.steps:
             V = next(releaser)
-            state.append(V)
+            state.append(V, forcing)
+
+        # --- Update forcing ---
+        forcing.update(step)
 
         # --- Save to file ---
         # Save before or after update ???

@@ -38,7 +38,10 @@ def test_append() -> None:
     """Append to the state"""
     new = dict(pid=[1], X=[2.0], Y=[222.2], Z=[5], super=[1002], age=[0])
 
-    state.append(new)
+    state.append(new, forcing=None)
     assert len(state) == 2
     assert np.all(state.pid == np.array([0, 1]))
     assert np.all(state["X"] == np.array([10.2, 2.0]))
+
+# Make a test where new particles get initial temperature
+# from a forcing file

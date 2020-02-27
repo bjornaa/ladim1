@@ -1,7 +1,7 @@
 time_control:
     # Start and stop of simulation
     start_time     : 2015-03-31 00:00:00
-    stop_time      : 2015-04-02 12:00:00
+    stop_time      : 2015-04-10 23:00:00
     # reference_time is optional. default = start_time
     reference_time : 2015-01-01
 
@@ -12,6 +12,7 @@ files:
 
 gridforce:
     module: ladim.gridforce.ROMS
+    subgrid: [300, 500, 480, 600]
     input_file: /scratch/Data/NK800/file_*.nc
     ibm_forcing: [temp, salt]
 
@@ -31,7 +32,7 @@ ibm:
 
 particle_release:
     release_type: continuous
-    release_frequency: [60, s]  # Normally: [1, h]
+    release_frequency: [1, h]
     variables:
     - mult           # Number of particles released
     - release_time   # Time of release, formatted as yyyy-mm-ddThh:mm:ss
@@ -50,7 +51,7 @@ particle_release:
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
-    outper: [60, s]  # Normally: [1, h]
+    outper: [1, h]
     # Uncomment the entry below to split output file into daily files
     # numrec: 24
 
@@ -119,6 +120,6 @@ output_variables:
 
 numerics:
     # Model time step, [value, unit]
-    dt: [60, s]     # usually 120 on 160m NorFjords, 600 NorKyst, 1800 SVIM
+    dt: [600, s]     # usually 120 on 160m NorFjords, 600 NorKyst, 1800 SVIM
     advection: RK4  # either EF, RK2 or RK4 (recommended)
     diffusion: 1.0  # [m*2/s]
