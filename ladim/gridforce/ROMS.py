@@ -346,7 +346,7 @@ class Forcing:
                 all_frames.extend(new_frames)
 
         # Check that time frames are strictly sorted
-        all_frames = np.array(all_frames, dtype=np.datetime64)
+        all_frames = np.array([np.datetime64(tf) for tf in all_frames])
         I = all_frames[1:] <= all_frames[:-1]
         if np.any(I):
             i = I.nonzero()[0][0] + 1   # Index of first out-of-order frame
