@@ -5,6 +5,43 @@ import pytest
 from ladim.release import ParticleReleaser
 
 
+def releaser(conf, grid, text):
+    fname = conf['particle_release_file']
+    try:
+        with open(fname, 'w', encoding='utf-8-sig') as file:
+            file.write(text)
+        pr = ParticleReleaser(conf, grid)
+    finally:
+        os.remove(fname)
+    return pr
+
+
+@pytest.fixture()
+def minimal_config():
+    return dict(
+        start="cold",
+        dt=3600,
+        start_time=np.datetime64("2015-03-31 12"),
+        stop_time=np.datetime64("2015-04-04"),
+        particle_release_file="release.rls",
+        release_format=["release_time", "X", "Y"],
+        release_dtype=dict(release_time=np.datetime64, X=float, Y=float),
+        release_type="discrete",
+        particle_variables=[],
+    )
+
+
+class Test_Releaser:
+    def test_attr_total_particle_count_correct(self, minimal_config):
+        release_text = (
+            "2015-04-01T00 0 0\n"
+            "2015-04-01T01 0 0\n"
+            "2015-04-01T02 0 0\n"
+        )
+        pr = releaser(minimal_config, grid=None, text=release_text)
+        assert pr.total_particle_count == 3
+
+
 def test_discrete() -> None:
 
     # Make a minimal config object
