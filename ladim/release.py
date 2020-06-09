@@ -205,14 +205,14 @@ class ParticleReleaser(Iterator):
 
         # initital number of particles
         if config["start"] == "warm":
-            particles_released = [warm_particle_count]
+            init_released = warm_particle_count
         else:
-            particles_released = [0]
+            init_released = 0
+        particles_released = [init_released] + [len(df) for df in self._B]
 
         # Loop through the releases, collect particle variable data
         for t in self.times:
             V = next(self)
-            particles_released.append(particles_released[-1] + len(V))
             for name in config["particle_variables"]:
                 dtype = config["release_dtype"][name]
                 if dtype == np.datetime64:
