@@ -41,6 +41,20 @@ class Test_Releaser:
         pr = releaser(minimal_config, grid=None, text=release_text)
         assert pr.total_particle_count == 3
 
+    def test_attr_times_correct_when_simple_config(self, minimal_config):
+        release_text = (
+            "2015-04-01T00 0 0\n"
+            "2015-04-01T01 0 0\n"
+            "2015-04-01T02 0 0\n"
+        )
+        pr = releaser(minimal_config, grid=None, text=release_text)
+
+        assert pr.times.astype(str).tolist() == [
+            '2015-04-01T00:00:00.000000000',
+            '2015-04-01T01:00:00.000000000',
+            '2015-04-01T02:00:00.000000000',
+        ]
+
 
 def test_discrete() -> None:
 
