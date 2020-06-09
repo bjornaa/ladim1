@@ -208,7 +208,7 @@ class ParticleReleaser(Iterator):
             init_released = warm_particle_count
         else:
             init_released = 0
-        particles_released = [init_released] + [len(df) for df in self._B]
+        particles_released = [init_released] + [df['mult'].sum() for df in self._B]
 
         # Loop through the releases, collect particle variable data
         for t in self.times:

@@ -22,6 +22,7 @@ def minimal_config():
         start="cold",
         dt=3600,
         start_time=np.datetime64("2015-03-31 12"),
+        reference_time=np.datetime64("2015-03-31 12"),
         stop_time=np.datetime64("2015-04-04"),
         particle_release_file="release.rls",
         release_format=["release_time", "X", "Y"],
@@ -43,6 +44,15 @@ def mult_config(minimal_config):
 def lonlat_config(minimal_config):
     c = minimal_config.copy()
     c['release_format'] = ['release_time', 'lat', 'lon']
+    return c
+
+
+@pytest.fixture()
+def pvar_config(minimal_config):
+    c = minimal_config.copy()
+    c['release_format'] += ["pvar"]
+    c['release_dtype']['pvar'] = int
+    c['particle_variables'] = ['release_time', 'pvar']
     return c
 
 
@@ -115,6 +125,15 @@ class Test_Releaser:
         pr = releaser(mult_config, grid=None, text=release_text)
         assert pr.total_particle_count == 7
 
+    def test_correct_particles_released_when_mult(self, mult_config):
+        release_text = (
+            "1 2015-04-01T00 0 0\n"
+            "4 2015-04-01T01 0 0\n"
+            "2 2015-04-01T02 0 0\n"
+        )
+        pr = releaser(mult_config, grid=None, text=release_text)
+        assert pr.particles_released == [0, 1, 4, 2]
+
     def test_is_iterator_of_dataframes(self, minimal_config):
         release_text = (
             "2015-04-01T00 0 0\n"
@@ -153,6 +172,16 @@ class Test_Releaser:
 
         assert pr.total_particle_count == 4
         assert len(list_pr) == 2
+
+    def test_correct_particle_variables(self, pvar_config):
+        release_text = (
+            "2015-04-01T00:00 0 0 1\n"
+            "2015-04-01T00:00 0 0 2\n"
+            "2015-04-01T02:00 0 0 3\n"
+        )
+        pr = releaser(pvar_config, grid=None, text=release_text)
+        assert pr.particle_variables['pvar'].tolist() == [1, 2, 3]
+        assert pr.particle_variables['release_time'].tolist() == [43200, 43200, 50400]
 
 
 def test_discrete() -> None:
