@@ -81,6 +81,32 @@ class Test_Releaser:
         pr = releaser(mult_config, grid=None, text=release_text)
         assert pr.total_particle_count == 7
 
+    def test_is_iterator_of_dataframes(self, minimal_config):
+        release_text = (
+            "2015-04-01T00 0 0\n"
+            "2015-04-01T01 0 0\n"
+            "2015-04-01T02 0 0\n"
+        )
+        pr = releaser(minimal_config, grid=None, text=release_text)
+        pr_list = list(pr)
+        assert len(pr_list) == 3
+        assert isinstance(pr_list[0], pd.DataFrame)
+        assert list(pr_list[0].columns) == ['release_time', 'X', 'Y', 'pid']
+        assert list(pr_list[0].release_time) == [pd.Timestamp('2015-04-01 00')]
+
+    def notest_returns_one_dataframe_per_timestep(self, minimal_config):
+        release_text = (
+            "2015-04-01T00:00 0 0\n"
+            "2015-04-01T00:30 0 0\n"
+            "2015-04-01T00:45 0 0\n"
+            "2015-04-01T02:00 0 0\n"
+        )
+        pr = releaser(minimal_config, grid=None, text=release_text)
+        list_pr = list(pr)
+
+        assert pr.total_particle_count == 4
+        assert len(list_pr) == 2
+
 
 def test_discrete() -> None:
 
