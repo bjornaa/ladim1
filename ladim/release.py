@@ -211,19 +211,14 @@ class ParticleReleaser(Iterator):
         particles_released = [init_released] + [df['mult'].sum() for df in self._B]
 
         # Loop through the releases, collect particle variable data
-        for t in self.times:
-            V = next(self)
-            for name in config["particle_variables"]:
-                dtype = config["release_dtype"][name]
-                if dtype == np.datetime64:
-                    g = np.array(V[name]).astype("M8[s]")
-                    rtimes = g - config["reference_time"]
-                    rtimes = rtimes.astype(np.float64)
-                    pvars[name] = np.concatenate((pvars[name], rtimes))
-                else:
-                    pvars[name] = np.concatenate((pvars[name], V[name]))
+        mult = A['mult'].values
+        for name in config['particle_variables']:
+            val = np.repeat(A[name].values, mult)
+            if config['release_dtype'][name] == np.datetime64:
+                val = (val - config["reference_time"]) / np.timedelta64(1, 's')
+            pvars[name] = np.concatenate((pvars[name], val))
 
-        self.total_particle_count = warm_particle_count + self._particle_count
+        self.total_particle_count = warm_particle_count + np.sum(mult)
         self.particle_variables = pvars
         logging.info("Total particle count = {}".format(self.total_particle_count))
         self.particles_released = particles_released
