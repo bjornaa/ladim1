@@ -39,6 +39,13 @@ def mult_config(minimal_config):
     return c
 
 
+@pytest.fixture()
+def lonlat_config(minimal_config):
+    c = minimal_config.copy()
+    c['release_format'] = ['release_time', 'lat', 'lon']
+    return c
+
+
 class Test_Releaser:
     def test_attr_total_particle_count_correct_when_simple_config(self, minimal_config):
         release_text = (
@@ -72,6 +79,23 @@ class Test_Releaser:
         pr = releaser(minimal_config, grid=None, text=release_text)
 
         assert pr.steps.tolist() == [12, 13, 14]
+
+    def test_conversion_when_latlon(self, lonlat_config):
+        release_text = (
+            "2015-04-01T00 1 2\n"
+            "2015-04-01T01 3 4\n"
+            "2015-04-01T02 5 6\n"
+        )
+
+        class Grid:
+            @staticmethod
+            def ll2xy(lon, lat):
+                return 10*lon, 10*lat
+
+        pr = releaser(lonlat_config, grid=Grid(), text=release_text)
+        frame = pd.concat(list(pr))
+        assert frame['X'].values.tolist() == [20, 40, 60]
+        assert frame['Y'].values.tolist() == [10, 30, 50]
 
     def test_accepts_multiple_date_formats(self, minimal_config):
         release_text = (
