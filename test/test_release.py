@@ -104,6 +104,19 @@ class Test_Releaser:
         assert list(pr_list[0].columns) == ['release_time', 'X', 'Y', 'pid']
         assert list(pr_list[0].release_time) == [pd.Timestamp('2015-04-01 00')]
 
+    def test_returns_one_dataframe_per_timestep_if_mult(self, mult_config):
+        release_text = (
+            "1 2015-04-01T00 0 0\n"
+            "4 2015-04-01T01 0 0\n"
+            "2 2015-04-01T02 0 0\n"
+        )
+        pr = releaser(mult_config, grid=None, text=release_text)
+        assert len(pr.times) == 3
+        pr_list = list(pr)
+        assert len(pr_list) == 3
+        assert len(pr_list[0]) == 1
+        assert len(pr_list[1]) == 4
+
     def notest_returns_one_dataframe_per_timestep(self, minimal_config):
         release_text = (
             "2015-04-01T00:00 0 0\n"
