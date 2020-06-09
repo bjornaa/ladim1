@@ -31,8 +31,16 @@ def minimal_config():
     )
 
 
+@pytest.fixture()
+def mult_config(minimal_config):
+    c = minimal_config.copy()
+    c['release_format'] = ["mult"] + c['release_format']
+    c['release_dtype']['mult'] = int
+    return c
+
+
 class Test_Releaser:
-    def test_attr_total_particle_count_correct(self, minimal_config):
+    def test_attr_total_particle_count_correct_when_simple_config(self, minimal_config):
         release_text = (
             "2015-04-01T00 0 0\n"
             "2015-04-01T01 0 0\n"
@@ -54,6 +62,15 @@ class Test_Releaser:
             '2015-04-01T01:00:00.000000000',
             '2015-04-01T02:00:00.000000000',
         ]
+
+    def test_accepts_multiple_date_formats(self, minimal_config):
+        release_text = (
+            "2015-04-01T00 0 0\n"
+            '"2015-04-01 01" 0 0\n'
+            "2015-04-01 0 0\n"
+        )
+        pr = releaser(minimal_config, grid=None, text=release_text)
+        assert pr.total_particle_count == 3
 
 
 def test_discrete() -> None:
