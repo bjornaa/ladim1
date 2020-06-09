@@ -161,8 +161,13 @@ class ParticleReleaser(Iterator):
         if config["start"] == "warm":
             A = A[A.index > start_time]
 
-        # Release times
-        self.times = A["release_time"].unique()
+        # Compute which timestep the release should happen
+        timediff = A["release_time"] - config['start_time']
+        dt = np.timedelta64(config["dt"], 's')
+        rel_tstep = np.int32(timediff / dt)
+
+        # Release times, rounded to nearest time step
+        self.times = np.unique(config['start_time'] + rel_tstep * dt)
 
         logging.info("Number of release times = {}".format(len(self.times)))
 
@@ -173,7 +178,7 @@ class ParticleReleaser(Iterator):
 
         # Make dataframes for each timeframe
         # self._B = [x[1] for x in A.groupby('release_time')]
-        self._B = [x[1] for x in A.groupby(A.index)]
+        self._B = [x[1] for x in A.groupby(rel_tstep)]
 
         # Read the particle variables
         self._index = 0  # Index of next release
