@@ -72,6 +72,15 @@ class Test_Releaser:
         pr = releaser(minimal_config, grid=None, text=release_text)
         assert pr.total_particle_count == 3
 
+    def test_correct_particle_count_when_mult(self, mult_config):
+        release_text = (
+            "1 2015-04-01T00 0 0\n"
+            "4 2015-04-01T01 0 0\n"
+            "2 2015-04-01T02 0 0\n"
+        )
+        pr = releaser(mult_config, grid=None, text=release_text)
+        assert pr.total_particle_count == 7
+
 
 def test_discrete() -> None:
 
