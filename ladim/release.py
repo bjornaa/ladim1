@@ -161,8 +161,13 @@ class ParticleReleaser(Iterator):
         if config["start"] == "warm":
             A = A[A.index > start_time]
 
-        # Release times
-        self.times = A["release_time"].unique()
+        # Compute which timestep the release should happen
+        timediff = A["release_time"] - config['start_time']
+        dt = np.timedelta64(config["dt"], 's')
+        rel_tstep = np.int32(timediff / dt)
+
+        # Release times, rounded to nearest time step
+        self.times = np.unique(config['start_time'] + rel_tstep * dt)
 
         logging.info("Number of release times = {}".format(len(self.times)))
 
@@ -173,7 +178,7 @@ class ParticleReleaser(Iterator):
 
         # Make dataframes for each timeframe
         # self._B = [x[1] for x in A.groupby('release_time')]
-        self._B = [x[1] for x in A.groupby(A.index)]
+        self._B = [x[1] for x in A.groupby(rel_tstep)]
 
         # Read the particle variables
         self._index = 0  # Index of next release
@@ -200,25 +205,20 @@ class ParticleReleaser(Iterator):
 
         # initital number of particles
         if config["start"] == "warm":
-            particles_released = [warm_particle_count]
+            init_released = warm_particle_count
         else:
-            particles_released = [0]
+            init_released = 0
+        particles_released = [init_released] + [df['mult'].sum() for df in self._B]
 
         # Loop through the releases, collect particle variable data
-        for t in self.times:
-            V = next(self)
-            particles_released.append(particles_released[-1] + len(V))
-            for name in config["particle_variables"]:
-                dtype = config["release_dtype"][name]
-                if dtype == np.datetime64:
-                    g = np.array(V[name]).astype("M8[s]")
-                    rtimes = g - config["reference_time"]
-                    rtimes = rtimes.astype(np.float64)
-                    pvars[name] = np.concatenate((pvars[name], rtimes))
-                else:
-                    pvars[name] = np.concatenate((pvars[name], V[name]))
+        mult = A['mult'].values
+        for name in config['particle_variables']:
+            val = np.repeat(A[name].values, mult)
+            if config['release_dtype'][name] == np.datetime64:
+                val = (val - config["reference_time"]) / np.timedelta64(1, 's')
+            pvars[name] = np.concatenate((pvars[name], val))
 
-        self.total_particle_count = warm_particle_count + self._particle_count
+        self.total_particle_count = warm_particle_count + np.sum(mult)
         self.particle_variables = pvars
         logging.info("Total particle count = {}".format(self.total_particle_count))
         self.particles_released = particles_released
