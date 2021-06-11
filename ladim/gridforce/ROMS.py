@@ -349,8 +349,8 @@ class Forcing:
         all_frames = np.array([np.datetime64(tf) for tf in all_frames])
         I = all_frames[1:] <= all_frames[:-1]
         if np.any(I):
-            i = I.nonzero()[0][0] + 1   # Index of first out-of-order frame
-            oooframe = str(all_frames[i]).split('.')[0]  # Remove microseconds
+            i = I.nonzero()[0][0] + 1  # Index of first out-of-order frame
+            oooframe = str(all_frames[i]).split(".")[0]  # Remove microseconds
             logging.info(f"Time frame {i} = {oooframe} out of order")
             logging.critical("Forcing time frames not strictly sorted")
             raise SystemExit(4)
