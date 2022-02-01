@@ -546,7 +546,6 @@ class Forcing:
 #      https://github.com/bjornaa/roppy
 # ----------------------------------------------
 
-
 def s_stretch(N, theta_s, theta_b, stagger="rho", Vstretching=1):
     """Compute a s-level stretching array
 
@@ -558,16 +557,21 @@ def s_stretch(N, theta_s, theta_b, stagger="rho", Vstretching=1):
 
     *stagger* : "rho"|"w"
 
-    *Vstretching* : 1|2|4
+    *Vstretching* : 1|2|3|4|5
 
     """
 
+    # if stagger == "rho":
+    #     S = -1.0 + (0.5 + np.arange(N)) / N
+    # elif stagger == "w":
+    #     S = np.linspace(-1.0, 0.0, N + 1)
     if stagger == "rho":
-        S = -1.0 + (0.5 + np.arange(N)) / N
+        K = np.arange(0.5, N)
     elif stagger == "w":
-        S = np.linspace(-1.0, 0.0, N + 1)
+        K = np.arange(N + 1)
     else:
         raise ValueError("stagger must be 'rho' or 'w'")
+    S = -1 + K / N
 
     if Vstretching == 1:
         cff1 = 1.0 / np.sinh(theta_s)
@@ -576,21 +580,38 @@ def s_stretch(N, theta_s, theta_b, stagger="rho", Vstretching=1):
             cff2 * np.tanh(theta_s * (S + 0.5)) - 0.5
         )
 
-    if Vstretching == 2:
+    elif Vstretching == 2:
         a, b = 1.0, 1.0
         Csur = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
         Cbot = np.sinh(theta_b * (S + 1)) / np.sinh(theta_b) - 1
         mu = (S + 1) ** a * (1 + (a / b) * (1 - (S + 1) ** b))
         return mu * Csur + (1 - mu) * Cbot
 
-    if Vstretching == 4:
+    elif Vstretching == 3:
+        gamma_ = 3.0
+        Csur = -np.log(np.cosh(gamma_ * (-S) ** theta_s)) / np.log(np.cosh(gamma_))
+        Cbot = (
+            np.log(np.cosh(gamma_ * (S + 1) ** theta_b)) / np.log(np.cosh(gamma_)) - 1
+        )
+        mu = 0.5 * (1 - np.tanh(gamma_ * (S + 0.5)))
+        return mu * Csur + (1 - mu) * Cbot
+
+    elif Vstretching == 4:
         C = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
         C = (np.exp(theta_b * C) - 1) / (1 - np.exp(-theta_b))
         return C
 
-    # else:
-    raise ValueError("Unknown Vstretching")
+    elif Vstretching == 5:
+        S1 = (K * K - 2 * K * N + K + N * N - N) / (N * N - N)
+        S2 = (K * K - K * N) / (1 - N)
+        S = -S1 - 0.01 * S2
 
+        C = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
+        C = (np.exp(theta_b * C) - 1) / (1 - np.exp(-theta_b))
+        return C
+
+    else:
+        raise
 
 def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     """Return depth of rho-points in s-levels
