@@ -12,7 +12,7 @@ from postladim import ParticleFile
 tstep = 40  # Time step to show
 # Output file (and type)
 outfile = "line_bokeh.png"
-#outfile = "line_bokeh.html"
+# outfile = "line_bokeh.html"
 scale = 3  # Figure size factor
 
 # --- Data files ---
@@ -34,7 +34,7 @@ with Dataset(grid_file) as f:
     H = f.variables["h"][:, :]
     M = f.variables["mask_rho"][:, :]
 jmax, imax = M.shape
-H[M < 1] = np.nan   # Mask out land
+H[M < 1] = np.nan  # Mask out land
 
 # --- Plot ---
 
@@ -50,7 +50,7 @@ p = figure(
 #   Take logarithm to show details in shallow part,
 #   Minus to make colours darker with increasing depth
 p.image(
-    image=[-np.log(H)], x=-0.5, y=-0.5, dw=imax, dh=jmax, palette='Blues8', alpha=0.7
+    image=[-np.log(H)], x=-0.5, y=-0.5, dw=imax, dh=jmax, palette="Blues8", alpha=0.7
 )
 
 # Particle distribution
@@ -62,4 +62,4 @@ if outfile.endswith("png"):
     p.toolbar_location = None
     bokeh.io.export_png(p, outfile)
 else:
-    bokeh.io.save(p, filename=outfile, title='', resources=bokeh.resources.CDN)
+    bokeh.io.save(p, filename=outfile, title="", resources=bokeh.resources.CDN)

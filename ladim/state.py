@@ -85,7 +85,10 @@ class State(Sized):
             elif name in self.ibm_forcing:
                 # Take values as Z must be a numpy array
                 self[name] = np.concatenate(
-                    (self[name], forcing.field(new["X"], new["Y"], new["Z"].values, name))
+                    (
+                        self[name],
+                        forcing.field(new["X"], new["Y"], new["Z"].values, name),
+                    )
                 )
             else:  # Initialize to zero
                 self[name] = np.concatenate((self[name], np.zeros(nnew)))

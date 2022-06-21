@@ -8,7 +8,7 @@ time_control:
     # Start of simulation
     start_time: 1989-05-24 12:00:00
     # End of simulation
-    stop_time:  1989-06-05T12
+    stop_time:  1989-06-20T00
     # Reference time for netcdf output
     # this is optional, by default equal to start_time
     reference_time: 1970-01-01 00

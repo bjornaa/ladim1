@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name="LADiM",
-    version="1.1",
+    version="1.2",
     description="Lagrangian Advection and Diffusion Model",
     author="Bjørn Ådlandsvik",
     author_email="bjorn@imr.no",

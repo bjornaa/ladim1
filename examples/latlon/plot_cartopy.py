@@ -5,7 +5,7 @@ from netCDF4 import Dataset
 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-from roppy.mpl_util import LevelColormap
+#from roppy.mpl_util import LevelColormap
 
 from postladim import ParticleFile
 
