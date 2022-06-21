@@ -34,7 +34,7 @@ If you do not have python 3.6 on your machine, the `anaconda <https://www.anacon
 LADiM is hosted on `github <https://github.com/bjornaa/ladim>`_, download by
 the command::
 
-  git clone https://github.com/bjornaa/ladim.git
+  git clone https://github.com/bjornaa/ladim1.git
 
 if you don't have :program:`git` installed, download and unzip the zip-file
 from the LADiM site above.

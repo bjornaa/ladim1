@@ -52,7 +52,7 @@ The options are:
 
 .. option:: config_file
 
-   Name of optional configuration file, default = :file:`ladim.yaml`
+   Name of optional configuration file, default = :file:`ladim1.yaml`
 
 Running LADiM from python
 -------------------------
@@ -61,8 +61,8 @@ LADiM can be run inside a python program. This is done by::
 
   import ladim
   #  ... more lines ...
-  with open('ladim.yaml') as fid:
-      ladim.main(config_stream=fid)
+  with open('ladim1.yaml') as fid:
+      ladim1.main(config_stream=fid)
 
 The main LADiM script, :file:`scripts/ladim`, uses this approach. The
 :file:`jupyter` example shows how to use this with a triple quoted text string

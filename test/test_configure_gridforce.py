@@ -2,7 +2,7 @@ from io import StringIO
 import yaml
 
 import pytest
-from ladim.configuration import configure_gridforce
+from ladim1.configuration import configure_gridforce
 
 
 def test_no_gridforce():
@@ -56,7 +56,7 @@ def test_backwards_grid_file():
     input = StringIO(
         """
         gridforce:
-            module: ladim.gridforce.ROMS.py
+            module: ladim1.gridforce.ROMS.py
         files:
             grid_file: grid.nc
             input_file: history.nc

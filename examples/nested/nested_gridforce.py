@@ -1,8 +1,8 @@
 import copy
 import numpy as np
 from netCDF4 import Dataset
-from ladim.gridforce import ROMS
-from ladim.sample import sample2D
+from ladim1.gridforce import ROMS
+from ladim1.sample import sample2D
 
 
 class Grid(object):

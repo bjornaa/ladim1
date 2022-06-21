@@ -26,5 +26,5 @@ The model code is available under the `MIT license
 <https://opensource.org/licenses/MIT>`_, and is hosted on github,
 `https://github.com/bjornaa/ladim <https://github.com/bjornaa/ladim>`_. This
 documentation is hosted on `Read the Docs
-<https://ladim.readthedocs.io/en/master>`_. A `pdf version
-<https://media.readthedocs.org/pdf/ladim/master/ladim.pdf>`_ is also available.
+<https://ladim1.readthedocs.io/en/master>`_. A `pdf version
+<https://media.readthedocs.org/pdf/ladim/master/ladim1.pdf>`_ is also available.

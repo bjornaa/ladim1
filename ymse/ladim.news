@@ -60,7 +60,7 @@ Bruk `source activate ladim1.0` for å få tak i denne.
    for å kjøre LADiM fra en jupyter notebook. Se example/jupyter. Takk til Pål
    for denne måten å gjøre det på.
 
-9. Forenkling av postladim. Å ta ut data fra partikkelfil ved tidspunkt n er nå
+9. Forenkling av postladim1. Å ta ut data fra partikkelfil ved tidspunkt n er nå
    forenklet. I stedet for å skrive pf.variables['X'][n], er det nå nok å
    skrive pf['X'][n]. Alle eksempler skal være oppdatert til denne notasjonen.
    Den gamle måten er avlegs (obsolete) men virker fremdeles. Det er og innført

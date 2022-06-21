@@ -1,55 +1,41 @@
-
+#
 # Configuration file for ladim
 #
 # Line source example
 #
 
 time_control:
-    # Start and stop of simulation
-    # start_time: 1989-06-03 09
+    # Start of simulation
     start_time: 1989-05-24 12:00:00
-    # stop_time:  1989-06-15 12:00:00
-    stop_time:  1989-06-05T12
+    # End of simulation
+    stop_time:  1989-06-20T00
     # Reference time for netcdf output
-    # by default set to start_time
+    # this is optional, by default equal to start_time
     reference_time: 1970-01-01 00
 
 files:
-    grid_file             : ../data/ocean_avg_0014.nc
-    input_file            : ../data/ocean_avg_*.nc
-    particle_release_file : outline.rls
-    output_file           : outline.nc
-    # warm_start_file       : a4.nc
-
-state:
-    # pid, X, Y, Z are mandatory and should not be given
-    # Ingen, kan bruke [] eller kutte linjen
-    # [lon, lat]
-    # ibm_variables: []
+    particle_release_file : line.rls
+    output_file           : line.nc
+    # With warm start, warm_start_file goes here
 
 particle_release:
     variables: [release_time, X, Y, Z]
     # Converters (if not float)
-    # mult: int
     release_time: time
-    # farmid: int
+    # Time-independent variables,
     particle_variables: [release_time]
 
 gridforce:
+    # Content depend on the selected gridforce module
     # Gridforce module
-    module: ladim.gridforce.ROMS
-    grid:
-        subgrid: [50, 150, 50, 100]
+    module: ladim1.gridforce.ROMS
+    # The grid file is now optional, defaults to first input file
+    input_file            : ../data/ocean_avg_*.nc
 
 output_variables:
     # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET
     # format: NETCDF3_64BIT_DATA
     format: NETCDF3_CLASSIC
-
-    # Records per file
-    # Default = 0 meaning unlimited i.e. only one (unnumbered) output file
-    # numrec: 20
-
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Variable names
@@ -79,7 +65,7 @@ numerics:
     # Advection method: options =
     #        EF = Euler-Forward,
     #        RK2, RK4 = Runge-Kutta 2nd or 4th order
-    advection: RK4
+    advection: EF
     # Horizontal diffusion coefficient [m2.s-1]
     #         zero = no diffusion
     diffusion: 0.0

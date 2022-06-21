@@ -46,7 +46,7 @@ cmap = plt.get_cmap("Blues")
 ax.contourf(Xcell, Ycell, H, cmap=cmap, alpha=0.3)
 
 # Lon/lat lines
-ax.contour(Xcell, Ycell, lat, levels=range(57, 64), colors="black", linestyles=":")
+ax.contour(Xcell, Ycell, lat, levels=range(56, 64), colors="black", linestyles=":")
 ax.contour(Xcell, Ycell, lon, levels=range(-4, 10, 2), colors="black", linestyles=":")
 
 # Landmask
@@ -57,15 +57,18 @@ plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 # Plot initial particle distribution
 X, Y = pf.position(0)
 (particle_dist,) = ax.plot(X, Y, ".", color="red", markeredgewidth=0, lw=0.5)
-# title = ax.set_title(pf.time(0))
-timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15, transform=ax.transAxes)
+
+def time(t):
+    return pf.time[t].values.astype('M8[h]')
+
+timestamp = ax.text(0.01, 0.96, time(0), fontsize=15, transform=ax.transAxes)
 
 
 # Update function
 def animate(t):
     X, Y = pf.position(t)
     particle_dist.set_data(X, Y)
-    timestamp.set_text(pf.time(t))
+    timestamp.set_text(time(t))
     return particle_dist, timestamp
 
 

@@ -12,9 +12,9 @@ Unmodified use
 --------------
 
 The simplest workflow is to simply use the installed LADiM. Use a work
-directory, copy and modify a ``ladim.yaml`` file to point to your input files
+directory, copy and modify a ``ladim1.yaml`` file to point to your input files
 and adjust the simulation time and other settings. Run the simulation by the
-command ladim.
+command ladim1.
 
 The configuration file can be renamed and saved to make the model simulation
 reproducible. To run LADiM with a named configuration file, give the
@@ -73,7 +73,7 @@ The conda solution is described below.
 
 The ``git`` part is set up by::
 
-  git clone https://github.com/bjornaa/ladim.git
+  git clone https://github.com/bjornaa/ladim1.git
   cd ladim
   git branch mydevelop
   git checkout mydevelop

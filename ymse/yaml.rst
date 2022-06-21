@@ -18,7 +18,7 @@ rundt tekststrenger.
 Bruk i LADiM
 ------------
 
-Default navn på konfigurasjonsfilen er ``ladim.yaml``, men navnet kan være hva
+Default navn på konfigurasjonsfilen er ``ladim1.yaml``, men navnet kan være hva
 som helst. Bruk da ``ladim <navn på konfig-fil>`` fra kommandolinje.
 
 Den definitive beskrivelsen av formatet er i leserutinen
@@ -157,7 +157,7 @@ Felt::
   grid:     optional
 
 module gir python-modulen for grid-forcing. Kan bruke dot-notasjon
-ladim.gridforce.ROMS for moduler i "standard" LADiM. Kan bruke navn for python
+ladim1.gridforce.ROMS for moduler i "standard" LADiM. Kan bruke navn for python
 modul navn.py i arbeidskatalogen.
 
 ibm_forcing er variable som skal leses inn for IBM. F.eks. temperatur og salt.
@@ -179,7 +179,7 @@ Denne seksjonen er opional og har bare et felt::
 
   ibm_module: optional
 
-Enten dot-navn som ladim.ibms.ibm_salmon_lice for ferdig installert IBM. For
+Enten dot-navn som ladim1.ibms.ibm_salmon_lice for ferdig installert IBM. For
 lokal IBM i arbeidskatalog bare bruk navn for navn.py
 
 KOMMENTAR:
@@ -246,6 +246,3 @@ KOMMENTAR:
 Ønske om å kunne ha inn variabel diffusivitet i rom og tid. Kan
 f.eks. ha inn et filnavn for å hente. Evt. beregne utfra turbulensverdier i
 havmodellen. Litt vanskelig å finne noe generelt å ha her.
-
-
-

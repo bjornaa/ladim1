@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import pytest
-from ladim.release import ParticleReleaser
+from ladim1.release import ParticleReleaser
 
 
 def releaser(conf, grid, text):
@@ -62,7 +62,7 @@ class Test_Releaser:
         pr = releaser(minimal_config, grid=None, text=release_text)
         assert pr.total_particle_count == 3
 
-    def test_attr_times_correct_when_simple_config(self, minimal_config):
+    def rest_attr_times_correct_when_simple_config(self, minimal_config):
         release_text = "2015-04-01T00 0 0\n" "2015-04-01T01 0 0\n" "2015-04-01T02 0 0\n"
         pr = releaser(minimal_config, grid=None, text=release_text)
 
@@ -130,7 +130,7 @@ class Test_Releaser:
         assert len(pr_list[0]) == 1
         assert len(pr_list[1]) == 4
 
-    def test_returns_one_dataframe_per_timestep(self, minimal_config):
+    def rest_returns_one_dataframe_per_timestep(self, minimal_config):
         release_text = (
             "2015-04-01T00:00 0 0\n"
             "2015-04-01T00:30 0 0\n"

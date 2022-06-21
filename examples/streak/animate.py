@@ -64,13 +64,15 @@ plt.pcolormesh(Xb, Yb, M, cmap=constmap)
 X, Y = pf.position(0)
 pids = pf["pid"][0]
 
+def time(t):
+    return pf.time[t].values.astype('M8[h]')
 
 C = age(0)
 vmax = pf.num_times / 6  # Maximum particle age in days
 pdistr = ax.scatter(X, Y, c=C, vmin=0, vmax=vmax, cmap=plt.get_cmap("plasma_r"))
 cb = plt.colorbar(pdistr)
 cb.set_label("Particle age [days]", fontsize=14)
-timestamp = ax.text(0.01, 0.97, pf.time(0), fontsize=15, transform=ax.transAxes)
+timestamp = ax.text(0.01, 0.97, time(0), fontsize=15, transform=ax.transAxes)
 
 
 # Update function
@@ -80,7 +82,7 @@ def animate(t):
     # Particle age in days
     C = age(t)
     pdistr.set_array(C)
-    timestamp.set_text(pf.time(t))
+    timestamp.set_text(time(t))
     return pdistr, timestamp
 
 

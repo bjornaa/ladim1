@@ -20,7 +20,7 @@ The results can be shown as an animation by::
 
 
 Experiment with the settings in ``make_release.py`` to change the initial
-condition and ``ladim.yaml`` for the simulation.
+condition and ``ladim1.yaml`` for the simulation.
 
 There are different visualizations, ``plot_distribution.py`` plots the particle
 distribution at a given time, ``plot_cellcount.py`` counts particles in the

@@ -57,16 +57,16 @@ ladim  11.84s user 0.20s, 6.6% og 0.2%)
 # Profilerer
 # ----------------------------
 
-python -m cProfile -o ladim.prof /opt/anaconda/bin/ladim
+python -m cProfile -o ladim1.prof /opt/anaconda/bin/ladim
 
 i ipython:
   import pstats
-  p = pstats.Stats('ladim.prof')
+  p = pstats.Stats('ladim1.prof')
   p.strip_dirs().sort_stats('cumulative').print_stats(12)
 
 Med standard kjøring gir dette:
 
-Thu Feb  9 14:01:22 2017    ladim.prof
+Thu Feb  9 14:01:22 2017    ladim1.prof
 
          238391 function calls (235195 primitive calls) in 217.353 seconds
 

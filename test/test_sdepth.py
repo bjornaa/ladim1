@@ -10,7 +10,7 @@
 import unittest
 import numpy as np
 
-from ladim.gridforce.ROMS import sdepth, s_stretch, z2s
+from ladim1.gridforce.ROMS import sdepth, s_stretch, z2s
 
 
 # ------------------------------------

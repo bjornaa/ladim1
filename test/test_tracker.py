@@ -1,7 +1,7 @@
 import numpy as np
-from ladim.state import State
+from ladim1.state import State
 
-# from ladim.tracker import Tracker
+# from ladim1.tracker import Tracker
 
 
 class Grid:
@@ -52,7 +52,7 @@ def test_out_of_area():
         start_time=np.datetime64("2017-02-10 20"),
         dt=600,
         particle_variables=[],
-        ibm_module="ladim.ibms.ibm_salmon_lice",
+        ibm_module="ladim1.ibms.ibm_salmon_lice",
         ibm_variables=["super", "age"],
         advection="EF",
         diffusion=False,

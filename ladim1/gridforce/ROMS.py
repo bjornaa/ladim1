@@ -15,7 +15,8 @@ import glob
 import logging
 import numpy as np
 from netCDF4 import Dataset, num2date
-from ladim.sample import sample2D
+
+from ladim1.sample import sample2D, bilin_inv
 
 
 class Grid:
@@ -33,13 +34,23 @@ class Grid:
 
     def __init__(self, config):
 
-        logging.info("Initializing zROMS grid object")
+        logging.info("Initializing ROMS-type grid object")
+
+        # Grid file
+        if "grid_file" in config["gridforce"]:
+            grid_file = config["gridforce"]["grid_file"]
+        elif "input_file" in config["gridforce"]:
+            files = glob.glob(config["gridforce"]["input_file"])
+            files.sort()
+            grid_file = files[0]
+        else:
+            logging.error("No grid file specified")
+            raise SystemExit(1)
+
         try:
-            ncid = Dataset(config["gridforce"]["grid_file"])
+            ncid = Dataset(grid_file)
         except OSError:
-            logging.error(
-                "Grid file {} not found".format(config["gridforce"]["grid_file"])
-            )
+            logging.error("Could not open grid file " + grid_file)
             raise SystemExit(1)
 
         # Subgrid, only considers internal grid cells
@@ -79,9 +90,39 @@ class Grid:
         self.Iv = self.I
         self.Jv = slice(self.j0 - 1, self.j1)
 
-        # Vertical z-levels
-        # self.z_levels = ncid.variables['zlevels'][:]
-        self.z_levels = np.array([0, 1, 2, 3, 5, 10, 15, 20])
+        # Vertical grid
+
+        if "Vinfo" in config["gridforce"]:
+            Vinfo = config["gridforce"]["Vinfo"]
+            self.N = Vinfo["N"]
+            self.hc = Vinfo["hc"]
+            self.Vstretching = Vinfo.get("Vstretching", 1)
+            self.Vtransform = Vinfo.get("Vtransform", 1)
+            self.Cs_r = s_stretch(
+                self.N,
+                Vinfo["theta_s"],
+                Vinfo["theta_b"],
+                stagger="rho",
+                Vstretching=self.Vstretching,
+            )
+            self.Cs_w = s_stretch(
+                self.N,
+                Vinfo["theta_s"],
+                Vinfo["theta_b"],
+                stagger="w",
+                Vstretching=self.Vstretching,
+            )
+
+        else:
+            self.hc = ncid.variables["hc"].getValue()
+            self.Cs_r = ncid.variables["Cs_r"][:]
+            self.Cs_w = ncid.variables["Cs_w"][:]
+            self.N = len(self.Cs_r)
+            # Vertical transform
+            try:
+                self.Vtransform = ncid.variables["Vtransform"].getValue()
+            except KeyError:
+                self.Vtransform = 1  # Default = old way
 
         # Read some variables
         self.H = ncid.variables["h"][self.J, self.I]
@@ -92,11 +133,14 @@ class Grid:
         self.dy = 1.0 / ncid.variables["pn"][self.J, self.I]
         self.lon = ncid.variables["lon_rho"][self.J, self.I]
         self.lat = ncid.variables["lat_rho"][self.J, self.I]
+        self.angle = ncid.variables["angle"][self.J, self.I]
 
-        # self.z_r = sdepth(self.H, self.hc, self.Cs_r,
-        #                  stagger='rho', Vtransform=self.Vtransform)
-        # self.z_w = sdepth(self.H, self.hc, self.Cs_w,
-        #                  stagger='w', Vtransform=self.Vtransform)
+        self.z_r = sdepth(
+            self.H, self.hc, self.Cs_r, stagger="rho", Vtransform=self.Vtransform
+        )
+        self.z_w = sdepth(
+            self.H, self.hc, self.Cs_w, stagger="w", Vtransform=self.Vtransform
+        )
 
         # Land masks at u- and v-points
         M = self.M
@@ -137,19 +181,19 @@ class Grid:
         """Return the longitude and latitude from grid coordinates"""
         if method == "bilinear":  # More accurate
             return self.xy2ll(X, Y)
-        else:  # containing grid cell, less accurate
-            I = X.round().astype("int") - self.i0
-            J = Y.round().astype("int") - self.j0
-            return self.lon[J, I], self.lat[J, I]
+        # else: containing grid cell, less accurate
+        I = X.round().astype("int") - self.i0
+        J = Y.round().astype("int") - self.j0
+        return self.lon[J, I], self.lat[J, I]
 
-        return (
-            sample2D(self.lon, X - self.i0, Y - self.j0),
-            sample2D(self.lat, X - self.i0, Y - self.j0),
-        )
-
-    def ingrid(self, X, Y):
+    def ingrid(self, X: np.ndarray, Y: np.ndarray) -> np.ndarray:
         """Returns True for points inside the subgrid"""
-        return (self.xmin < X) & (X < self.xmax) & (self.ymin < Y) & (Y < self.ymax)
+        return (
+            (self.xmin + 0.5 < X)
+            & (X < self.xmax - 0.5)
+            & (self.ymin + 0.5 < Y)
+            & (Y < self.ymax - 0.5)
+        )
 
     def onland(self, X, Y):
         """Returns True for points on land"""
@@ -191,118 +235,31 @@ class Forcing:
         logging.info("Initiating forcing")
 
         self._grid = grid  # Get the grid object, make private?
-
+        # self.config = config["gridforce"]
         self.ibm_forcing = config["ibm_forcing"]
 
-        # Test for glob, use MFDataset if needed
-        files = glob.glob(config["gridforce"]["input_file"])
-        files.sort()
+        files = self.find_files(config["gridforce"])
         numfiles = len(files)
         if numfiles == 0:
             logging.error("No input file: {}".format(config["gridforce"]["input_file"]))
             raise SystemExit(3)
         logging.info("Number of forcing files = {}".format(numfiles))
 
-        # ----------------------------------------
-        # Open first file for some general info
-        # must be valid for all the files
-        # ----------------------------------------
-
-        with Dataset(files[0]) as nc:
-
-            # time_units = nc.variables['ocean_time'].units
-            time_units = nc.variables["time"].units
-
-            self.scaled = dict()
-            self.scale_factor = dict()
-            self.add_offset = dict()
-
-            if hasattr(nc.variables["u"], "scale_factor"):
-                self.scaled["U"] = True
-                self.scale_factor["U"] = np.float32(nc.variables["u"].scale_factor)
-                self.add_offset["U"] = np.float32(nc.variables["u"].add_offset)
-                self.scaled["V"] = True
-                self.scale_factor["V"] = np.float32(self.scale_factor["U"])
-                self.add_offset["V"] = np.float32(self.add_offset["U"])
-            else:
-                self.scaled["U"] = False
-                self.scaled["V"] = False
-
-            for key in self.ibm_forcing:
-                if hasattr(nc.variables[key], "scale_factor"):
-                    self.scaled[key] = True
-                    self.scale_factor[key] = np.float32(nc.variables[key].scale_factor)
-                    self.add_offset[key] = np.float32(nc.variables[key].add_offset)
-                else:
-                    self.scaled[key] = False
-
         # ---------------------------
         # Overview of all the files
         # ---------------------------
 
-        times = []  # list of times of all frames
-        num_frames = []  # Available time frames in each file
-        # change_times = []     # Times for change of file
-        for fname in files:
-            print(fname)
-            with Dataset(fname) as nc:
-                # new_times = nc.variables['ocean_time'][:]
-                new_times = nc.variables["time"][:]
-                times.extend(new_times)
-                num_frames.append(len(new_times))
-        logging.info("Number of available forcing times = {:d}".format(len(times)))
-
-        # Find first/last forcing times
-        # -----------------------------
-        time0 = num2date(times[0], time_units)
-        time1 = num2date(times[-1], time_units)
-        logging.info("time0 = {}".format(str(time0)))
-        logging.info("time1 = {}".format(str(time1)))
-        # print(time0)
-        # print(time1)
-        start_time = np.datetime64(config["start_time"])
-        # self.time = start_time
-        self.dt = np.timedelta64(int(config["dt"]), "s")  # or use
-
-        # Check that forcing period covers the simulation period
-        # ------------------------------------------------------
-        # Use logging module for this
-
-        if time0 > start_time:
-            logging.error("No forcing at start time")
-            raise SystemExit(3)
-        if time1 < config["stop_time"]:
-            logging.error("No forcing at stop time")
-            raise SystemExit(3)
-
-        # Make a list steps of the forcing time steps
-        # --------------------------------------------
-        steps = []  # Model time step of forcing
-        for t in times:
-            # print(num2date(t, time_units), t)
-            otime = np.datetime64(str(num2date(t, time_units)))
-            dtime = np.timedelta64(otime - start_time, "s").astype(int)
-            steps.append(int(dtime / config["dt"]))
-
-        # print(steps)
-
-        # change_steps = [steps[t] for t in change_times]
-
-        file_idx = dict()
-        frame_idx = dict()
-        step_counter = -1
-        for i, fname in enumerate(files):
-            for frame in range(num_frames[i]):
-                step_counter += 1
-                step = steps[step_counter]
-                # print(step_counter, step, i, frame)
-                file_idx[step] = i
-                frame_idx[step] = frame
+        all_frames, num_frames = self.scan_file_times(files)
+        steps, file_idx, frame_idx = self.forcing_steps(
+            config, files, all_frames, num_frames
+        )
 
         self._files = files
+        # self.stepdiff = stepdiff
         self.stepdiff = np.diff(steps)
         self.file_idx = file_idx
         self.frame_idx = frame_idx
+        self._nc = None
 
         # Read old input
         # requires at least one input before start
@@ -310,6 +267,7 @@ class Forcing:
         # --------------
         # prestep = last forcing step < 0
         #
+
         V = [step for step in steps if step < 0]
         if V:  # Forcing available before start time
             prestep = max(V)
@@ -331,11 +289,12 @@ class Forcing:
 
         elif steps[0] == 0:
             # Simulation start at first forcing time
+            # Runge-Kutta needs dU and dV in this case as well
             self.U, self.V = self._read_velocity(0)
             self.Unew, self.Vnew = self._read_velocity(steps[1])
             self.dU = (self.Unew - self.U) / steps[1]
             self.dV = (self.Vnew - self.V) / steps[1]
-            # Syncronize
+            # Synchronize with start time
             self.Unew = self.U
             self.Vnew = self.V
             # Extrapolate to time step = -1
@@ -348,8 +307,95 @@ class Forcing:
                 self["d" + name] = (self[name + "new"] - self[name]) / steps[1]
                 self[name] = self[name] - self["d" + name]
 
+        else:
+            # No forcing at start, should already be excluded
+            raise SystemExit(3)
+
         self.steps = steps
         self._files = files
+
+    # ===================================================
+    @staticmethod
+    def find_files(force_config):
+        """Find (and sort) the forcing file(s)"""
+        files = glob.glob(force_config["input_file"])
+        files.sort()
+        if force_config.get("first_file", None):
+            files = [f for f in files if f >= force_config["first_file"]]
+        if force_config.get("last_file", None):
+            files = [f for f in files if f <= force_config["last_file"]]
+        return files
+
+    @staticmethod
+    def scan_file_times(files):
+        """Check files and scan the times
+
+        Returns:
+          all_frames: List of all time frames
+          num_frames: Mapping: filename -> number of time frames in file
+
+        """
+        all_frames = []  # All time frames
+        num_frames = {}  # Number of time frames in each file
+        for fname in files:
+            with Dataset(fname) as nc:
+                new_times = nc.variables["ocean_time"][:]
+                num_frames[fname] = len(new_times)
+                units = nc.variables["ocean_time"].units
+                new_frames = num2date(new_times, units)
+                all_frames.extend(new_frames)
+
+        # Check that time frames are strictly sorted
+        all_frames = np.array([np.datetime64(tf) for tf in all_frames])
+        I = all_frames[1:] <= all_frames[:-1]
+        if np.any(I):
+            i = I.nonzero()[0][0] + 1  # Index of first out-of-order frame
+            oooframe = str(all_frames[i]).split(".")[0]  # Remove microseconds
+            logging.info(f"Time frame {i} = {oooframe} out of order")
+            logging.critical("Forcing time frames not strictly sorted")
+            raise SystemExit(4)
+
+        logging.info(f"Number of available forcing times = {len(all_frames)}")
+        return all_frames, num_frames
+
+    @staticmethod
+    def forcing_steps(config, files, all_frames, num_frames):
+
+        time0 = all_frames[0]
+        time1 = all_frames[-1]
+        logging.info(f"First forcing time = {time0}")
+        logging.info(f"Last forcing time = {time1}")
+        start_time = np.datetime64(config["start_time"])
+        dt = np.timedelta64(int(config["dt"]), "s")
+
+        # Check that forcing period covers the simulation period
+        # ------------------------------------------------------
+
+        if time0 > start_time:
+            logging.error("No forcing at start time")
+            raise SystemExit(3)
+        if time1 < config["stop_time"]:
+            logging.error("No forcing at stop time")
+            raise SystemExit(3)
+
+        # Make a list steps of the forcing time steps
+        # --------------------------------------------
+        steps = []  # Model time step of forcing
+        for t in all_frames:
+            dtime = np.timedelta64(t - start_time, "s").astype(int)
+            steps.append(int(dtime / config["dt"]))
+
+        file_idx = dict()  # Dårlig navn
+        frame_idx = dict()
+        step_counter = -1
+        # for i, fname in enumerate(files):
+        for fname in files:
+            for i in range(num_frames[fname]):
+                step_counter += 1
+                step = steps[step_counter]
+                file_idx[step] = fname
+                frame_idx[step] = i
+        return steps, file_idx, frame_idx
 
     # ==============================================
 
@@ -358,7 +404,7 @@ class Forcing:
     def update(self, t):
         """Update the fields to time step t"""
 
-        # Read from config
+        # Read from config?
         interpolate_velocity_in_time = True
         interpolate_ibm_forcing_in_time = False
 
@@ -392,6 +438,28 @@ class Forcing:
 
     # --------------
 
+    def open_forcing_file(self, n):
+        """Open forcing file at time step = n"""
+        nc = self._nc
+        nc = Dataset(self.file_idx[n])
+        nc.set_auto_maskandscale(False)
+
+        self.scaled = dict()
+        self.scale_factor = dict()
+        self.add_offset = dict()
+
+        # Åpne for alias til navn
+        forcing_variables = ["u", "v"] + self.ibm_forcing
+        for key in forcing_variables:
+            if hasattr(nc.variables[key], "scale_factor"):
+                self.scaled[key] = True
+                self.scale_factor[key] = np.float32(nc.variables[key].scale_factor)
+                self.add_offset[key] = np.float32(nc.variables[key].add_offset)
+            else:
+                self.scaled[key] = False
+
+        self._nc = nc
+
     def _read_velocity(self, n):
         """Read fields at time step = n"""
         # Need a switch for reading W
@@ -399,30 +467,28 @@ class Forcing:
 
         # Handle file opening/closing
         # Always read velocity before other fields
-        logging.debug("Reading velocity for time step = {}".format(n))
-        first = True
-        if first:  # Open file initiallt
-            self._nc = Dataset(self._files[self.file_idx[n]])
-            self._nc.set_auto_maskandscale(False)
-            first = False
-        else:
-            if self.frame_idx[n] == 0:  # New file
-                self._nc.close()  # Close previous file
-                self._nc = Dataset(self._files[self.file_idx[n]])
-                self._nc.set_auto_maskandscale(False)
+        logging.info("Reading velocity for time step = {}".format(n))
+
+        # If finished a file or first read (self._nc == "")
+        if not self._nc:  # First read
+            self.open_forcing_file(n)
+        elif self.frame_idx[n] == 0:  # Just finished a forcing file
+            self._nc.close()
+            self.open_forcing_file(n)
 
         frame = self.frame_idx[n]
 
         # Read the velocity
         U = self._nc.variables["u"][frame, :, self._grid.Ju, self._grid.Iu]
         V = self._nc.variables["v"][frame, :, self._grid.Jv, self._grid.Iv]
+
         # Scale if needed
         # Assume offset = 0 for velocity
-        if self.scaled["U"]:
-            U = self.scale_factor["U"] * U
-            V = self.scale_factor["U"] * V
-            # U = self.add_offset['U'] + self.scale_factor['U']*U
-            # V = self.add_offset['U'] + self.scale_factor['U']*V
+        if self.scaled["u"]:
+            U = self.scale_factor["u"] * U
+            V = self.scale_factor["v"] * V
+            # U = self.add_offset['u'] + self.scale_factor['u']*U
+            # V = self.add_offset['v'] + self.scale_factor['v']*V
 
         # If necessary put U,V = zero on land and land boundaries
         # Stay as float32
@@ -432,7 +498,6 @@ class Forcing:
 
     def _read_field(self, name, n):
         """Read a 3D field"""
-        # print("IBM-forcing:", name)
         frame = self.frame_idx[n]
         F = self._nc.variables[name][frame, :, self._grid.J, self._grid.I]
         if self.scaled[name]:
@@ -452,31 +517,25 @@ class Forcing:
 
         self._nc.close()
 
-    # def sample_velocity(self, X, Y, Z, tstep=0, method='bilinear'):
     def velocity(self, X, Y, Z, tstep=0, method="bilinear"):
 
         i0 = self._grid.i0
         j0 = self._grid.j0
-        K, A = vert_level(self._grid.z_levels, X - i0, Y - j0, Z)
+        K, A = z2s(self._grid.z_r, X - i0, Y - j0, Z)
         if tstep < 0.001:
-            return sample3DUV(self.U, self.V, X - i0, Y - j0, K, A, method=method)
+            U = self.U
+            V = self.V
         else:
-            return sample3DUV(
-                self.U + tstep * self.dU,
-                self.V + tstep * self.dV,
-                X - i0,
-                Y - j0,
-                K,
-                A,
-                method=method,
-            )
+            U = self.U + tstep * self.dU
+            V = self.V + tstep * self.dV
+        return sample3DUV(U, V, X - i0, Y - j0, K, A, method=method)
 
     # Simplify to grid cell
     def field(self, X, Y, Z, name):
         # should not be necessary to repeat
         i0 = self._grid.i0
         j0 = self._grid.j0
-        K, A = vert_level(self._grid.z_levels, X - i0, Y - j0, Z)
+        K, A = z2s(self._grid.z_r, X - i0, Y - j0, Z)
         F = self[name]
         return sample3D(F, X - i0, Y - j0, K, A, method="nearest")
 
@@ -486,7 +545,6 @@ class Forcing:
 #      more or less from the roppy package
 #      https://github.com/bjornaa/roppy
 # ----------------------------------------------
-
 
 def s_stretch(N, theta_s, theta_b, stagger="rho", Vstretching=1):
     """Compute a s-level stretching array
@@ -499,16 +557,21 @@ def s_stretch(N, theta_s, theta_b, stagger="rho", Vstretching=1):
 
     *stagger* : "rho"|"w"
 
-    *Vstretching* : 1|2|4
+    *Vstretching* : 1|2|3|4|5
 
     """
 
+    # if stagger == "rho":
+    #     S = -1.0 + (0.5 + np.arange(N)) / N
+    # elif stagger == "w":
+    #     S = np.linspace(-1.0, 0.0, N + 1)
     if stagger == "rho":
-        S = -1.0 + (0.5 + np.arange(N)) / N
+        K = np.arange(0.5, N)
     elif stagger == "w":
-        S = np.linspace(-1.0, 0.0, N + 1)
+        K = np.arange(N + 1)
     else:
         raise ValueError("stagger must be 'rho' or 'w'")
+    S = -1 + K / N
 
     if Vstretching == 1:
         cff1 = 1.0 / np.sinh(theta_s)
@@ -524,14 +587,31 @@ def s_stretch(N, theta_s, theta_b, stagger="rho", Vstretching=1):
         mu = (S + 1) ** a * (1 + (a / b) * (1 - (S + 1) ** b))
         return mu * Csur + (1 - mu) * Cbot
 
+    elif Vstretching == 3:
+        gamma_ = 3.0
+        Csur = -np.log(np.cosh(gamma_ * (-S) ** theta_s)) / np.log(np.cosh(gamma_))
+        Cbot = (
+            np.log(np.cosh(gamma_ * (S + 1) ** theta_b)) / np.log(np.cosh(gamma_)) - 1
+        )
+        mu = 0.5 * (1 - np.tanh(gamma_ * (S + 0.5)))
+        return mu * Csur + (1 - mu) * Cbot
+
     elif Vstretching == 4:
         C = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
         C = (np.exp(theta_b * C) - 1) / (1 - np.exp(-theta_b))
         return C
 
-    else:
-        raise ValueError("Unknown Vstretching")
+    elif Vstretching == 5:
+        S1 = (K * K - 2 * K * N + K + N * N - N) / (N * N - N)
+        S2 = (K * K - K * N) / (1 - N)
+        S = -S1 - 0.01 * S2
 
+        C = (1 - np.cosh(theta_s * S)) / (np.cosh(theta_s) - 1)
+        C = (np.exp(theta_b * C) - 1) / (1 - np.exp(-theta_b))
+        return C
+
+    else:
+        raise
 
 def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     """Return depth of rho-points in s-levels
@@ -565,7 +645,7 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
     """
     H = np.asarray(H)
     Hshape = H.shape  # Save the shape of H
-    H = H.ravel()  # and make H 1D for easy shape manipulation
+    H = H.ravel()  # and make H 1D for easy shape maniplation
     C = np.asarray(C)
     N = len(C)
     outshape = (N,) + Hshape  # Shape of output
@@ -581,47 +661,63 @@ def sdepth(H, Hc, C, stagger="rho", Vtransform=1):
         B = np.outer(C, H)
         return (A + B).reshape(outshape)
 
-    elif Vtransform == 2:  # New transform by Shchepetkin
+    if Vtransform == 2:  # New transform by Shchepetkin
         N = Hc * S[:, None] + np.outer(C, H)
         D = 1.0 + Hc / H
         return (N / D).reshape(outshape)
 
-    else:
-        raise ValueError("Unknown Vtransform")
+    # else:
+    raise ValueError("Unknown Vtransform")
 
 
 # ------------------------
 #   Sampling routines
 # ------------------------
 
-# TODO: Unify with s-routine
 
-
-def vert_level(z_level, X, Y, Z):
+def z2s(z_rho, X, Y, Z):
     """
-    Find vertical level and coefficients for vertical interpolation
+    Find s-level and coefficients for vertical interpolation
 
-    input: X, Y, Z is 3D position, Z positive
+    input:
+        z_rho  3D array with vertical s-coordinate structure at rho-points
+        X, Y   1D arrays, horizontal position in grid coordinates
+        Z      1D array, particle depth, meters, positive
 
-    Returns K and A where:
+    Returns
+        K      1D integer array
+        A      1D float array
 
-    K is a integer array such that
-       0 <= z_level[K] <= Z < z_level[K+1], K = 0, ...
-
-    A is a 2D float array such that
-        Z = A*z_level[K] + (1-A)*z_level[K+1]
+    With:
+        1 <= K < kmax = z_rho.shape[0]
+        z_rho[K-1] < -Z < z_rho[K] for 1 < K < kmax - 1
+        -Z < z_rho[1] for K = 1
+        z_rho[-1] < -Z for K = kmax - 1
+        0.0 <= A <= 1
+        Interior linear interpolation:
+            A * z_rho[K - 1] + (1 - A) * z_rho[K] = -Z
+            for z_rho[0] < -Z < z_rho[-1]
+        Extend constant below lowest:
+            A * z_rho[K - 1] + (1 - A) * z_rho[K] = z_rho[0]
+            for -Z < z_rho[0]  (K=1, A=1)
+        Extend constantly above highest:
+            A * z_rho[K - 1] + (1 - A) * z_rho[K] = z_rho[-1]
+            for -Z > z_rho[-1]  (K=kmax-1, A=0)
 
     """
 
-    # kmax = z_level.shape[0]-1          # Number of vertical
+    kmax = z_rho.shape[0]  # Number of vertical levels
 
-    # K = np.sum(z_w[:, J, I] < -Z, axis=0) - 1
-    # K = K.clip(0, kmax-1)
-    K = np.searchsorted(z_level, Z) - 1
+    # Find rho-based horizontal grid cell (rho-point)
+    I = np.around(X).astype("int")
+    J = np.around(Y).astype("int")
 
-    A = (z_level[K + 1] - Z) / (z_level[K + 1] - z_level[K])
+    # Vectorized searchsorted
+    K = np.sum(z_rho[:, J, I] < -Z, axis=0)
+    K = K.clip(1, kmax - 1)
 
-    A = A.clip(0, 1)
+    A = (z_rho[K, J, I] + Z) / (z_rho[K, J, I] - z_rho[K - 1, J, I])
+    A = A.clip(0, 1)  # Extend constantly
 
     return K, A
 
@@ -646,23 +742,20 @@ def sample3D(F, X, Y, K, A, method="bilinear"):
 
     """
 
-    # print('sample3D: method =', method)
-
-    # sjekk om 1-A eller A
     if method == "bilinear":
         # Find rho-point as lower left corner
         I = X.astype("int")
         J = Y.astype("int")
         P = X - I
         Q = Y - J
-        W000 = (1 - P) * (1 - Q) * A
-        W010 = (1 - P) * Q * A
-        W100 = P * (1 - Q) * A
-        W110 = P * Q * A
-        W001 = (1 - P) * (1 - Q) * (1 - A)
-        W011 = (1 - P) * Q * (1 - A)
-        W101 = P * (1 - Q) * (1 - A)
-        W111 = P * Q * (1 - A)
+        W000 = (1 - P) * (1 - Q) * (1 - A)
+        W010 = (1 - P) * Q * (1 - A)
+        W100 = P * (1 - Q) * (1 - A)
+        W110 = P * Q * (1 - A)
+        W001 = (1 - P) * (1 - Q) * A
+        W011 = (1 - P) * Q * A
+        W101 = P * (1 - Q) * A
+        W111 = P * Q * A
 
         return (
             W000 * F[K, J, I]
@@ -675,10 +768,10 @@ def sample3D(F, X, Y, K, A, method="bilinear"):
             + W111 * F[K - 1, J + 1, I + 1]
         )
 
-    else:  # method == 'nearest'
-        I = X.round().astype("int")
-        J = Y.round().astype("int")
-        return F[K, J, I]
+    # else:  method == 'nearest'
+    I = X.round().astype("int")
+    J = Y.round().astype("int")
+    return F[K, J, I]
 
 
 def sample3DUV(U, V, X, Y, K, A, method="bilinear"):

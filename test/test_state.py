@@ -1,14 +1,14 @@
-# from ladim.configuration import Configure
+# from ladim1.configuration import Configure
 # from typing import List
 import numpy as np
-from ladim.state import State
+from ladim1.state import State
 
 
 config = dict(
     warm_start_file="",
     start_time=np.datetime64("2017-02-10 20"),
     dt=600,
-    ibm_module="ladim.ibms.ibm_salmon_lice",
+    ibm_module="ladim1.ibms.ibm_salmon_lice",
     ibm_variables=["super", "age"],
     particle_variables=[],
     advection="RK4",

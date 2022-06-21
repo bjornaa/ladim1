@@ -8,33 +8,28 @@ time_control:
     # Start and stop of simulation
     start_time: 1989-05-24 12:00:00
     stop_time:  1989-06-15 12:00:00
+    reference_time: 1989-01-01
 
 files:
-    particle_release_file : streak.rls
-    output_file           : streak.nc
+    particle_release_file : station.rls
+    output_file           : station.nc
 
 particle_release:
-    # type = continuous or discrete [default]
-    release_type: 'continuous'
-    release_frequency: [1800, s]
     variables: [release_time, X, Y, Z]
-    # Data type [int, float, time], default = float
+    # Converters (if not float)
     release_time: time
     particle_variables: [release_time]
 
 gridforce:
-    module: ladim.gridforce.ROMS
+    module: ladim1.gridforce.ROMS
     input_file            : ../data/ocean_avg_0014.nc
 
 output_variables:
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
-    # Records per file
-    # numrec: 20
-
     # Variable names
     particle: [release_time]
-    instance: [pid, X, Y]
+    instance: [pid, X, Y, Z]
     # NetCDF arguments
     release_time:
         ncformat: f8
@@ -51,7 +46,6 @@ output_variables:
         units: m
         positive: down
 
-
 numerics:
     # Model time step, [value, unit]
     dt: [1, h]
@@ -61,4 +55,4 @@ numerics:
     advection: RK2
     # Horizontal diffusion coefficient [m2.s-1]
     #         zero = no diffusion
-    diffusion: 5.0
+    diffusion: 0.0

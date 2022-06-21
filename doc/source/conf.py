@@ -132,7 +132,7 @@ latex_elements = {
 latex_documents = [
     (
         "index",
-        "ladim.tex",
+        "ladim1.tex",
         "LADiM Documentation",
         r"Bjørn Ådlandsvik <bjorn@imr.no>\\Institute of Marine Research",
         "manual",

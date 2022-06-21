@@ -2,7 +2,7 @@
 # against values from the old fortran code.
 
 from numpy import array, datetime64
-from ladim.ibms import light
+from ladim1.ibms import light
 
 # Time. longitude, latitude, fortran value
 test_values = [

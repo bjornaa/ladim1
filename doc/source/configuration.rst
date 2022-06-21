@@ -7,7 +7,7 @@ The LADiM model system is highly configurable using a separate configuration fil
 necessary aspect should be customizable by the configuration file.
 
 The name of the configuration file is given as a command line argument to the
-main ladim script. If the name is missing, a default name of :file:`ladim.yaml`
+main ladim script. If the name is missing, a default name of :file:`ladim1.yaml`
 is supposed.
 
 It is a goal to provide sane defaults in the configuration file, so that
@@ -32,7 +32,7 @@ example configuration files are self-describing and can easily be modified.
 An example configuration file
 -----------------------------
 
-Below is an example configuration file, :file:`models/salmon_lice/ladim.yaml`.
+Below is an example configuration file, :file:`models/salmon_lice/ladim1.yaml`.
 
-.. literalinclude:: ../../models/salmon_lice/ladim.yaml
+.. literalinclude:: ../../models/salmon_lice/ladim1.yaml
   :language: yaml

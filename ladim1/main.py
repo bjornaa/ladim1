@@ -14,7 +14,7 @@ Lagrangian Advection and Diffusion Model
 import sys
 import logging
 
-import ladim
+import ladim1
 from .configuration import configure
 from .gridforce import Grid, Forcing
 from .release import ParticleReleaser

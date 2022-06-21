@@ -1,18 +1,20 @@
+
 # Configuration file for ladim
 #
-# Continuous  release example
+# Line source example
 #
 
-
 time_control:
-    # Start and stop of simulation
     start_time: 1989-05-24 12:00:00
-    stop_time:  1989-06-15 12:00:00
-    reference_time: 1989-01-01
+    stop_time:  1989-06-05T12
+    reference_time: 1970-01-01 00
 
 files:
-    particle_release_file : station.rls
-    output_file           : station.nc
+    particle_release_file : line.rls
+    output_file           : gosouth.nc
+
+ibm:
+    ibm_module: gosouth_ibm
 
 particle_release:
     variables: [release_time, X, Y, Z]
@@ -21,10 +23,19 @@ particle_release:
     particle_variables: [release_time]
 
 gridforce:
-    module: ladim.gridforce.ROMS
-    input_file            : ../data/ocean_avg_0014.nc
+    # Gridforce module
+    module: ladim1.gridforce.ROMS
+    input_file            : ../data/ocean_avg_*.nc
 
 output_variables:
+    # Output format, default = NETCDF3_64BIT = NETCDF3_64BIT_OFFSET
+    # format: NETCDF3_64BIT_DATA
+    format: NETCDF3_CLASSIC
+
+    # Records per file
+    # Default = 0 meaning unlimited i.e. only one (unnumbered) output file
+    # numrec: 20
+
     # Output period, format [value, unit], unit = s, m, h, or d
     outper: [3, h]
     # Variable names
@@ -45,6 +56,8 @@ output_variables:
         standard_name: depth_below_surface
         units: m
         positive: down
+    # lon: {ncformat: f4, long_name: particle longitude, units: degrees_east}
+    # lat: {ncformat: f4, long_name: particle latitude, units: degrees_north}
 
 numerics:
     # Model time step, [value, unit]
@@ -52,7 +65,7 @@ numerics:
     # Advection method: options =
     #        EF = Euler-Forward,
     #        RK2, RK4 = Runge-Kutta 2nd or 4th order
-    advection: RK2
+    advection: EF
     # Horizontal diffusion coefficient [m2.s-1]
     #         zero = no diffusion
     diffusion: 0.0

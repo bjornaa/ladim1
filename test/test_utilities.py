@@ -1,5 +1,5 @@
 import numpy as np
-from ladim.utilities import timestep2stamp, timestamp2step
+from ladim1.utilities import timestep2stamp, timestamp2step
 
 config = dict(dt=600, start_time=np.datetime64("2017-02-10 20"))
 

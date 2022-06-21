@@ -2,7 +2,7 @@ from io import StringIO
 import yaml
 
 import pytest
-from ladim.configuration import *
+from ladim1.configuration import *
 
 
 def test_no_ibm():

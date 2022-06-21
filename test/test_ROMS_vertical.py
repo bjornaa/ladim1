@@ -1,5 +1,5 @@
 import numpy as np
-from ladim.gridforce.ROMS import sdepth, z2s, sample3D
+from ladim1.gridforce.ROMS import sdepth, z2s, sample3D
 
 
 # Make a module level fixture for these tests

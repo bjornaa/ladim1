@@ -21,11 +21,10 @@ A simplified, but working, version of the :program:`ladim` script::
   from ladim import main
 
   loglevel = logging.INFO
-  config_file = 'ladim.yaml'
+  config_file = 'ladim1.yaml'
 
   logging.basicConfig(
       level=loglevel, format='%(levelname)s:%(module)s - %(message)s')
 
   with open(config_file, encoding='utf8') as fp:
       main(config_stream=fp, loglevel=loglevel)
-

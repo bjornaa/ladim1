@@ -22,7 +22,7 @@ particle_release:
     particle_variables: [release_time]
 
 gridforce:
-    module: ladim.gridforce.ROMS
+    module: ladim1.gridforce.ROMS
     input_file            : ../data/ocean_avg_*.nc
 
 output_variables:

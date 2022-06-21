@@ -6,7 +6,7 @@ import os
 import sys
 import importlib
 
-# from ladim.configuration import config
+# from ladim1.configuration import config
 
 
 class Grid:

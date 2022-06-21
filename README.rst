@@ -18,7 +18,7 @@ Get a small example data set by running the download script in
 commands::
 
   python make_release.py
-  ladim
+  ladim1
 
 
 Source code and documentation
@@ -28,8 +28,8 @@ The code is open source using the MIT License. It is available from
 `github <https://github.com/bjornaa/ladim>`_
 
 The documentation is hosted on `readthedocs
-<https://ladim.readthedocs.io/en/master>`_. A `pdf version
-<https://media.readthedocs.org/pdf/ladim/master/ladim.pdf>`_ is also available.
+<https://ladim1.readthedocs.io/en/master>`_. A `pdf version
+<https://media.readthedocs.org/pdf/ladim/master/ladim1.pdf>`_ is also available.
 
 ::
 

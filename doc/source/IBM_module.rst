@@ -31,7 +31,7 @@ Requirements for an IBM module:
 IBM support utilities
 ----------------------
 
-A :mod:`light` module is available as ``ladim.ibms.light``, that can be used
+A :mod:`light` module is available as ``ladim1.ibms.light``, that can be used
 to compute the surface light (without clouds). This is useful for modelling
 diel vertical migration for many species. The module is based on the
 paper by A. Skartveit & J.A. Olseth (1988). It is given as a function:

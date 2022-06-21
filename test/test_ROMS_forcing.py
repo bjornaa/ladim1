@@ -3,7 +3,7 @@ from datetime import datetime
 import numpy as np
 from netCDF4 import Dataset
 import pytest
-from ladim.gridforce.ROMS import Forcing
+from ladim1.gridforce.ROMS import Forcing
 
 
 @pytest.fixture

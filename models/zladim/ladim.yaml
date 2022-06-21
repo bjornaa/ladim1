@@ -30,7 +30,7 @@ gridforce:
     # subgrid: [350, 400, 510, 550]
     # mapping: model name -> name in input file
     # velocity: {U: u, V: v}
-    module: ladim.gridforce.zROMS
+    module: ladim1.gridforce.zROMS
     ibm_forcing: {temp: temp, salt: salt}
     # grid arguments
     grid:
@@ -39,7 +39,7 @@ gridforce:
 # Samle IBM-variablene her
 ibm:
     # IBM-module, omit or '' for no IBM
-    ibm_module: ladim.ibms.ibm_salmon_lice
+    ibm_module: ladim1.ibms.ibm_salmon_lice
 
 state:
     # pid, X, Y, Z are mandatory and should not be given

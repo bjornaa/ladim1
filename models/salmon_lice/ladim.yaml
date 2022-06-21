@@ -11,14 +11,14 @@ files:
 
 
 gridforce:
-    module: ladim.gridforce.ROMS
+    module: ladim1.gridforce.ROMS
     subgrid: [300, 500, 480, 600]
     input_file: /scratch/Data/NK800/file_*.nc
     ibm_forcing: [temp, salt]
 
 
 ibm:
-    module: ladim.ibms.salmon_lice
+    module: ladim1.ibms.salmon_lice
     variables:
     - super       # Number of actual salmon lice per simulation particle
     - age         # Age of particle [degree*days]
